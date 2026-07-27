@@ -696,12 +696,12 @@ const aboutButton =
 const aboutModal =
     document.getElementById("aboutModal");
 
-const closeAbout =
-    document.getElementById("closeAbout");
+const closeAbout = document.getElementById("closeAbout");
+const modal = document.querySelector(".modal");
 
-aboutButton.addEventListener("click",()=>{
-
-    aboutModal.classList.remove("hidden");
+closeAbout.addEventListener("click", () => {
+    modal.style.display = "none";
+});
 
 });
 
@@ -1048,28 +1048,8 @@ console.log(
 
 /*==========================================================
     FIN DU SCRIPT
-==========================================================*//*==========================================================
-    ENREGISTREMENT DU SERVICE WORKER
-==========================================================*/
-
-if("serviceWorker" in navigator){
-
-    window.addEventListener("load",()=>{
-
-        navigator.serviceWorker.register("./service-worker.js")
-
-            .then(()=>{
-
-                console.log("Service Worker enregistré.");
-
-            })
-
-            .catch(error=>{
-
-                console.error(error);
-
-            });
-
+==========================================================*/if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js");
     });
-
 }
