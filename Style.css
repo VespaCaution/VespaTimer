@@ -1,0 +1,1017 @@
+/* ==========================================================
+   VespaTimer v1.0
+   Style principal
+========================================================== */
+
+/* ==========================================================
+   VARIABLES
+========================================================== */
+
+:root{
+
+    --primary:#2E7D32;
+    --primary-dark:#1B5E20;
+    --primary-light:#81C784;
+
+    --background:#F3F6F3;
+    --surface:#FFFFFF;
+
+    --text:#222222;
+    --text-light:#666666;
+
+    --border:#DADADA;
+
+    --success:#4CAF50;
+    --warning:#F9A825;
+    --danger:#D32F2F;
+
+    --radius:18px;
+
+    --shadow:
+        0 6px 18px rgba(0,0,0,.08);
+
+}
+
+/* ==========================================================
+   RESET
+========================================================== */
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+}
+
+body{
+
+    background:var(--background);
+
+    color:var(--text);
+
+    font-family:
+
+        system-ui,
+
+        -apple-system,
+
+        BlinkMacSystemFont,
+
+        "Segoe UI",
+
+        Roboto,
+
+        sans-serif;
+
+    max-width:700px;
+
+    margin:auto;
+
+    padding:18px;
+
+    padding-bottom:120px;
+
+}
+
+/* ==========================================================
+   TITRES
+========================================================== */
+
+h1{
+
+    font-size:2rem;
+
+    color:var(--primary-dark);
+
+}
+
+h2{
+
+    font-size:1.25rem;
+
+    margin-bottom:16px;
+
+    color:var(--primary-dark);
+
+}
+
+h3{
+
+    font-size:1rem;
+
+    margin-bottom:10px;
+
+}
+
+.subtitle{
+
+    color:var(--text-light);
+
+    margin-top:4px;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.app-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:22px;
+
+}
+
+.icon-button{
+
+    width:48px;
+
+    height:48px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:var(--primary);
+
+    color:white;
+
+    font-size:1.2rem;
+
+    cursor:pointer;
+
+}
+
+/* ==========================================================
+   CARTES
+========================================================== */
+
+.card{
+
+    background:var(--surface);
+
+    border-radius:var(--radius);
+
+    padding:18px;
+
+    margin-bottom:18px;
+
+    box-shadow:var(--shadow);
+
+}
+
+/* ==========================================================
+   LABELS
+========================================================== */
+
+label{
+
+    display:block;
+
+    margin-top:16px;
+
+    margin-bottom:6px;
+
+    font-weight:600;
+
+}
+
+/* ==========================================================
+   CHAMPS
+========================================================== */
+
+input,
+
+textarea{
+
+    width:100%;
+
+    padding:12px;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    font-size:1rem;
+
+    background:white;
+
+}
+
+input:focus,
+
+textarea:focus{
+
+    outline:none;
+
+    border-color:var(--primary);
+
+}
+
+textarea{
+
+    resize:vertical;
+
+}
+
+/* ==========================================================
+   DEUX COLONNES
+========================================================== */
+
+.row{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:12px;
+
+    margin-top:10px;
+
+}
+
+/* ==========================================================
+   BARRE DE PROGRESSION
+========================================================== */
+
+.progress-container{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+.progress-bar{
+
+    width:100%;
+
+    height:16px;
+
+    background:#E5E5E5;
+
+    border-radius:999px;
+
+    overflow:hidden;
+
+}
+
+.progress-fill{
+
+    width:0%;
+
+    height:100%;
+
+    background:var(--primary);
+
+    transition:.3s;
+
+}
+
+#globalProgressText{
+
+    text-align:center;
+
+    font-weight:600;
+
+  }/* ==========================================================
+   CARTES DES FRELONS
+========================================================== */
+
+.hornet-card{
+
+    overflow:hidden;
+
+}
+
+.hornet-header{
+
+    width:100%;
+
+    border:none;
+
+    background:none;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    text-align:left;
+
+    padding:4px;
+
+}
+
+.hornet-number{
+
+    font-size:.8rem;
+
+    font-weight:700;
+
+    color:var(--primary);
+
+    letter-spacing:1px;
+
+}
+
+.hornet-name{
+
+    font-size:1.25rem;
+
+    font-weight:700;
+
+    margin-top:4px;
+
+}
+
+.expand-arrow{
+
+    font-size:1.4rem;
+
+    color:var(--primary);
+
+    transition:.25s;
+
+}
+
+.hornet-body{
+
+    margin-top:20px;
+
+}
+
+.hidden{
+
+    display:none !important;
+
+}
+
+/* ==========================================================
+   ÉTAT
+========================================================== */
+
+.status{
+
+    margin-top:18px;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    font-weight:700;
+
+}
+
+.waiting{
+
+    background:#EEEEEE;
+
+    color:#444;
+
+}
+
+.running{
+
+    background:#E8F5E9;
+
+    color:var(--primary-dark);
+
+}
+
+.finished{
+
+    background:#E3F2FD;
+
+    color:#1565C0;
+
+}
+
+/* ==========================================================
+   CHRONOMÈTRE
+========================================================== */
+
+.timer-display{
+
+    margin:22px 0;
+
+    text-align:center;
+
+    font-family:
+
+        "Courier New",
+
+        monospace;
+
+    font-size:2.7rem;
+
+    font-weight:700;
+
+    color:var(--primary-dark);
+
+    background:#EEF7EE;
+
+    border:2px solid var(--primary-light);
+
+    border-radius:16px;
+
+    padding:18px;
+
+}
+
+/* ==========================================================
+   BOUTONS
+========================================================== */
+
+.timer-buttons{
+
+    display:grid;
+
+    grid-template-columns:1fr;
+
+    gap:10px;
+
+    margin-bottom:22px;
+
+}
+
+.timer-buttons button{
+
+    border:none;
+
+    border-radius:14px;
+
+    padding:15px;
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.startButton{
+
+    background:#43A047;
+
+    color:white;
+
+}
+
+.stopButton{
+
+    background:#D32F2F;
+
+    color:white;
+
+}
+
+.resetButton{
+
+    background:#757575;
+
+    color:white;
+
+}
+
+.timer-buttons button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.timer-buttons button:disabled{
+
+    opacity:.45;
+
+    cursor:not-allowed;
+
+    transform:none;
+
+}
+
+/* ==========================================================
+   LISTE DES VOLS
+========================================================== */
+
+.flights-section{
+
+    margin-top:20px;
+
+}
+
+.flight-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+    margin-top:12px;
+
+}
+
+.flight-item{
+
+    display:grid;
+
+    grid-template-columns:40px 1fr 42px;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:10px 12px;
+
+    border-radius:10px;
+
+    background:#F7F7F7;
+
+}
+
+.flight-number{
+
+    font-weight:700;
+
+    color:var(--primary-dark);
+
+}
+
+.flight-time{
+
+    font-family:"Courier New", monospace;
+
+    font-size:1.05rem;
+
+}
+
+.delete-flight{
+
+    width:36px;
+
+    height:36px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#ECECEC;
+
+    cursor:pointer;
+
+    font-size:1rem;
+
+}
+
+.delete-flight:hover{
+
+    background:#FFE3E3;
+
+}
+
+/* ==========================================================
+   TEMPS MOYEN
+========================================================== */
+
+.average-card{
+
+    margin-top:20px;
+
+    background:#EEF7EE;
+
+    border-radius:14px;
+
+    padding:16px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.average-card span{
+
+    font-weight:600;
+
+}
+
+.averageTime{
+
+    font-size:1.5rem;
+
+    color:var(--primary-dark);
+
+}/* ==========================================================
+   BANNIÈRE DES CHRONOMÈTRES
+========================================================== */
+
+.running-banner{
+
+    position:sticky;
+
+    top:12px;
+
+    z-index:1000;
+
+    background:var(--primary-dark);
+
+    color:white;
+
+    padding:16px;
+
+    border-radius:var(--radius);
+
+    margin-bottom:18px;
+
+    box-shadow:var(--shadow);
+
+}
+
+.running-banner h3{
+
+    margin-bottom:12px;
+
+    color:white;
+
+}
+
+#runningTimers{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.running-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:8px 10px;
+
+    background:rgba(255,255,255,.12);
+
+    border-radius:10px;
+
+    font-family:"Courier New", monospace;
+
+}
+
+/* ==========================================================
+   TEMPS MOYENS
+========================================================== */
+
+#averageContainer{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+.average-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:12px;
+
+    background:#EEF7EE;
+
+    border-radius:12px;
+
+}
+
+/* ==========================================================
+   BOUTON TERMINER
+========================================================== */
+
+.finish-section{
+
+    margin:30px 0;
+
+}
+
+#completeButton{
+
+    width:100%;
+
+    border:none;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    background:var(--primary);
+
+    color:white;
+
+    font-size:1.15rem;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+#completeButton:hover{
+
+    background:var(--primary-dark);
+
+}
+
+/* ==========================================================
+   MODALE "À PROPOS"
+========================================================== */
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:rgba(0,0,0,.45);
+
+    padding:20px;
+
+    z-index:5000;
+
+}
+
+.modal-content{
+
+    width:100%;
+
+    max-width:420px;
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:24px;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
+
+}
+
+.modal-content p{
+
+    margin:14px 0;
+
+    line-height:1.6;
+
+}
+
+.version{
+
+    text-align:center;
+
+    font-weight:700;
+
+    color:var(--text-light);
+
+    margin-top:20px;
+
+}
+
+#closeAbout{
+
+    width:100%;
+
+    margin-top:20px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:var(--primary);
+
+    color:white;
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+/* ==========================================================
+   ÉCRAN DE RÉSUMÉ
+========================================================== */
+
+.summary{
+
+    position:fixed;
+
+    inset:0;
+
+    overflow-y:auto;
+
+    background:var(--background);
+
+    padding:24px;
+
+    z-index:6000;
+
+}
+
+.summary-header{
+
+    text-align:center;
+
+    margin-bottom:24px;
+
+}
+
+.summary-card{
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:16px;
+
+    margin-bottom:14px;
+
+    box-shadow:var(--shadow);
+
+}
+
+.summary-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin:8px 0;
+
+}
+
+/* ==========================================================
+   ANIMATIONS
+========================================================== */
+
+.card{
+
+    animation:fadeUp .25s ease;
+
+}
+
+button{
+
+    transition:
+
+        background .2s,
+
+        transform .15s,
+
+        opacity .15s;
+
+}
+
+button:active{
+
+    transform:scale(.97);
+
+}
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(12px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:480px){
+
+    body{
+
+        padding:14px;
+
+    }
+
+    h1{
+
+        font-size:1.8rem;
+
+    }
+
+    .timer-display{
+
+        font-size:2.2rem;
+
+    }
+
+    .row{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+/* ==========================================================
+   IMPRESSION
+========================================================== */
+
+@media print{
+
+    .icon-button,
+
+    .timer-buttons,
+
+    .delete-flight,
+
+    #completeButton{
+
+        display:none;
+
+    }
+
+}
+
+/* ==========================================================
+   UTILITAIRES
+========================================================== */
+
+.hidden{
+
+    display:none !important;
+
+}
+
+.center{
+
+    text-align:center;
+
+}
+
+.bold{
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   FIN DU CSS
+========================================================== */
