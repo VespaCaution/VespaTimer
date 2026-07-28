@@ -757,12 +757,13 @@ textarea{
 /* ==========================================================
    MODALE "À PROPOS"
 ========================================================== */
-
 .modal{
 
     position:fixed;
 
     inset:0;
+
+    background:rgba(0,0,0,.45);
 
     display:flex;
 
@@ -770,19 +771,24 @@ textarea{
 
     align-items:center;
 
-    background:rgba(0,0,0,.45);
-
     padding:20px;
+
+    overflow-y:auto;
 
     z-index:5000;
 
 }
+
 
 .modal-content{
 
     width:100%;
 
     max-width:420px;
+
+    max-height:90vh;
+
+    overflow-y:auto;
 
     background:white;
 
@@ -792,13 +798,6 @@ textarea{
 
     box-shadow:0 12px 30px rgba(0,0,0,.25);
 
-}
-
-.modal-content p{
-
-    margin:14px 0;
-
-    line-height:1.6;
 
 }
 
