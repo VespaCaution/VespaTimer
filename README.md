@@ -1,2 +1,2 @@
 # VespaTimer
-VespaTimer est une application web (PWA) pour faciliter le travail du pot-à-mêche 
+VespaTimer est une un site web pour faciliter le travail du pot-à-mêche 
