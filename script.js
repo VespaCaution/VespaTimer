@@ -1051,7 +1051,13 @@ console.log(
 
     "🐝 VespaTimer v1.0 chargé avec succès."
 
-);
+);const mapButton = document.getElementById("mapButton");
+
+mapButton.addEventListener("click", () => {
+
+    window.location.href = "map.html";
+
+});
 
 /*==========================================================
     FIN DU SCRIPT
