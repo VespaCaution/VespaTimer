@@ -696,31 +696,30 @@ const aboutButton =
 const aboutModal =
     document.getElementById("aboutModal");
 
-const closeAbout = document.getElementById("closeAbout");
-const modal = document.querySelector(".modal");
+const closeAbout =
+    document.getElementById("closeAbout");
+
+aboutButton.addEventListener("click", () => {
+
+    aboutModal.classList.remove("hidden");
+
+});
 
 closeAbout.addEventListener("click", () => {
-    modal.style.display = "none";
-});
-
-});
-
-closeAbout.addEventListener("click",()=>{
 
     aboutModal.classList.add("hidden");
 
 });
 
-aboutModal.addEventListener("click",(event)=>{
+aboutModal.addEventListener("click", (event) => {
 
-    if(event.target===aboutModal){
+    if (event.target === aboutModal) {
 
         aboutModal.classList.add("hidden");
 
     }
 
 });
-
 /*==========================================================
     ARRET DE TOUS LES CHRONOMETRES
 ==========================================================*/
