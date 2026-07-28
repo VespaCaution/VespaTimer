@@ -889,22 +889,40 @@ const summaryScreen =
 
 completeButton.addEventListener("click",()=>{
 
+completeButton.addEventListener("click",()=>{
+
     if(surveyFinished){
 
         return;
 
     }
 
-    surveyFinished=true;
+    surveyFinished = true;
 
     stopAllTimers();
+
+    hornets.forEach(hornet=>{
+
+        hornet.startButton.disabled = true;
+        hornet.stopButton.disabled = true;
+        hornet.resetButton.disabled = true;
+
+        hornet.mark.disabled = true;
+        hornet.bearing.disabled = true;
+
+    });
+
+    document.getElementById("location").disabled = true;
+    document.getElementById("firstname").disabled = true;
+    document.getElementById("lastname").disabled = true;
+    document.getElementById("phone").disabled = true;
+    document.getElementById("notes").disabled = true;
 
     generateSummary();
 
     summaryScreen.classList.remove("hidden");
 
 });
-
 /*==========================================================
     INITIALISATION
 ==========================================================*/
