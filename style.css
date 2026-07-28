@@ -284,7 +284,7 @@ textarea{
 
     font-weight:600;
 
-  }/* ==========================================================
+}/* ==========================================================
    CARTES DES FRELONS
 ========================================================== */
 
@@ -757,13 +757,12 @@ textarea{
 /* ==========================================================
    MODALE "À PROPOS"
 ========================================================== */
+
 .modal{
 
     position:fixed;
 
     inset:0;
-
-    background:rgba(0,0,0,.45);
 
     display:flex;
 
@@ -771,24 +770,19 @@ textarea{
 
     align-items:center;
 
-    padding:20px;
+    background:rgba(0,0,0,.45);
 
-    overflow-y:auto;
+    padding:20px;
 
     z-index:5000;
 
 }
-
 
 .modal-content{
 
     width:100%;
 
     max-width:420px;
-
-    max-height:90vh;
-
-    overflow-y:auto;
 
     background:white;
 
@@ -798,6 +792,13 @@ textarea{
 
     box-shadow:0 12px 30px rgba(0,0,0,.25);
 
+}
+
+.modal-content p{
+
+    margin:14px 0;
+
+    line-height:1.6;
 
 }
 
@@ -834,24 +835,6 @@ textarea{
     font-weight:700;
 
     cursor:pointer;
-
-}
-.modal-content{
-
-    width:100%;
-    max-width:420px;
-
-    max-height:80vh;
-
-    overflow-y:auto;
-
-    background:white;
-
-    border-radius:20px;
-
-    padding:24px;
-
-    box-shadow:0 12px 30px rgba(0,0,0,.25);
 
 }
 
