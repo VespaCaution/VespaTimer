@@ -699,21 +699,21 @@ const aboutModal =
 const closeAbout =
     document.getElementById("closeAbout");
 
-aboutButton.addEventListener("click",()=>{
+aboutButton.addEventListener("click", () => {
 
     aboutModal.classList.remove("hidden");
 
 });
 
-closeAbout.addEventListener("click",()=>{
+closeAbout.addEventListener("click", () => {
 
     aboutModal.classList.add("hidden");
 
 });
 
-aboutModal.addEventListener("click",(event)=>{
+aboutModal.addEventListener("click", (event) => {
 
-    if(event.target===aboutModal){
+    if (event.target === aboutModal) {
 
         aboutModal.classList.add("hidden");
 
@@ -878,17 +878,7 @@ function generateSummary(){
 
     container.appendChild(notes);
 
-}/*==========================================================
-    TERMINER LE RELEVE
-==========================================================*/
-
-const completeButton =
-    document.getElementById("completeButton");
-
-const summaryScreen =
-    document.getElementById("summaryScreen");
-
-completeButton.addEventListener("click",()=>{
+}completeButton.addEventListener("click",()=>{
 
     if(surveyFinished){
 
@@ -896,9 +886,26 @@ completeButton.addEventListener("click",()=>{
 
     }
 
-    surveyFinished=true;
+    surveyFinished = true;
 
     stopAllTimers();
+
+    hornets.forEach(hornet=>{
+
+        hornet.startButton.disabled = true;
+        hornet.stopButton.disabled = true;
+        hornet.resetButton.disabled = true;
+
+        hornet.mark.disabled = true;
+        hornet.bearing.disabled = true;
+
+    });
+
+    document.getElementById("location").disabled = true;
+    document.getElementById("firstname").disabled = true;
+    document.getElementById("lastname").disabled = true;
+    document.getElementById("phone").disabled = true;
+    document.getElementById("notes").disabled = true;
 
     generateSummary();
 
