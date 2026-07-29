@@ -1061,10 +1061,4 @@ mapButton.addEventListener("click", () => {
 
 /*==========================================================
     FIN DU SCRIPT
-==========================================================*/const mapButton = document.getElementById("mapButton");
-
-mapButton.onclick = function(){
-
-    alert("Le bouton fonctionne !");
-
-};
+==========================================================*/
