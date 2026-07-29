@@ -153,7 +153,11 @@ gpsButton.addEventListener("click",()=>{
     CARTE
 ==========================================================*/
 
-function createMap(latitude,longitude){
+createMap(latitude,longitude);
+
+prepareHornets();
+
+drawHornetZones(latitude,longitude);
 
     if(map){
 
@@ -546,7 +550,7 @@ function drawHornetZones(latitude, longitude){
 
         hornetLayers.push(circle);
 
-    });
+    });drawOverlapZones();
 
 }/*==========================================================
     DESSIN D'UN SECTEUR DE RECHERCHE
@@ -615,7 +619,17 @@ function drawSearchSector(latitude, longitude, hornet, color){
 
     );
 
-    hornetLayers.push(sector);
+    hornetLayers.push(sector);drawSearchSector(
+
+    latitude,
+
+    longitude,
+
+    hornet,
+
+    hornetColors[index]
+
+);
 
 }/*==========================================================
     ZONES DE RECOUVREMENT
