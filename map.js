@@ -633,7 +633,17 @@ function drawHornetRoutes(latitude, longitude){
         hornetLayers.push(marker);
 
 
-    });
+    });drawSearchSector(
+
+    latitude,
+
+    longitude,
+
+    hornet,
+
+    hornetColors[index]
+
+);
 
 
 }/*==========================================================
