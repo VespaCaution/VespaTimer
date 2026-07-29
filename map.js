@@ -257,7 +257,11 @@ showMapButton.addEventListener("click",()=>{
 
         longitude
 
-    );
+    );loadHornetData();
+
+
+prepareHornets();
+    updateInfoPanel();
 
 
     hideLoading();
