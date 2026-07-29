@@ -505,7 +505,7 @@ function calculateNestPoint(latitude, longitude, hornet){
     DESSIN DES TRAJECTOIRES
 ==========================================================*/
 
-function drawHornetRoutes(latitude, longitude){
+function drawHornetRoutes(latitude, longitude){drawPriorityZones();
 
 
     hornetLayers.forEach(layer=>{
