@@ -1050,14 +1050,13 @@ window.addEventListener("beforeunload",(event)=>{
 console.log(
 
     "🐝 VespaTimer v1.0 chargé avec succès."
+const mapButton = document.getElementById("mapButton");
 
-);const mapButton = document.getElementById("mapButton");
+mapButton.onclick = function(){
 
-mapButton.addEventListener("click", () => {
+    alert("Le bouton fonctionne !");
 
-    window.location.href = "map.html";
-
-});
+};
 
 /*==========================================================
     FIN DU SCRIPT
