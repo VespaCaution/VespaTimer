@@ -940,3 +940,157 @@
             r += 'Lieu: ' + (surveyLocation.name || 'N/A') + '\n';
             r += 'Coordonnées: ' + surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5) + '\n';
             r += 'Inspecteur: ' + (inspectorName || 'N/A') + '\n'
+            hornets.forEach(h => {
+                const avg = getAverage(h);
+                r += h.name + ': Dir=' + h.direction + '° | Vols=' + h.flights.join('s, ') + 's | Moy=' + avg.toFixed(
+                    1) + 's | Dist=' + getDistance(avg).toFixed(0) + 'm\n';
+            });
+            navigator.clipboard.writeText(r).then(() => {
+                alert('✅ Rapport copié dans le presse-papier. Utilisez Ctrl+P pour imprimer en PDF.');
+            }).catch(() => {
+                alert('Rapport:\n\n' + r + '\n\nUtilisez Ctrl+P pour imprimer en PDF.');
+            });
+            window.print();
+        }
+
+        function importData(e) {
+            const f = e.target.files[0];
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                try {
+                    const d = JSON.parse(ev.target.result);
+                    if (d.hornets && Array.isArray(d.hornets)) {
+                        hornets = d.hornets.map(h => ({
+                            ...createHornet(h.name || 'Frelon'),
+                            direction: h.direction || 0,
+                            flights: h.flights || []
+                        }));
+                    }
+                    if (d.surveyLocation) surveyLocation = d.surveyLocation;
+                    inspectorName = d.inspectorName || '';
+                    notes = d.notes || '';
+                    updatePotMarker();
+                    renderAll();
+                    alert(t('import_success'));
+                } catch (ex) { alert(t('import_error')); }
+            };
+            reader.readAsText(f);
+            e.target.value = '';
+        }
+
+        function resetAll() {
+            if (!confirm(t('confirm_reset'))) return;
+            saveHistory();
+            hornets = [createHornet('Frelon 1')];
+            surveyLocation = { lat: 46.8, lng: 6.8, name: '' };
+            inspectorName = '';
+            notes = '';
+            document.getElementById('locationInput').value = '';
+            document.getElementById('inspectorInput').value = '';
+            document.getElementById('notesField').value = '';
+            clearMap();
+            updatePotMarker();
+            renderAll();
+            console.log('All data reset');
+        }
+
+        // ==================== RENDER ====================
+        function renderAll() {
+            // Hornet cards
+            const container = document.getElementById('hornetContainer');
+            container.innerHTML = hornets.map((h, idx) => {
+                const avg = getAverage(h);
+                const dist = getDistance(avg);
+                const fc = h.flights.length;
+                let timerText = '00:00';
+                if (h.timerRunning && h.timerStart) {
+                    const s = Math.floor((Date.now() - h.timerStart) / 1000);
+                    timerText = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2,
+                    '0');
+                } else if (h.elapsedSeconds > 0) {
+                    timerText = h.elapsedSeconds.toFixed(0) + 's';
+                }
+
+                const badgeBg = h.timerRunning ? '#c47b6b' : (fc > 0 ? '#5f7d6b' : '#d4a853');
+                const badgeText = h.timerRunning ? '⏳ ' + t('running') : (fc > 0 ? '✅ ' + fc + '/5 ' + t(
+                    'flights_label') : '🆕 ' + t('ready'));
+
+                return `
+            <div class="hornet-card" style="border-left:4px solid ${COLORS[idx % COLORS.length]};">
+              <div class="hornet-header">
+                <input class="hornet-name-input" value="${h.name}" style="color:${COLORS[idx % COLORS.length]}" onchange="updateName(${h.id}, this.value)">
+                <span class="badge" style="background:${badgeBg}">${badgeText}</span>
+              </div>
+              <div class="flex-row" style="margin:6px 0;">
+                <span>🧭 <input type="number" class="dir-input" value="${h.direction}" min="0" max="359" onchange="updateDirection(${h.id}, this.value)">°</span>
+                <span class="timer-display">${timerText}</span>
+              </div>
+              <div class="flex-row">
+                <button class="btn-gold btn-sm" onclick="startTimer(${h.id})" ${h.timerRunning || fc >= 5 ? 'disabled' : ''}>▶ Start</button>
+                <button class="btn-grey btn-sm" onclick="stopTimer(${h.id})" ${!h.timerRunning ? 'disabled' : ''}>⏹ Stop</button>
+                <button class="btn-red btn-sm" onclick="resetTimer(${h.id})">↺ Reset</button>
+                <button class="btn-grey btn-sm" onclick="deleteFlight(${h.id})" ${!fc ? 'disabled' : ''}>🗑️ Vol</button>
+              </div>
+              <div class="flights-text">📊 ${t('flights_label')}: ${fc ? h.flights.map(s => s + 's').join(', ') : '—'}</div>
+              <div class="stat-line">📏 ${t('average')}: <strong>${avg.toFixed(1)}s</strong> · 🗺️ ${t('distance')}: <strong>${dist.toFixed(0)}m</strong></div>
+            </div>`;
+            }).join('');
+
+            // Info
+            document.getElementById('locationDisplay').textContent =
+                surveyLocation.name || surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5);
+            document.getElementById('datetime').textContent = new Date().toLocaleString();
+            document.getElementById('inspectorInput').value = inspectorName;
+            document.getElementById('notesField').value = notes;
+            document.getElementById('liveBanner').style.display = hornets.some(h => h.timerRunning) ? 'block' : 'none';
+
+            // Stats
+            const hwf = hornets.filter(h => h.flights.length > 0);
+            const statsDiv = document.getElementById('statsContent');
+            if (!hwf.length) {
+                statsDiv.innerHTML = t('no_flights_stats');
+            } else {
+                let html = hwf.map((h) => {
+                    const idx = hornets.indexOf(h);
+                    return '<span style="color:' + COLORS[idx % COLORS.length] + ';">● ' + h.name + ': ' +
+                        getAverage(h).toFixed(1) + 's (' + h.flights.length + ' ' + t('flights_label') +
+                        ')</span>';
+                }).join(' ');
+                const globalAvg = hwf.reduce((s, h) => s + getAverage(h), 0) / hwf.length;
+                const totalFlights = hwf.reduce((s, h) => s + h.flights.length, 0);
+                html += '<br>📈 Moy. globale: <strong>' + globalAvg.toFixed(1) + 's</strong> · Total: ' + totalFlights +
+                    ' ' + t('flights_label');
+                statsDiv.innerHTML = html;
+            }
+
+            saveAll();
+            if (map) drawAnalysis();
+        }
+
+        // ==================== LIVE UPDATE ====================
+        setInterval(() => {
+            if (hornets.some(h => h.timerRunning)) {
+                renderAll();
+            }
+            document.getElementById('datetime').textContent = new Date().toLocaleString();
+        }, 500);
+
+        // ==================== INIT ====================
+        function boot() {
+            loadAll();
+            applyTranslations();
+            document.getElementById('langSelect').value = currentLang;
+            renderAll();
+            setTimeout(initMap, 500);
+            console.log('🐝 VespaTimer v1.1 démarré - Langue:', currentLang);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot);
+        } else {
+            boot();
+        }
+    </script>
+</body>
+</html>
