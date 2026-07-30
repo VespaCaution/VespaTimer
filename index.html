@@ -493,3 +493,450 @@
                 history_btn: 'Cronologia 15g',
                 clear_map: 'Cancella',
                 no_flights: 'Aggiungi voli per vede
+                stats_title: 'Statistiche',
+                import_btn: 'Importa',
+                reset_btn: 'Nuovo',
+                about_title: 'Informazioni',
+                about_text: 'Benvenuto su VespaTimer*, un sito web che facilita il lavoro del pot-à-mèche**, calcolando direttamente le medie e triangolando il nido in base ai tuoi tempi.',
+                about_instruction: 'Una volta completate le letture, premi Completa e fotografa le letture e le coordinate, quindi inviale al tuo telemetro regionale.',
+                about_refresh: 'Per rifare l\'esercizio, aggiorna il sito (chiudilo e riaprilo).',
+                about_report: 'Non dimenticare di segnalare le tue osservazioni (calabrone, nido, ecc.) su:',
+                about_happy: 'Buona caccia! 🙂',
+                about_footer1: '* Richiede connessione Internet per data e ora. Segnala i bug se ne incontri.',
+                about_footer2: '** Maggiori informazioni via:',
+                no_flights_stats: 'Nessun volo registrato',
+                ready: 'Pronto',
+                running: 'In corso',
+                flights_label: 'voli',
+                direction: 'Direzione',
+                distance: 'Dist',
+                average: 'Media',
+                priority_zone: 'Zona prioritaria',
+                history_empty: 'Nessuna cronologia recente (15 giorni)',
+                import_success: '✅ Dati importati!',
+                import_error: '❌ File non valido',
+                gps_error: '⚠️ GPS non disponibile',
+                max_hornets: 'Massimo 5 calabroni',
+                confirm_reset: 'Cancellare tutti i dati?'
+            }
+        };
+
+        function t(key) {
+            return (translations[currentLang] && translations[currentLang][key]) || key;
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('vespatimer_lang', lang);
+            applyTranslations();
+            renderAll();
+        }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                el.textContent = t(key);
+            });
+            document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-lang-placeholder');
+                el.placeholder = t(key);
+            });
+        }
+
+        // ==================== HORNET FUNCTIONS ====================
+        function createHornet(name) {
+            return {
+                id: Date.now() + Math.random(),
+                name: name || 'Frelon 1',
+                direction: 0,
+                flights: [],
+                timerRunning: false,
+                timerStart: null,
+                elapsedSeconds: 0
+            };
+        }
+
+        function getAverage(h) {
+            if (!h.flights.length) return 0;
+            return h.flights.reduce((a, b) => a + b, 0) / h.flights.length;
+        }
+
+        function getDistance(avg) {
+            if (avg <= 30) return 0;
+            return (avg - 30) * 2.5;
+        }
+
+        // ==================== PERSISTENCE ====================
+        function saveAll() {
+            try {
+                localStorage.setItem('vespatimer_data', JSON.stringify({
+                    hornets,
+                    surveyLocation,
+                    inspectorName,
+                    notes
+                }));
+            } catch (e) {}
+        }
+
+        function loadAll() {
+            try {
+                const d = JSON.parse(localStorage.getItem('vespatimer_data'));
+                if (d) {
+                    if (d.hornets && Array.isArray(d.hornets)) hornets = d.hornets;
+                    if (d.surveyLocation) surveyLocation = d.surveyLocation;
+                    inspectorName = d.inspectorName || '';
+                    notes = d.notes || '';
+                }
+            } catch (e) {}
+            const savedLang = localStorage.getItem('vespatimer_lang');
+            if (savedLang && ['fr', 'en', 'de', 'it'].includes(savedLang)) {
+                currentLang = savedLang;
+                document.getElementById('langSelect').value = currentLang;
+            }
+            if (!hornets.length) {
+                hornets.push(createHornet('Frelon 1'));
+            }
+        }
+
+        function saveHistory() {
+            if (!hornets.some(h => h.flights.length > 0)) return;
+            let history = [];
+            try { history = JSON.parse(localStorage.getItem('vespatimer_history') || '[]'); } catch (e) {}
+            history.push({
+                date: new Date().toISOString(),
+                location: { ...surveyLocation },
+                hornets: hornets.map(h => ({ name: h.name, direction: h.direction, flights: [...h.flights] })),
+                notes,
+                inspectorName
+            });
+            if (history.length > 50) history = history.slice(-50);
+            try { localStorage.setItem('vespatimer_history', JSON.stringify(history)); } catch (e) {}
+        }
+
+        function getHistory() {
+            try { return JSON.parse(localStorage.getItem('vespatimer_history') || '[]'); } catch (e) { return []; }
+        }
+
+        // ==================== TIMER ACTIONS ====================
+        function startTimer(id) {
+            const h = hornets.find(x => x.id === id);
+            if (!h || h.timerRunning || h.flights.length >= 5) return;
+            h.timerRunning = true;
+            h.timerStart = Date.now() - (h.elapsedSeconds * 1000);
+            renderAll();
+            console.log('Timer started for hornet', id);
+        }
+
+        function stopTimer(id) {
+            const h = hornets.find(x => x.id === id);
+            if (!h || !h.timerRunning) return;
+            const elapsed = Math.floor((Date.now() - h.timerStart) / 1000);
+            h.timerRunning = false;
+            h.timerStart = null;
+            if (elapsed > 0) {
+                h.flights.push(elapsed);
+                if (h.flights.length > 5) h.flights.shift();
+            }
+            h.elapsedSeconds = 0;
+            saveHistory();
+            renderAll();
+            console.log('Timer stopped for hornet', id, 'elapsed:', elapsed);
+        }
+
+        function resetTimer(id) {
+            const h = hornets.find(x => x.id === id);
+            if (!h) return;
+            h.timerRunning = false;
+            h.timerStart = null;
+            h.elapsedSeconds = 0;
+            renderAll();
+        }
+
+        function deleteFlight(id) {
+            const h = hornets.find(x => x.id === id);
+            if (!h || !h.flights.length) return;
+            h.flights.pop();
+            renderAll();
+        }
+
+        function updateDirection(id, val) {
+            const h = hornets.find(x => x.id === id);
+            if (!h) return;
+            h.direction = Math.min(359, Math.max(0, parseInt(val) || 0));
+            renderAll();
+        }
+
+        function updateName(id, val) {
+            const h = hornets.find(x => x.id === id);
+            if (!h) return;
+            h.name = val || 'Frelon';
+            renderAll();
+        }
+
+        function addHornet() {
+            if (hornets.length >= MAX_HORNETS) { alert(t('max_hornets')); return; }
+            hornets.push(createHornet('Frelon ' + (hornets.length + 1)));
+            renderAll();
+            console.log('Hornet added, total:', hornets.length);
+        }
+
+        // ==================== LOCATION ====================
+        function setLocation() {
+            const val = document.getElementById('locationInput').value.trim();
+            if (!val) return;
+            surveyLocation.name = val;
+            const m = val.match(/([-+]?\d+\.?\d*)\s*[,;]\s*([-+]?\d+\.?\d*)/);
+            if (m) {
+                surveyLocation.lat = parseFloat(m[1]);
+                surveyLocation.lng = parseFloat(m[2]);
+            }
+            updatePotMarker();
+            renderAll();
+            console.log('Location set:', surveyLocation);
+        }
+
+        function getGPS() {
+            if (!navigator.geolocation) { alert(t('gps_error')); return; }
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                surveyLocation.lat = pos.coords.latitude;
+                surveyLocation.lng = pos.coords.longitude;
+                document.getElementById('locationInput').value = pos.coords.latitude.toFixed(5) + ', ' + pos.coords
+                    .longitude.toFixed(5);
+                updatePotMarker();
+                renderAll();
+                console.log('GPS position acquired');
+            }, function() { alert(t('gps_error')); }, { enableHighAccuracy: true, timeout: 10000 });
+        }
+
+        function manualCoords() {
+            const lat = prompt('Latitude:', surveyLocation.lat.toFixed(5));
+            if (lat === null) return;
+            const lng = prompt('Longitude:', surveyLocation.lng.toFixed(5));
+            if (lng === null) return;
+            const latNum = parseFloat(lat);
+            const lngNum = parseFloat(lng);
+            if (isNaN(latNum) || isNaN(lngNum)) { alert('Coordonnées invalides'); return; }
+            surveyLocation.lat = latNum;
+            surveyLocation.lng = lngNum;
+            document.getElementById('locationInput').value = latNum.toFixed(5) + ', ' + lngNum.toFixed(5);
+            updatePotMarker();
+            renderAll();
+        }
+
+        // ==================== MAP ====================
+        function initMap() {
+            const mapEl = document.getElementById('map');
+            if (!mapEl) { setTimeout(initMap, 300); return; }
+            if (map) { map.invalidateSize(); return; }
+
+            map = L.map('map', { zoomControl: true }).setView([surveyLocation.lat, surveyLocation.lng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            }).addTo(map);
+
+            updatePotMarker();
+            setTimeout(() => { if (map) map.invalidateSize(); }, 400);
+            console.log('Map initialized');
+        }
+
+        function updatePotMarker() {
+            if (!map) return;
+            if (potMarker) map.removeLayer(potMarker);
+            potMarker = L.marker([surveyLocation.lat, surveyLocation.lng], { draggable: true })
+                .addTo(map)
+                .bindPopup('📍 ' + t('pot_label'))
+                .openPopup();
+            potMarker.on('dragend', function(e) {
+                const p = e.target.getLatLng();
+                surveyLocation.lat = p.lat;
+                surveyLocation.lng = p.lng;
+                document.getElementById('locationDisplay').textContent = p.lat.toFixed(5) + ', ' + p.lng.toFixed(
+                5);
+                saveAll();
+                drawAnalysis();
+            });
+        }
+
+        function clearMap() {
+            if (!map) return;
+            mapLines.forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
+            mapLines = [];
+            document.getElementById('predictionPanel').innerHTML = '⚠️ ' + t('no_flights');
+            document.getElementById('historyPanel').style.display = 'none';
+        }
+
+        function drawAnalysis(historyData) {
+            if (!map) return;
+            // Remove old lines
+            mapLines.forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
+            mapLines = [];
+
+            const predictions = [];
+
+            // Current hornets
+            hornets.forEach((h, idx) => {
+                if (!h.flights.length) return;
+                const avg = getAverage(h);
+                const distM = getDistance(avg);
+                if (distM <= 0) return;
+
+                const distKm = distM / 1000;
+                const dirRad = (h.direction * Math.PI) / 180;
+                const pot = L.latLng(surveyLocation.lat, surveyLocation.lng);
+                const latOff = (distKm / 111.32) * Math.cos(dirRad);
+                const lngOff = (distKm / (111.32 * Math.cos(pot.lat * Math.PI / 180))) * Math.sin(dirRad);
+                const nest = L.latLng(pot.lat + latOff, pot.lng + lngOff);
+
+                const line = L.polyline([pot, nest], { color: COLORS[idx % COLORS.length], weight: 3,
+                    dashArray: '5,5' }).addTo(map);
+                mapLines.push(line);
+
+                const sectorPts = [pot];
+                for (let a = -15; a <= 15; a += 3) {
+                    const r = ((h.direction + a) * Math.PI) / 180;
+                    sectorPts.push(L.latLng(
+                        pot.lat + (distKm * 0.85 / 111.32) * Math.cos(r),
+                        pot.lng + (distKm * 0.85 / (111.32 * Math.cos(pot.lat * Math.PI / 180))) * Math.sin(r)
+                    ));
+                }
+                const sector = L.polygon(sectorPts, { color: COLORS[idx % COLORS.length], fillOpacity: 0.08,
+                    weight: 1 }).addTo(map);
+                mapLines.push(sector);
+
+                const m = L.circleMarker(nest, { radius: 7, color: COLORS[idx % COLORS.length], fillOpacity: 0.7 })
+                    .addTo(map);
+                m.bindPopup('<b>' + h.name + '</b><br>~' + distM.toFixed(0) + 'm<br>' + h.direction + '°');
+                mapLines.push(m);
+
+                predictions.push({ name: h.name, point: nest, dist: distM });
+            });
+
+            // History
+            if (historyData && historyData.length) {
+                historyData.forEach(entry => {
+                    if (!entry.location || !entry.hornets) return;
+                    entry.hornets.forEach(hh => {
+                        if (!hh.flights || !hh.flights.length) return;
+                        const avg = hh.flights.reduce((a, b) => a + b, 0) / hh.flights.length;
+                        const dm = (avg - 30) * 2.5;
+                        if (dm <= 0) return;
+                        const dkm = dm / 1000;
+                        const dr = (hh.direction * Math.PI) / 180;
+                        const ph = L.latLng(entry.location.lat, entry.location.lng);
+                        const nh = L.latLng(
+                            ph.lat + (dkm / 111.32) * Math.cos(dr),
+                            ph.lng + (dkm / (111.32 * Math.cos(ph.lat * Math.PI / 180))) * Math.sin(dr)
+                        );
+                        const hm = L.circleMarker(nh, { radius: 3, color: '#999', fillOpacity: 0.4, weight: 1 })
+                            .addTo(map);
+                        hm.bindPopup('Hist. ' + new Date(entry.date).toLocaleDateString());
+                        mapLines.push(hm);
+                    });
+                });
+            }
+
+            // Priority zone
+            if (predictions.length >= 2) {
+                const clat = predictions.reduce((s, p) => s + p.point.lat, 0) / predictions.length;
+                const clng = predictions.reduce((s, p) => s + p.point.lng, 0) / predictions.length;
+                const starIcon = L.divIcon({ html: '⭐', iconSize: [30, 30], iconAnchor: [15, 15],
+                className: '' });
+                const star = L.marker([clat, clng], { icon: starIcon }).addTo(map);
+                star.bindPopup('<b>' + t('priority_zone') + '</b>');
+                mapLines.push(star);
+            }
+
+            document.getElementById('predictionPanel').innerHTML = predictions.length ?
+                '🔍 ' + predictions.map(p => p.name + ' → ~' + p.dist.toFixed(0) + 'm').join(' · ') :
+                '⚠️ ' + t('no_flights');
+        }
+
+        function showHistory() {
+            const history = getHistory();
+            const recent = history.filter(e => new Date(e.date) > new Date(Date.now() - 15 * 24 * 60 * 60 * 1000));
+            drawAnalysis(recent);
+
+            const panel = document.getElementById('historyPanel');
+            panel.style.display = 'block';
+            panel.innerHTML = recent.length ?
+                recent.reverse().map(e => '<div class="history-item"><strong>📅 ' + new Date(e.date)
+                    .toLocaleDateString() + '</strong><br>📍 ' + (e.location?.name || '?') + ' | 🐝 ' + (e.hornets
+                    ?.filter(h => h.flights?.length).length || 0) + ' ' + t('flights_label') + '</div>').join('') :
+                '<div class="history-item">📭 ' + t('history_empty') + '</div>';
+        }
+
+        // ==================== EXPORT ====================
+        function downloadBlob(blob, name) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function exportJSON() {
+            const data = {
+                version: '1.1',
+                date: new Date().toISOString(),
+                surveyLocation,
+                inspectorName,
+                notes,
+                hornets: hornets.map(h => ({
+                    name: h.name,
+                    direction: h.direction,
+                    flights: h.flights,
+                    average: getAverage(h),
+                    distance: getDistance(getAverage(h))
+                }))
+            };
+            downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), 'vespatimer_' + new Date()
+                .toISOString().slice(0, 10) + '.json');
+            console.log('JSON exported');
+        }
+
+        function exportGPX() {
+            let g = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="VespaTimer">\n';
+            g += '<wpt lat="' + surveyLocation.lat + '" lon="' + surveyLocation.lng +
+            '"><name>Pot-à-Mèche</name></wpt>\n';
+            hornets.forEach(h => {
+                if (!h.flights.length) return;
+                const d = getDistance(getAverage(h));
+                if (d <= 0) return;
+                const r = (h.direction * Math.PI) / 180;
+                g += '<wpt lat="' + (surveyLocation.lat + (d / 111320) * Math.cos(r)).toFixed(6) + '" lon="' + (
+                    surveyLocation.lng + (d / (111320 * Math.cos(surveyLocation.lat * Math.PI / 180))) * Math.sin(
+                    r)).toFixed(6) + '"><name>' + h.name + '</name></wpt>\n';
+            });
+            g += '</gpx>';
+            downloadBlob(new Blob([g], { type: 'application/gpx+xml' }), 'vespatimer.gpx');
+            console.log('GPX exported');
+        }
+
+        function exportKML() {
+            let k = '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n<Document>\n';
+            k += '<Placemark><name>Pot-à-Mèche</name><Point><coordinates>' + surveyLocation.lng + ',' + surveyLocation.lat +
+                ',0</coordinates></Point></Placemark>\n';
+            hornets.forEach(h => {
+                if (!h.flights.length) return;
+                const d = getDistance(getAverage(h));
+                if (d <= 0) return;
+                const r = (h.direction * Math.PI) / 180;
+                k += '<Placemark><name>' + h.name + '</name><Point><coordinates>' +
+                    (surveyLocation.lng + (d / (111320 * Math.cos(surveyLocation.lat * Math.PI / 180))) * Math.sin(r))
+                    .toFixed(6) + ',' +
+                    (surveyLocation.lat + (d / 111320) * Math.cos(r)).toFixed(6) +
+                    ',0</coordinates></Point></Placemark>\n';
+            });
+            k += '</Document>\n</kml>';
+            downloadBlob(new Blob([k], { type: 'application/vnd.google-earth.kml+xml' }), 'vespatimer.kml');
+            console.log('KML exported');
+        }
+
+        function exportPDF() {
+            let r = '=== RAPPORT VESPATIMER v1.1 ===\n';
+            r += 'Date: ' + new Date().toLocaleString() + '\n';
+            r += 'Lieu: ' + (surveyLocation.name || 'N/A') + '\n';
+            r += 'Coordonnées: ' + surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5) + '\n';
+            r += 'Inspecteur: ' + (inspectorName || 'N/A') + '\n'
