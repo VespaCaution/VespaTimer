@@ -12,7 +12,8 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐝</text></svg>">
     <title>🐝 VespaTimer v1.1</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
     <style>
         :root {
             --bg: #f5f2e6;
@@ -223,6 +224,13 @@
             display: inline-block;
         }
 
+        .time-input {
+            width: 60px !important;
+            text-align: center;
+            display: inline-block;
+            padding: 4px !important;
+        }
+
         .timer-display {
             font-size: 1.8rem;
             font-weight: 700;
@@ -428,6 +436,14 @@
         .delete-hornet-btn:hover {
             opacity: 1;
         }
+
+        .manual-time-section {
+            background: #f9f4e8;
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-top: 6px;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
@@ -516,8 +532,8 @@
             <h2>ℹ️ <span data-lang="about_title">À propos de VespaTimer</span></h2>
             <div class="about-text">
                 <p data-lang="about_text">Bienvenue sur VespaTimer*, ceci est un site internet qui facilite le travail du pot à mèche**, en faisant directement les moyennes et en triangulant le nid selon vos chronométrages.</p>
-                <p data-lang="about_instruction">Une fois vos relevés complétés, appuyez sur Compléter et photographiez vos relevés et coordonnées puis transmettez-les à votre télémètre régional.</p>
-                <p data-lang="about_refresh">Pour refaire l'exercice, rafraîchissez le site (en le fermant puis en le rouvrant).</p>
+                <p data-lang="about_instruction">Une fois vos relevés complétés, téléchargez le format souhaité (souvent PDF) puis transmettez-le à votre télémètre régional.</p>
+                <p data-lang="about_refresh">Pour refaire l'exercice, rafraîchissez le site, supprimez les frelons et ajoutez les nouveaux.</p>
                 <p>⚠️ <span data-lang="about_report">N'oubliez pas de signaler vos observations (frelon, nid, etc.) sur :</span> <a href="https://frelonasiatique.ch" target="_blank">frelonasiatique.ch</a></p>
                 <p>🐝 <span data-lang="about_happy">Bonne chasse ! 🙂</span></p>
                 <hr>
@@ -570,8 +586,8 @@
                 reset_btn: 'Nouveau',
                 about_title: 'À propos de VespaTimer',
                 about_text: 'Bienvenue sur VespaTimer*, ceci est un site internet qui facilite le travail du pot à mèche**, en faisant directement les moyennes et en triangulant le nid selon vos chronométrages.',
-                about_instruction: 'Une fois vos relevés complétés, appuyez sur Compléter et photographiez vos relevés et coordonnées puis transmettez-les à votre télémètre régional.',
-                about_refresh: 'Pour refaire l\'exercice, rafraîchissez le site (en le fermant puis en le rouvrant).',
+                about_instruction: 'Une fois vos relevés complétés, téléchargez le format souhaité (souvent PDF) puis transmettez-le à votre télémètre régional.',
+                about_refresh: 'Pour refaire l\'exercice, rafraîchissez le site, supprimez les frelons et ajoutez les nouveaux.',
                 about_report: 'N\'oubliez pas de signaler vos observations (frelon, nid, etc.) sur :',
                 about_happy: 'Bonne chasse ! 🙂',
                 about_footer1: '* Requiert une connexion Internet pour la date et l\'heure. Veuillez signaler les bugs si vous en rencontrez.',
@@ -596,7 +612,10 @@
                 nest_estimated: 'Nid estimé',
                 no_nest: 'Pas assez de données',
                 pot_location: 'Lieu du pot',
-                personal_info_label: 'Info personnelle'
+                personal_info_label: 'Info personnelle',
+                manual_time: 'Ou ajouter un temps manuellement (secondes)',
+                add_manual: 'Ajouter',
+                manual_time_placeholder: 'ex: 45'
             },
             en: {
                 about_btn: 'About',
@@ -624,8 +643,8 @@
                 reset_btn: 'New',
                 about_title: 'About VespaTimer',
                 about_text: 'Welcome to VespaTimer*, a website that facilitates pot-à-mèche work**, by directly calculating averages and triangulating the nest based on your timings.',
-                about_instruction: 'Once your readings are complete, press Complete and photograph your readings and coordinates then send them to your regional telemeter.',
-                about_refresh: 'To redo the exercise, refresh the site (close and reopen it).',
+                about_instruction: 'Once your readings are complete, download the preferred format (often PDF) then send it to your regional telemeter.',
+                about_refresh: 'To redo the exercise, refresh the site, delete hornets and re-add your new ones.',
                 about_report: 'Don\'t forget to report your observations (hornet, nest, etc.) on:',
                 about_happy: 'Happy hunting! 🙂',
                 about_footer1: '* Requires Internet connection for date and time. Please report bugs if you encounter any.',
@@ -650,7 +669,10 @@
                 nest_estimated: 'Estimated nest',
                 no_nest: 'Not enough data',
                 pot_location: 'Pot location',
-                personal_info_label: 'Personal info'
+                personal_info_label: 'Personal info',
+                manual_time: 'Or add time manually (seconds)',
+                add_manual: 'Add',
+                manual_time_placeholder: 'e.g. 45'
             },
             de: {
                 about_btn: 'Über',
@@ -677,13 +699,13 @@
                 import_btn: 'Importieren',
                 reset_btn: 'Neu',
                 about_title: 'Über VespaTimer',
-                about_text: 'Willkommen bei VespaTimer*, einer Website, die die Pot-à-Mèche-Arbeit erleichtert.',
-                about_instruction: 'Senden Sie Ihre Messungen an Ihren regionalen Telemeter.',
-                about_refresh: 'Aktualisieren Sie die Seite, um neu zu beginnen.',
-                about_report: 'Melden Sie Ihre Beobachtungen auf:',
+                about_text: 'Willkommen bei VespaTimer*, einer Website, die die Pot-à-Mèche-Arbeit erleichtert**, indem sie Durchschnittswerte berechnet und das Nest anhand Ihrer Zeitmessungen trianguliert.',
+                about_instruction: 'Sobald Ihre Messungen abgeschlossen sind, laden Sie das gewünschte Format herunter (oft PDF) und senden Sie es an Ihren regionalen Telemeter.',
+                about_refresh: 'Um die Übung zu wiederholen, aktualisieren Sie die Seite, löschen Sie Hornissen und fügen Sie neue hinzu.',
+                about_report: 'Vergessen Sie nicht, Ihre Beobachtungen (Hornisse, Nest, etc.) zu melden auf:',
                 about_happy: 'Gute Jagd! 🙂',
-                about_footer1: '* Internetverbindung erforderlich.',
-                about_footer2: '** Mehr Informationen:',
+                about_footer1: '* Erfordert Internetverbindung für Datum und Uhrzeit. Bitte melden Sie Fehler, falls Sie welche finden.',
+                about_footer2: '** Weitere Informationen via:',
                 no_flights_stats: 'Keine Flüge',
                 ready: 'Bereit',
                 running: 'Läuft',
@@ -704,7 +726,10 @@
                 nest_estimated: 'Geschätztes Nest',
                 no_nest: 'Nicht genug Daten',
                 pot_location: 'Pot Standort',
-                personal_info_label: 'Persönliche Info'
+                personal_info_label: 'Persönliche Info',
+                manual_time: 'Oder Zeit manuell hinzufügen (Sekunden)',
+                add_manual: 'Hinzufügen',
+                manual_time_placeholder: 'z.B. 45'
             },
             it: {
                 about_btn: 'Info',
@@ -731,13 +756,13 @@
                 import_btn: 'Importa',
                 reset_btn: 'Nuovo',
                 about_title: 'Info VespaTimer',
-                about_text: 'Benvenuto su VespaTimer*, un sito che facilita il lavoro del pot-à-mèche.',
-                about_instruction: 'Invia le tue letture al telemetro regionale.',
-                about_refresh: 'Aggiorna il sito per ricominciare.',
-                about_report: 'Segnala le tue osservazioni su:',
+                about_text: 'Benvenuto su VespaTimer*, un sito che facilita il lavoro del pot-à-mèche**, calcolando direttamente le medie e triangolando il nido in base ai tuoi tempi.',
+                about_instruction: 'Una volta completate le letture, scarica il formato desiderato (spesso PDF) e invialo al tuo telemetro regionale.',
+                about_refresh: 'Per rifare l\'esercizio, aggiorna il sito, elimina i calabroni e aggiungi i nuovi.',
+                about_report: 'Non dimenticare di segnalare le tue osservazioni (calabrone, nido, ecc.) su:',
                 about_happy: 'Buona caccia! 🙂',
-                about_footer1: '* Connessione Internet richiesta.',
-                about_footer2: '** Maggiori informazioni:',
+                about_footer1: '* Richiede connessione Internet per data e ora. Segnala i bug se ne incontri.',
+                about_footer2: '** Maggiori informazioni via:',
                 no_flights_stats: 'Nessun volo',
                 ready: 'Pronto',
                 running: 'In corso',
@@ -758,7 +783,10 @@
                 nest_estimated: 'Nido stimato',
                 no_nest: 'Dati insufficienti',
                 pot_location: 'Posizione pot',
-                personal_info_label: 'Info personali'
+                personal_info_label: 'Info personali',
+                manual_time: 'O aggiungi tempo manualmente (secondi)',
+                add_manual: 'Aggiungi',
+                manual_time_placeholder: 'es. 45'
             }
         };
 
@@ -910,6 +938,20 @@
             renderAll();
         }
 
+        function addManualTime(id) {
+            const h = hornets.find(x => x.id === id);
+            if (!h || h.flights.length >= 5) return;
+            const input = document.getElementById('manualTime_' + id);
+            if (!input) return;
+            const val = parseInt(input.value);
+            if (isNaN(val) || val <= 0) { alert('Veuillez entrer un temps valide en secondes.'); return; }
+            h.flights.push(val);
+            if (h.flights.length > 5) h.flights.shift();
+            input.value = '';
+            saveHistory();
+            renderAll();
+        }
+
         function deleteHornet(id) {
             if (hornets.length <= 1) { alert('Gardez au moins un frelon.'); return; }
             hornets = hornets.filter(x => x.id !== id);
@@ -977,7 +1019,7 @@
         function initMap() {
             const mapEl = document.getElementById('map');
             if (!mapEl || map) return;
-            map = L.map('map', { zoomControl: true }).setView([surveyLocation.lat, surveyLocation.lng], 15);
+            map = L.map('map', { zoomControl: true }).setView([surveyLocation.lat, surveyLocation.lng], 16);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap',
                 maxZoom: 19
@@ -1028,20 +1070,15 @@
                     pot.lng + (dkm / (111.32 * Math.cos(pot.lat * Math.PI / 180))) * Math.sin(rad)
                 );
 
+                // Line only (no cone/sector)
                 mapLines.push(L.polyline([pot, nest], { color: COLORS[idx % 5], weight: 3, dashArray: '5,5' }).addTo(map));
 
-                const sectorPts = [pot];
-                for (let a = -15; a <= 15; a += 3) {
-                    const r = ((h.direction + a) * Math.PI) / 180;
-                    sectorPts.push(L.latLng(
-                 pot.lat + (dkm * 0.85 / 111.32) * Math.cos(r),
-                        pot.lng + (dkm * 0.85 / (111.32 * Math.cos(pot.lat * Math.PI / 180))) * Math.sin(r)
-                    ));
-                }
-                mapLines.push(L.polygon(sectorPts, { color: COLORS[idx % 5], fillOpacity: 0.08, weight: 1 }).addTo(map));
+                // 50m radius circle around nest
+                mapLines.push(L.circle(nest, { radius: 50, color: COLORS[idx % 5], fillOpacity: 0.12, weight: 1.5, dashArray: '3,6' }).addTo(map));
 
+                // Nest marker
                 const marker = L.circleMarker(nest, { radius: 7, color: COLORS[idx % 5], fillOpacity: 0.7 }).addTo(map);
-                marker.bindPopup('<b>' + h.name + ' (' + COLOR_NAMES[idx % 5] + ')</b><br>~' + d.toFixed(0) + 'm<br>🧭 ' + h.direction + '°<br>📍 ' + nest.lat.toFixed(5) + ', ' + nest.lng.toFixed(5));
+                marker.bindPopup('<b>' + h.name + ' (' + COLOR_NAMES[idx % 5] + ')</b><br>~' + d.toFixed(0) + 'm<br>🧭 ' + h.direction + '°<br>📍 ' + nest.lat.toFixed(5) + ', ' + nest.lng.toFixed(5) + '<br>⭕ Cercle: 50m');
                 mapLines.push(marker);
                 predictions.push({ name: h.name, color: COLOR_NAMES[idx % 5], point: nest, dist: d, direction: h.direction });
             });
@@ -1078,7 +1115,7 @@
             }
 
             document.getElementById('predictionPanel').innerHTML = predictions.length ?
-                '🔍 ' + predictions.map(p => p.name + ' (' + p.color + ') → ~' + p.dist.toFixed(0) + 'm').join(' · ') :
+                '🔍 ' + predictions.map(p => p.name + ' (' + p.color + ') → ~' + p.dist.toFixed(0) + 'm') .join(' · ') :
                 '⚠️ ' + t('no_flights');
         }
 
@@ -1299,6 +1336,13 @@
               <div class="flights-text">📊 ${t('flights_label')}: ${fc ? h.flights.map(s => s + 's').join(', ') : '—'}</div>
               <div class="stat-line">📏 ${t('average')}: <strong>${avg.toFixed(1)}s</strong> · 🗺️ ${t('distance')}: <strong>${dist.toFixed(0)}m</strong></div>
               ${nest ? '<div class="stat-line" style="font-size:0.78rem;">📍 Nid estimé: <strong>' + nest.lat.toFixed(5) + ', ' + nest.lng.toFixed(5) + '</strong></div>' : ''}
+              <div class="manual-time-section">
+                <span style="font-size:0.8rem;">✍️ ${t('manual_time')}:</span>
+                <div class="flex-row" style="margin-top:4px;">
+                  <input type="number" id="manualTime_${h.id}" class="time-input" placeholder="${t('manual_time_placeholder')}" min="1">
+                  <button class="btn-gold btn-sm" onclick="addManualTime(${h.id})" ${fc >= 5 ? 'disabled' : ''}>➕ ${t('add_manual')}</button>
+                </div>
+              </div>
             </div>`;
             }).join('');
 
