@@ -2,1095 +2,423 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🐝 VespaTimer v1.1</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        :root {
-            --bg: #f5f2e6;
-            --card: #ffffff;
-            --text: #3b2e1e;
-            --gold: #d4a853;
-            --danger: #c47b6b;
-            --green: #5f7d6b;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: var(--bg);
-            font-family: system-ui, -apple-system, sans-serif;
-            padding: 10px;
-            color: var(--text);
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: var(--card);
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-        }
-
-        h2 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        button {
-            padding: 10px 18px;
-            border-radius: 25px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin: 3px;
-            transition: 0.15s;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        button:hover {
-            opacity: 0.9;
-        }
-
-        button:active {
-            transform: scale(0.96);
-        }
-
-        button:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-gold {
-            background: var(--gold);
-            color: white;
-        }
-
-        .btn-red {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-grey {
-            background: #e8e0d0;
-            color: var(--text);
-        }
-
-        .btn-sm {
-            padding: 6px 14px;
-            font-size: 0.8rem;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        textarea,
-        select {
-            font-size: 16px;
-            padding: 10px;
-            border-radius: 16px;
-            border: 1px solid #ddd;
-            width: 100%;
-            margin: 4px 0;
-            background: white;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 55px;
-        }
-
-        .hornet-card {
-            background: #fefaf2;
-            border: 2px solid #e7d7b8;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 10px;
-        }
-
-        .hornet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .hornet-name-input {
-            border: none !important;
-            background: transparent !important;
-            font-weight: 700;
-            font-size: 1.1rem !important;
-            width: 140px !important;
-            padding: 4px !important;
-            margin: 0 !important;
-        }
-
-        .dir-input {
-            width: 75px !important;
-            text-align: center;
-            padding: 8px !important;
-            display: inline-block;
-        }
-
-        .timer-display {
-            font-size: 1.7rem;
-            font-weight: 700;
-            background: #f0ede5;
-            padding: 6px 16px;
-            border-radius: 30px;
-            display: inline-block;
-            min-width: 90px;
-            text-align: center;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: white;
-            white-space: nowrap;
-        }
-
-        #map {
-            height: 350px;
-            width: 100%;
-            border-radius: 16px;
-            background: #e8e0d0;
-        }
-
-        .banner-live {
-            background: var(--danger);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            display: none;
-            margin-top: 8px;
-            font-weight: bold;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        .flights-text {
-            font-size: 0.85rem;
-            color: #5e4e32;
-            margin: 6px 0;
-        }
-
-        .stat-line {
-            font-size: 0.9rem;
-            margin: 2px 0;
-        }
-
-        #historyPanel {
-            max-height: 200px;
-            overflow-y: auto;
-            display: none;
-            margin-top: 10px;
-        }
-
-        .history-item {
-            background: #f9f4e8;
-            padding: 8px;
-            border-radius: 10px;
-            margin: 4px 0;
-            font-size: 0.85rem;
-            border-left: 4px solid var(--gold);
-        }
-
-        .flex-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .lang-select {
-            width: auto !important;
-            padding: 6px 12px !important;
-            border-radius: 20px !important;
-        }
-
-        .about-text {
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        .about-text a {
-            color: #b85c3a;
-        }
+        body { font-family: Arial, sans-serif; background: #f5f2e6; margin: 0; padding: 10px; }
+        .card { background: white; border-radius: 16px; padding: 14px; margin: 10px 0; }
+        button { padding: 12px 20px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; margin: 4px; font-size: 16px; }
+        button:active { background: #ccc; }
+        .gold { background: #d4a853; color: white; }
+        .red { background: #c47b6b; color: white; }
+        .grey { background: #ddd; }
+        .hornet { border: 2px solid #e7d7b8; border-radius: 12px; padding: 10px; margin: 8px 0; background: #fefaf2; }
+        .timer { font-size: 24px; font-weight: bold; background: #eee; padding: 8px 16px; border-radius: 20px; display: inline-block; }
+        #map { height: 300px; border-radius: 12px; background: #ddd; }
+        select, input { font-size: 16px; padding: 8px; border-radius: 12px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
-    <div class="container">
 
-        <!-- HEADER -->
-        <div class="flex-between" style="margin-bottom:10px;">
-            <h1 style="font-size:2rem; margin:0;">🐝 VespaTimer <span style="font-size:1rem;">v1.1</span></h1>
-            <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
-                <option value="fr">🇫🇷 Français</option>
-                <option value="en">🇬🇧 English</option>
-                <option value="de">🇩🇪 Deutsch</option>
-                <option value="it">🇮🇹 Italiano</option>
-            </select>
-        </div>
+    <h1>🐝 VespaTimer v1.1</h1>
 
-        <!-- SURVEY CARD -->
-        <div class="card">
-            <div class="flex-between">
-                <div><strong>📍 <span data-lang="pot_label">Pot-à-Mèche</span></strong><br><small id="locationDisplay">---</small></div>
-                <div id="datetime">---</div>
-            </div>
-            <div class="flex-row" style="margin-top:8px;">
-                <input type="text" id="locationInput" data-lang-placeholder="location_placeholder" placeholder="Nom du lieu ou lat,lng" style="flex:1;">
-                <button class="btn-gold" onclick="setLocation()" data-lang="save_btn">💾 Enregistrer</button>
-            </div>
-            <input type="text" id="inspectorInput" data-lang-placeholder="inspector_placeholder" placeholder="👤 Inspecteur" onchange="inspectorName=this.value;saveAll()">
-            <textarea id="notesField" data-lang-placeholder="notes_placeholder" placeholder="📝 Notes..." onchange="notes=this.value;saveAll()"></textarea>
-            <div class="banner-live" id="liveBanner" data-lang="timer_active">⏱️ Chronomètre actif</div>
-        </div>
+    <select id="langSelect" onchange="changeLang()">
+        <option value="fr">🇫🇷 Français</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="it">🇮🇹 Italiano</option>
+    </select>
 
-        <!-- HORNETS CARD -->
-        <div class="card">
-            <h2>🐝 <span data-lang="hornets_title">Frelons</span> <small>(max 5)</small></h2>
-            <div id="hornetContainer"></div>
-            <button class="btn-grey" onclick="addHornet()" style="margin-top:8px;" data-lang="add_hornet">➕ Ajouter un frelon</button>
-        </div>
+    <div class="card">
+        <strong>📍 Pot-à-Mèche:</strong> <span id="locDisplay">46.8, 6.8</span><br>
+        <input id="locInput" placeholder="Lieu ou lat,lng" style="width:200px;">
+        <button class="gold" onclick="setLoc()">Enregistrer</button>
+        <button class="grey" onclick="getGps()">📍 GPS</button>
+    </div>
 
-        <!-- MAP CARD -->
-        <div class="card">
-            <h2>🗺️ <span data-lang="map_title">Triangulation</span></h2>
-            <div id="map"></div>
-            <div class="flex-row" style="margin-top:8px;">
-                <button class="btn-grey btn-sm" onclick="getGPS()">📍 <span data-lang="gps_btn">Ma position</span></button>
-                <button class="btn-grey btn-sm" onclick="manualCoords()">✍️ <span data-lang="manual_coords">Coordonnées</span></button>
-                <button class="btn-gold btn-sm" onclick="showHistory()">📋 <span data-lang="history_btn">Historique 15j</span></button>
-                <button class="btn-red btn-sm" onclick="clearMap()">🗑️ <span data-lang="clear_map">Effacer</span></button>
-            </div>
-            <div id="predictionPanel" style="margin-top:8px;padding:8px;background:#f9f4e8;border-radius:12px;font-size:0.9rem;">⚠️ <span data-lang="no_flights">Ajoutez des vols pour voir les estimations</span></div>
-            <div id="historyPanel"></div>
-        </div>
+    <div class="card">
+        <h3>🐝 Frelons</h3>
+        <div id="hornets"></div>
+        <button class="grey" onclick="addHornet()">+ Ajouter</button>
+    </div>
 
-        <!-- STATS CARD -->
-        <div class="card">
-            <h2>📊 <span data-lang="stats_title">Statistiques</span></h2>
-            <div id="statsContent">---</div>
-        </div>
+    <div class="card">
+        <h3>🗺️ Carte</h3>
+        <div id="map"></div>
+        <button class="grey" onclick="showHistory()">📋 Historique</button>
+        <button class="red" onclick="clearMap()">🗑️ Effacer</button>
+        <div id="predictions"></div>
+    </div>
 
-        <!-- EXPORT CARD -->
-        <div class="card">
-            <div class="flex-row" style="justify-content:center;">
-                <button class="btn-grey btn-sm" onclick="exportJSON()">📤 JSON</button>
-                <button class="btn-grey btn-sm" onclick="exportPDF()">📄 PDF</button>
-                <button class="btn-grey btn-sm" onclick="exportGPX()">📍 GPX</button>
-                <button class="btn-grey btn-sm" onclick="exportKML()">🌍 KML</button>
-                <button class="btn-grey btn-sm" onclick="document.getElementById('importFile').click()">📥 <span data-lang="import_btn">Importer</span></button>
-                <button class="btn-red btn-sm" onclick="resetAll()">🔄 <span data-lang="reset_btn">Nouveau</span></button>
-                <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
-            </div>
-        </div>
+    <div class="card">
+        <h3>📊 Stats</h3>
+        <div id="stats"></div>
+    </div>
 
-        <!-- ABOUT CARD -->
-        <div class="card about-text">
-            <strong>ℹ️ <span data-lang="about_title">À propos</span></strong>
-            <p data-lang="about_text">Bienvenue sur VespaTimer*, ceci est un site internet qui facilite le travail du pot à mèche**, en faisant directement les moyennes et en triangulant le nid selon vos chronométrages.</p>
-            <p data-lang="about_instruction">Une fois vos relevés complétés, appuyez sur Compléter et photographiez vos relevés et coordonnées puis transmettez-les à votre télémètre régional.</p>
-            <p data-lang="about_refresh">Pour refaire l'exercice, rafraîchissez le site (en le fermant puis en le rouvrant).</p>
-            <p>⚠️ <span data-lang="about_report">N'oubliez pas de signaler vos observations (frelon, nid, etc.) sur :</span> <a href="https://frelonasiatique.ch" target="_blank">frelonasiatique.ch</a></p>
-            <p>🐝 <span data-lang="about_happy">Bonne chasse ! 🙂</span></p>
-            <hr style="border-color:#e0cfaa; border-style:dashed; margin:10px 0;">
-            <p style="font-size:0.75rem;color:#888;"><span data-lang="about_footer1">* Requiert une connexion Internet pour la date et l'heure. Veuillez signaler les bugs si vous en rencontrez.</span><br>
-                <span data-lang="about_footer2">** Plus d'informations via :</span> <a href="https://www.youtube.com/watch?v=HurtOt4qiM8" target="_blank">vidéo de Grégoire Hupka</a></p>
-        </div>
+    <div class="card">
+        <button class="grey" onclick="exportJSON()">📤 JSON</button>
+        <button class="grey" onclick="exportGPX()">📍 GPX</button>
+        <button class="grey" onclick="exportKML()">🌍 KML</button>
+        <button class="grey" onclick="document.getElementById('imp').click()">📥 Importer</button>
+        <button class="red" onclick="resetAll()">🔄 Reset</button>
+        <input type="file" id="imp" accept=".json" style="display:none;" onchange="importData(event)">
     </div>
 
     <script>
-        // ==================== GLOBAL STATE ====================
-        let hornets = [];
-        let surveyLocation = { lat: 46.8, lng: 6.8, name: '' };
-        let inspectorName = '';
-        let notes = '';
-        let currentLang = 'fr';
-        let map = null;
-        let potMarker = null;
-        let mapLines = [];
-        const COLORS = ['#d4a853', '#b85c3a', '#5f7d6b', '#7b5e7b', '#3a6b8c'];
-        const MAX_HORNETS = 5;
+        // ===== DATA =====
+        let hornets = [{ id: 1, name: 'Frelon 1', dir: 0, flights: [], running: false, start: null, elapsed: 0 }];
+        let loc = { lat: 46.8, lng: 6.8, name: '' };
+        let lang = 'fr';
+        let map, marker, lines = [];
+        const colors = ['#d4a853', '#b85c3a', '#5f7d6b', '#7b5e7b', '#3a6b8c'];
 
-        // ==================== TRANSLATIONS ====================
-        const translations = {
-            fr: {
-                pot_label: 'Pot-à-Mèche',
-                location_placeholder: 'Nom du lieu ou lat,lng',
-                save_btn: '💾 Enregistrer',
-                inspector_placeholder: '👤 Inspecteur',
-                notes_placeholder: '📝 Notes...',
-                timer_active: '⏱️ Chronomètre actif',
-                hornets_title: 'Frelons',
-                add_hornet: '➕ Ajouter un frelon',
-                map_title: 'Triangulation',
-                gps_btn: 'Ma position',
-                manual_coords: 'Coordonnées',
-                history_btn: 'Historique 15j',
-                clear_map: 'Effacer',
-                no_flights: 'Ajoutez des vols pour voir les estimations',
-                stats_title: 'Statistiques',
-                import_btn: 'Importer',
-                reset_btn: 'Nouveau',
-                about_title: 'À propos',
-                about_text: 'Bienvenue sur VespaTimer*, ceci est un site internet qui facilite le travail du pot à mèche**, en faisant directement les moyennes et en triangulant le nid selon vos chronométrages.',
-                about_instruction: 'Une fois vos relevés complétés, appuyez sur Compléter et photographiez vos relevés et coordonnées puis transmettez-les à votre télémètre régional.',
-                about_refresh: 'Pour refaire l\'exercice, rafraîchissez le site (en le fermant puis en le rouvrant).',
-                about_report: 'N\'oubliez pas de signaler vos observations (frelon, nid, etc.) sur :',
-                about_happy: 'Bonne chasse ! 🙂',
-                about_footer1: '* Requiert une connexion Internet pour la date et l\'heure. Veuillez signaler les bugs si vous en rencontrez.',
-                about_footer2: '** Plus d\'informations via :',
-                no_flights_stats: 'Aucun vol enregistré',
-                ready: 'Prêt',
-                running: 'En cours',
-                flights_label: 'vols',
-                direction: 'Direction',
-                distance: 'Dist',
-                average: 'Moy',
-                priority_zone: 'Zone prioritaire',
-                history_empty: 'Aucun historique récent (15 jours)',
-                import_success: '✅ Données importées !',
-                import_error: '❌ Fichier invalide',
-                gps_error: '⚠️ GPS impossible',
-                max_hornets: 'Maximum 5 frelons',
-                confirm_reset: 'Effacer toutes les données ?'
-            },
-            en: {
-                pot_label: 'Pot-à-Mèche',
-                location_placeholder: 'Location name or lat,lng',
-                save_btn: '💾 Save',
-                inspector_placeholder: '👤 Inspector',
-                notes_placeholder: '📝 Notes...',
-                timer_active: '⏱️ Timer active',
-                hornets_title: 'Hornets',
-                add_hornet: '➕ Add hornet',
-                map_title: 'Triangulation',
-                gps_btn: 'My position',
-                manual_coords: 'Coordinates',
-                history_btn: 'History 15d',
-                clear_map: 'Clear',
-                no_flights: 'Add flights to see estimates',
-                stats_title: 'Statistics',
-                import_btn: 'Import',
-                reset_btn: 'New',
-                about_title: 'About',
-                about_text: 'Welcome to VespaTimer*, a website that facilitates pot-à-mèche work**, by directly calculating averages and triangulating the nest based on your timings.',
-                about_instruction: 'Once your readings are complete, press Complete and photograph your readings and coordinates then send them to your regional telemeter.',
-                about_refresh: 'To redo the exercise, refresh the site (close and reopen it).',
-                about_report: 'Don\'t forget to report your observations (hornet, nest, etc.) on:',
-                about_happy: 'Happy hunting! 🙂',
-                about_footer1: '* Requires Internet connection for date and time. Please report bugs if you encounter any.',
-                about_footer2: '** More information via:',
-                no_flights_stats: 'No flights recorded',
-                ready: 'Ready',
-                running: 'Running',
-                flights_label: 'flights',
-                direction: 'Direction',
-                distance: 'Dist',
-                average: 'Avg',
-                priority_zone: 'Priority zone',
-                history_empty: 'No recent history (15 days)',
-                import_success: '✅ Data imported!',
-                import_error: '❌ Invalid file',
-                gps_error: '⚠️ GPS unavailable',
-                max_hornets: 'Maximum 5 hornets',
-                confirm_reset: 'Delete all data?'
-            },
-            de: {
-                pot_label: 'Pot-à-Mèche',
-                location_placeholder: 'Ortsname oder lat,lng',
-                save_btn: '💾 Speichern',
-                inspector_placeholder: '👤 Inspektor',
-                notes_placeholder: '📝 Notizen...',
-                timer_active: '⏱️ Timer aktiv',
-                hornets_title: 'Hornissen',
-                add_hornet: '➕ Hornisse hinzufügen',
-                map_title: 'Triangulation',
-                gps_btn: 'Mein Standort',
-                manual_coords: 'Koordinaten',
-                history_btn: 'Verlauf 15T',
-                clear_map: 'Löschen',
-                no_flights: 'Flüge hinzufügen für Schätzungen',
-                stats_title: 'Statistiken',
-                import_btn: 'Importieren',
-                reset_btn: 'Neu',
-                about_title: 'Über',
-                about_text: 'Willkommen bei VespaTimer*, einer Website, die die Pot-à-Mèche-Arbeit erleichtert**, indem sie Durchschnittswerte berechnet und das Nest anhand Ihrer Zeitmessungen trianguliert.',
-                about_instruction: 'Sobald Ihre Messungen abgeschlossen sind, drücken Sie Fertig und fotografieren Sie Ihre Messungen und Koordinaten und senden Sie sie an Ihren regionalen Telemeter.',
-                about_refresh: 'Um die Übung zu wiederholen, aktualisieren Sie die Seite (schließen und wieder öffnen).',
-                about_report: 'Vergessen Sie nicht, Ihre Beobachtungen (Hornisse, Nest, etc.) zu melden auf:',
-                about_happy: 'Gute Jagd! 🙂',
-                about_footer1: '* Erfordert Internetverbindung für Datum und Uhrzeit. Bitte melden Sie Fehler, falls Sie welche finden.',
-                about_footer2: '** Weitere Informationen via:',
-                no_flights_stats: 'Keine Flüge aufgezeichnet',
-                ready: 'Bereit',
-                running: 'Läuft',
-                flights_label: 'Flüge',
-                direction: 'Richtung',
-                distance: 'Entf',
-                average: 'Mittel',
-                priority_zone: 'Prioritätszone',
-                history_empty: 'Kein aktueller Verlauf (15 Tage)',
-                import_success: '✅ Daten importiert!',
-                import_error: '❌ Ungültige Datei',
-                gps_error: '⚠️ GPS nicht verfügbar',
-                max_hornets: 'Maximal 5 Hornissen',
-                confirm_reset: 'Alle Daten löschen?'
-            },
-            it: {
-                pot_label: 'Pot-à-Mèche',
-                location_placeholder: 'Nome luogo o lat,lng',
-                save_btn: '💾 Salva',
-                inspector_placeholder: '👤 Ispettore',
-                notes_placeholder: '📝 Note...',
-                timer_active: '⏱️ Timer attivo',
-                hornets_title: 'Calabroni',
-                add_hornet: '➕ Aggiungi calabrone',
-                map_title: 'Triangolazione',
-                gps_btn: 'Mia posizione',
-                manual_coords: 'Coordinate',
-                history_btn: 'Cronologia 15g',
-                clear_map: 'Cancella',
-                no_flights: 'Aggiungi voli per vede
-                stats_title: 'Statistiche',
-                import_btn: 'Importa',
-                reset_btn: 'Nuovo',
-                about_title: 'Informazioni',
-                about_text: 'Benvenuto su VespaTimer*, un sito web che facilita il lavoro del pot-à-mèche**, calcolando direttamente le medie e triangolando il nido in base ai tuoi tempi.',
-                about_instruction: 'Una volta completate le letture, premi Completa e fotografa le letture e le coordinate, quindi inviale al tuo telemetro regionale.',
-                about_refresh: 'Per rifare l\'esercizio, aggiorna il sito (chiudilo e riaprilo).',
-                about_report: 'Non dimenticare di segnalare le tue osservazioni (calabrone, nido, ecc.) su:',
-                about_happy: 'Buona caccia! 🙂',
-                about_footer1: '* Richiede connessione Internet per data e ora. Segnala i bug se ne incontri.',
-                about_footer2: '** Maggiori informazioni via:',
-                no_flights_stats: 'Nessun volo registrato',
-                ready: 'Pronto',
-                running: 'In corso',
-                flights_label: 'voli',
-                direction: 'Direzione',
-                distance: 'Dist',
-                average: 'Media',
-                priority_zone: 'Zona prioritaria',
-                history_empty: 'Nessuna cronologia recente (15 giorni)',
-                import_success: '✅ Dati importati!',
-                import_error: '❌ File non valido',
-                gps_error: '⚠️ GPS non disponibile',
-                max_hornets: 'Massimo 5 calabroni',
-                confirm_reset: 'Cancellare tutti i dati?'
-            }
+        // ===== TRANSLATIONS =====
+        const t = {
+            fr: { ready: 'Prêt', running: 'En cours', flights: 'vols', avg: 'Moy', dist: 'Dist', noData: 'Aucun vol',
+                addFlights: 'Ajoutez des vols', priority: 'Zone prioritaire', importOk: '✅ Importé!',
+                importFail: '❌ Erreur', gpsFail: '❌ GPS non disponible', maxHornets: 'Max 5 frelons',
+                confirmReset: 'Tout effacer ?' },
+            en: { ready: 'Ready', running: 'Running', flights: 'flights', avg: 'Avg', dist: 'Dist', noData: 'No flights',
+                addFlights: 'Add flights', priority: 'Priority zone', importOk: '✅ Imported!',
+                importFail: '❌ Error', gpsFail: '❌ GPS unavailable', maxHornets: 'Max 5 hornets',
+                confirmReset: 'Delete all?' },
+            de: { ready: 'Bereit', running: 'Läuft', flights: 'Flüge', avg: 'Mittel', dist: 'Entf', noData: 'Keine Flüge',
+                addFlights: 'Flüge hinzufügen', priority: 'Prioritätszone', importOk: '✅ Importiert!',
+                importFail: '❌ Fehler', gpsFail: '❌ GPS nicht verfügbar', maxHornets: 'Max 5 Hornissen',
+                confirmReset: 'Alles löschen?' },
+            it: { ready: 'Pronto', running: 'In corso', flights: 'voli', avg: 'Media', dist: 'Dist', noData: 'Nessun volo',
+                addFlights: 'Aggiungi voli', priority: 'Zona prioritaria', importOk: '✅ Importato!',
+                importFail: '❌ Errore', gpsFail: '❌ GPS non disponibile', maxHornets: 'Max 5 calabroni',
+                confirmReset: 'Cancellare tutto?' }
         };
 
-        function t(key) {
-            return (translations[currentLang] && translations[currentLang][key]) || key;
-        }
+        function _(key) { return (t[lang] && t[lang][key]) || key; }
 
-        function changeLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('vespatimer_lang', lang);
-            applyTranslations();
-            renderAll();
-        }
+        function changeLang() { lang = document.getElementById('langSelect').value;
+            localStorage.setItem('v_lang', lang);
+            render(); }
 
-        function applyTranslations() {
-            document.querySelectorAll('[data-lang]').forEach(el => {
-                const key = el.getAttribute('data-lang');
-                el.textContent = t(key);
-            });
-            document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
-                const key = el.getAttribute('data-lang-placeholder');
-                el.placeholder = t(key);
-            });
-        }
+        // ===== HORNET FUNCTIONS =====
+        function avg(h) { return h.flights.length ? h.flights.reduce((a, b) => a + b, 0) / h.flights.length : 0; }
 
-        // ==================== HORNET FUNCTIONS ====================
-        function createHornet(name) {
-            return {
-                id: Date.now() + Math.random(),
-                name: name || 'Frelon 1',
-                direction: 0,
-                flights: [],
-                timerRunning: false,
-                timerStart: null,
-                elapsedSeconds: 0
-            };
-        }
+        function dist(h) { const a = avg(h); return a > 30 ? (a - 30) * 2.5 : 0; }
 
-        function getAverage(h) {
-            if (!h.flights.length) return 0;
-            return h.flights.reduce((a, b) => a + b, 0) / h.flights.length;
-        }
-
-        function getDistance(avg) {
-            if (avg <= 30) return 0;
-            return (avg - 30) * 2.5;
-        }
-
-        // ==================== PERSISTENCE ====================
-        function saveAll() {
-            try {
-                localStorage.setItem('vespatimer_data', JSON.stringify({
-                    hornets,
-                    surveyLocation,
-                    inspectorName,
-                    notes
-                }));
-            } catch (e) {}
-        }
-
-        function loadAll() {
-            try {
-                const d = JSON.parse(localStorage.getItem('vespatimer_data'));
-                if (d) {
-                    if (d.hornets && Array.isArray(d.hornets)) hornets = d.hornets;
-                    if (d.surveyLocation) surveyLocation = d.surveyLocation;
-                    inspectorName = d.inspectorName || '';
-                    notes = d.notes || '';
-                }
-            } catch (e) {}
-            const savedLang = localStorage.getItem('vespatimer_lang');
-            if (savedLang && ['fr', 'en', 'de', 'it'].includes(savedLang)) {
-                currentLang = savedLang;
-                document.getElementById('langSelect').value = currentLang;
-            }
-            if (!hornets.length) {
-                hornets.push(createHornet('Frelon 1'));
-            }
-        }
-
-        function saveHistory() {
-            if (!hornets.some(h => h.flights.length > 0)) return;
-            let history = [];
-            try { history = JSON.parse(localStorage.getItem('vespatimer_history') || '[]'); } catch (e) {}
-            history.push({
-                date: new Date().toISOString(),
-                location: { ...surveyLocation },
-                hornets: hornets.map(h => ({ name: h.name, direction: h.direction, flights: [...h.flights] })),
-                notes,
-                inspectorName
-            });
-            if (history.length > 50) history = history.slice(-50);
-            try { localStorage.setItem('vespatimer_history', JSON.stringify(history)); } catch (e) {}
-        }
-
-        function getHistory() {
-            try { return JSON.parse(localStorage.getItem('vespatimer_history') || '[]'); } catch (e) { return []; }
-        }
-
-        // ==================== TIMER ACTIONS ====================
         function startTimer(id) {
             const h = hornets.find(x => x.id === id);
-            if (!h || h.timerRunning || h.flights.length >= 5) return;
-            h.timerRunning = true;
-            h.timerStart = Date.now() - (h.elapsedSeconds * 1000);
-            renderAll();
-            console.log('Timer started for hornet', id);
+            if (!h || h.running || h.flights.length >= 5) return;
+            h.running = true;
+            h.start = Date.now() - (h.elapsed * 1000);
+            render();
         }
 
         function stopTimer(id) {
             const h = hornets.find(x => x.id === id);
-            if (!h || !h.timerRunning) return;
-            const elapsed = Math.floor((Date.now() - h.timerStart) / 1000);
-            h.timerRunning = false;
-            h.timerStart = null;
-            if (elapsed > 0) {
-                h.flights.push(elapsed);
-                if (h.flights.length > 5) h.flights.shift();
-            }
-            h.elapsedSeconds = 0;
-            saveHistory();
-            renderAll();
-            console.log('Timer stopped for hornet', id, 'elapsed:', elapsed);
+            if (!h || !h.running) return;
+            const el = Math.floor((Date.now() - h.start) / 1000);
+            h.running = false;
+            h.start = null;
+            if (el > 0) { h.flights.push(el); if (h.flights.length > 5) h.flights.shift(); }
+            h.elapsed = 0;
+            saveHist();
+            render();
         }
 
         function resetTimer(id) {
             const h = hornets.find(x => x.id === id);
             if (!h) return;
-            h.timerRunning = false;
-            h.timerStart = null;
-            h.elapsedSeconds = 0;
-            renderAll();
+            h.running = false;
+            h.start = null;
+            h.elapsed = 0;
+            render();
         }
 
-        function deleteFlight(id) {
+        function delFlight(id) {
             const h = hornets.find(x => x.id === id);
-            if (!h || !h.flights.length) return;
-            h.flights.pop();
-            renderAll();
+            if (h && h.flights.length) { h.flights.pop();
+                render(); }
         }
 
-        function updateDirection(id, val) {
+        function updateDir(id, val) {
             const h = hornets.find(x => x.id === id);
-            if (!h) return;
-            h.direction = Math.min(359, Math.max(0, parseInt(val) || 0));
-            renderAll();
+            if (h) { h.dir = Math.min(359, Math.max(0, parseInt(val) || 0));
+                render(); }
         }
 
         function updateName(id, val) {
             const h = hornets.find(x => x.id === id);
-            if (!h) return;
-            h.name = val || 'Frelon';
-            renderAll();
+            if (h) { h.name = val || 'Frelon';
+                render(); }
         }
 
         function addHornet() {
-            if (hornets.length >= MAX_HORNETS) { alert(t('max_hornets')); return; }
-            hornets.push(createHornet('Frelon ' + (hornets.length + 1)));
-            renderAll();
-            console.log('Hornet added, total:', hornets.length);
+            if (hornets.length >= 5) { alert(_('maxHornets')); return; }
+            hornets.push({ id: Date.now(), name: 'Frelon ' + (hornets.length + 1), dir: 0, flights: [], running: false,
+                start: null, elapsed: 0 });
+            render();
         }
 
-        // ==================== LOCATION ====================
-        function setLocation() {
-            const val = document.getElementById('locationInput').value.trim();
-            if (!val) return;
-            surveyLocation.name = val;
-            const m = val.match(/([-+]?\d+\.?\d*)\s*[,;]\s*([-+]?\d+\.?\d*)/);
-            if (m) {
-                surveyLocation.lat = parseFloat(m[1]);
-                surveyLocation.lng = parseFloat(m[2]);
-            }
-            updatePotMarker();
-            renderAll();
-            console.log('Location set:', surveyLocation);
+        // ===== STORAGE =====
+        function save() {
+            localStorage.setItem('v_data', JSON.stringify({ hornets, loc }));
         }
 
-        function getGPS() {
-            if (!navigator.geolocation) { alert(t('gps_error')); return; }
-            navigator.geolocation.getCurrentPosition(function(pos) {
-                surveyLocation.lat = pos.coords.latitude;
-                surveyLocation.lng = pos.coords.longitude;
-                document.getElementById('locationInput').value = pos.coords.latitude.toFixed(5) + ', ' + pos.coords
-                    .longitude.toFixed(5);
-                updatePotMarker();
-                renderAll();
-                console.log('GPS position acquired');
-            }, function() { alert(t('gps_error')); }, { enableHighAccuracy: true, timeout: 10000 });
+        function load() {
+            try {
+                const d = JSON.parse(localStorage.getItem('v_data'));
+                if (d && d.hornets) hornets = d.hornets;
+                if (d && d.loc) loc = d.loc;
+            } catch (e) {}
+            const sl = localStorage.getItem('v_lang');
+            if (sl && t[sl]) { lang = sl;
+                document.getElementById('langSelect').value = lang; }
+            if (!hornets.length) hornets.push({ id: 1, name: 'Frelon 1', dir: 0, flights: [], running: false, start: null,
+                elapsed: 0 });
         }
 
-        function manualCoords() {
-            const lat = prompt('Latitude:', surveyLocation.lat.toFixed(5));
-            if (lat === null) return;
-            const lng = prompt('Longitude:', surveyLocation.lng.toFixed(5));
-            if (lng === null) return;
-            const latNum = parseFloat(lat);
-            const lngNum = parseFloat(lng);
-            if (isNaN(latNum) || isNaN(lngNum)) { alert('Coordonnées invalides'); return; }
-            surveyLocation.lat = latNum;
-            surveyLocation.lng = lngNum;
-            document.getElementById('locationInput').value = latNum.toFixed(5) + ', ' + lngNum.toFixed(5);
-            updatePotMarker();
-            renderAll();
+        function saveHist() {
+            if (!hornets.some(h => h.flights.length)) return;
+            let hist = [];
+            try { hist = JSON.parse(localStorage.getItem('v_hist') || '[]'); } catch (e) {}
+            hist.push({ date: new Date().toISOString(), loc: { ...loc }, hornets: hornets.map(h => ({ name: h.name,
+                    dir: h.dir, flights: [...h.flights] })) });
+            if (hist.length > 50) hist = hist.slice(-50);
+            localStorage.setItem('v_hist', JSON.stringify(hist));
         }
 
-        // ==================== MAP ====================
+        function getHist() { try { return JSON.parse(localStorage.getItem('v_hist') || '[]'); } catch (e) { return []; } }
+
+        // ===== LOCATION =====
+        function setLoc() {
+            const v = document.getElementById('locInput').value.trim();
+            if (!v) return;
+            loc.name = v;
+            const m = v.match(/([-+]?\d+\.?\d*)\s*[,;]\s*([-+]?\d+\.?\d*)/);
+            if (m) { loc.lat = +m[1];
+                loc.lng = +m[2]; }
+            updateMarker();
+            render();
+        }
+
+        function getGps() {
+            if (!navigator.geolocation) { alert(_('gpsFail')); return; }
+            navigator.geolocation.getCurrentPosition(p => {
+                loc.lat = p.coords.latitude;
+                loc.lng = p.coords.longitude;
+                document.getElementById('locInput').value = loc.lat.toFixed(5) + ', ' + loc.lng.toFixed(5);
+                updateMarker();
+                render();
+            }, () => alert(_('gpsFail')), { enableHighAccuracy: true });
+        }
+
+        // ===== MAP =====
         function initMap() {
-            const mapEl = document.getElementById('map');
-            if (!mapEl) { setTimeout(initMap, 300); return; }
-            if (map) { map.invalidateSize(); return; }
-
-            map = L.map('map', { zoomControl: true }).setView([surveyLocation.lat, surveyLocation.lng], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap',
-                maxZoom: 19
-            }).addTo(map);
-
-            updatePotMarker();
-            setTimeout(() => { if (map) map.invalidateSize(); }, 400);
-            console.log('Map initialized');
+            const el = document.getElementById('map');
+            if (!el || map) return;
+            map = L.map('map').setView([loc.lat, loc.lng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+            updateMarker();
         }
 
-        function updatePotMarker() {
+        function updateMarker() {
             if (!map) return;
-            if (potMarker) map.removeLayer(potMarker);
-            potMarker = L.marker([surveyLocation.lat, surveyLocation.lng], { draggable: true })
-                .addTo(map)
-                .bindPopup('📍 ' + t('pot_label'))
-                .openPopup();
-            potMarker.on('dragend', function(e) {
-                const p = e.target.getLatLng();
-                surveyLocation.lat = p.lat;
-                surveyLocation.lng = p.lng;
-                document.getElementById('locationDisplay').textContent = p.lat.toFixed(5) + ', ' + p.lng.toFixed(
-                5);
-                saveAll();
-                drawAnalysis();
-            });
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([loc.lat, loc.lng], { draggable: true }).addTo(map).bindPopup('📍 Pot-à-Mèche').openPopup();
+            marker.on('dragend', e => { loc.lat = e.target.getLatLng().lat;
+                loc.lng = e.target.getLatLng().lng;
+                save();
+                drawLines(); });
         }
 
         function clearMap() {
             if (!map) return;
-            mapLines.forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
-            mapLines = [];
-            document.getElementById('predictionPanel').innerHTML = '⚠️ ' + t('no_flights');
-            document.getElementById('historyPanel').style.display = 'none';
+            lines.forEach(l => map.removeLayer(l));
+            lines = [];
+            document.getElementById('predictions').textContent = '⚠️ ' + _('addFlights');
         }
 
-        function drawAnalysis(historyData) {
+        function drawLines(hist) {
             if (!map) return;
-            // Remove old lines
-            mapLines.forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
-            mapLines = [];
+            lines.forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
+            lines = [];
+            const preds = [];
 
-            const predictions = [];
-
-            // Current hornets
-            hornets.forEach((h, idx) => {
+            hornets.forEach((h, i) => {
                 if (!h.flights.length) return;
-                const avg = getAverage(h);
-                const distM = getDistance(avg);
-                if (distM <= 0) return;
-
-                const distKm = distM / 1000;
-                const dirRad = (h.direction * Math.PI) / 180;
-                const pot = L.latLng(surveyLocation.lat, surveyLocation.lng);
-                const latOff = (distKm / 111.32) * Math.cos(dirRad);
-                const lngOff = (distKm / (111.32 * Math.cos(pot.lat * Math.PI / 180))) * Math.sin(dirRad);
-                const nest = L.latLng(pot.lat + latOff, pot.lng + lngOff);
-
-                const line = L.polyline([pot, nest], { color: COLORS[idx % COLORS.length], weight: 3,
-                    dashArray: '5,5' }).addTo(map);
-                mapLines.push(line);
-
-                const sectorPts = [pot];
-                for (let a = -15; a <= 15; a += 3) {
-                    const r = ((h.direction + a) * Math.PI) / 180;
-                    sectorPts.push(L.latLng(
-                        pot.lat + (distKm * 0.85 / 111.32) * Math.cos(r),
-                        pot.lng + (distKm * 0.85 / (111.32 * Math.cos(pot.lat * Math.PI / 180))) * Math.sin(r)
-                    ));
-                }
-                const sector = L.polygon(sectorPts, { color: COLORS[idx % COLORS.length], fillOpacity: 0.08,
-                    weight: 1 }).addTo(map);
-                mapLines.push(sector);
-
-                const m = L.circleMarker(nest, { radius: 7, color: COLORS[idx % COLORS.length], fillOpacity: 0.7 })
-                    .addTo(map);
-                m.bindPopup('<b>' + h.name + '</b><br>~' + distM.toFixed(0) + 'm<br>' + h.direction + '°');
-                mapLines.push(m);
-
-                predictions.push({ name: h.name, point: nest, dist: distM });
+                const d = dist(h);
+                if (d <= 0) return;
+                const dkm = d / 1000;
+                const rad = (h.dir * Math.PI) / 180;
+                const p = L.latLng(loc.lat, loc.lng);
+                const n = L.latLng(p.lat + (dkm / 111.32) * Math.cos(rad), p.lng + (dkm / (111.32 * Math.cos(p.lat *
+                    Math.PI / 180))) * Math.sin(rad));
+                lines.push(L.polyline([p, n], { color: colors[i % 5], weight: 3, dashArray: '5,5' }).addTo(map));
+                lines.push(L.circleMarker(n, { radius: 7, color: colors[i % 5], fillOpacity: 0.7 }).addTo(map)
+                    .bindPopup(h.name + '<br>~' + d.toFixed(0) + 'm'));
+                preds.push({ name: h.name, pt: n, d: d });
             });
 
-            // History
-            if (historyData && historyData.length) {
-                historyData.forEach(entry => {
-                    if (!entry.location || !entry.hornets) return;
-                    entry.hornets.forEach(hh => {
-                        if (!hh.flights || !hh.flights.length) return;
-                        const avg = hh.flights.reduce((a, b) => a + b, 0) / hh.flights.length;
-                        const dm = (avg - 30) * 2.5;
-                        if (dm <= 0) return;
-                        const dkm = dm / 1000;
-                        const dr = (hh.direction * Math.PI) / 180;
-                        const ph = L.latLng(entry.location.lat, entry.location.lng);
-                        const nh = L.latLng(
-                            ph.lat + (dkm / 111.32) * Math.cos(dr),
-                            ph.lng + (dkm / (111.32 * Math.cos(ph.lat * Math.PI / 180))) * Math.sin(dr)
-                        );
-                        const hm = L.circleMarker(nh, { radius: 3, color: '#999', fillOpacity: 0.4, weight: 1 })
-                            .addTo(map);
-                        hm.bindPopup('Hist. ' + new Date(entry.date).toLocaleDateString());
-                        mapLines.push(hm);
-                    });
+            if (hist) hist.forEach(e => {
+                if (!e.loc || !e.hornets) return;
+                e.hornets.forEach(hh => {
+                    if (!hh.flights.length) return;
+                    const a = hh.flights.reduce((x, y) => x + y, 0) / hh.flights.length;
+                    const dd = a > 30 ? (a - 30) * 2.5 : 0;
+                    if (dd <= 0) return;
+                    const dkm = dd / 1000;
+                    const rad = (hh.dir * Math.PI) / 180;
+                    const p = L.latLng(e.loc.lat, e.loc.lng);
+                    const n = L.latLng(p.lat + (dkm / 111.32) * Math.cos(rad), p.lng + (dkm / (111.32 * Math.cos(p.lat *
+                        Math.PI / 180))) * Math.sin(rad));
+                    lines.push(L.circleMarker(n, { radius: 3, color: '#999', fillOpacity: 0.4 }).addTo(map)
+                        .bindPopup('Hist: ' + new Date(e.date).toLocaleDateString()));
                 });
+            });
+
+            if (preds.length >= 2) {
+                const clat = preds.reduce((s, p) => s + p.pt.lat, 0) / preds.length;
+                const clng = preds.reduce((s, p) => s + p.pt.lng, 0) / preds.length;
+                const icon = L.divIcon({ html: '⭐', iconSize: [30, 30], iconAnchor: [15, 15], className: '' });
+                lines.push(L.marker([clat, clng], { icon }).addTo(map).bindPopup(_('priority')));
             }
 
-            // Priority zone
-            if (predictions.length >= 2) {
-                const clat = predictions.reduce((s, p) => s + p.point.lat, 0) / predictions.length;
-                const clng = predictions.reduce((s, p) => s + p.point.lng, 0) / predictions.length;
-                const starIcon = L.divIcon({ html: '⭐', iconSize: [30, 30], iconAnchor: [15, 15],
-                className: '' });
-                const star = L.marker([clat, clng], { icon: starIcon }).addTo(map);
-                star.bindPopup('<b>' + t('priority_zone') + '</b>');
-                mapLines.push(star);
-            }
-
-            document.getElementById('predictionPanel').innerHTML = predictions.length ?
-                '🔍 ' + predictions.map(p => p.name + ' → ~' + p.dist.toFixed(0) + 'm').join(' · ') :
-                '⚠️ ' + t('no_flights');
+            document.getElementById('predictions').textContent = preds.length ?
+                '🔍 ' + preds.map(p => p.name + ' → ~' + p.d.toFixed(0) + 'm').join(' · ') :
+                '⚠️ ' + _('addFlights');
         }
 
         function showHistory() {
-            const history = getHistory();
-            const recent = history.filter(e => new Date(e.date) > new Date(Date.now() - 15 * 24 * 60 * 60 * 1000));
-            drawAnalysis(recent);
-
-            const panel = document.getElementById('historyPanel');
-            panel.style.display = 'block';
-            panel.innerHTML = recent.length ?
-                recent.reverse().map(e => '<div class="history-item"><strong>📅 ' + new Date(e.date)
-                    .toLocaleDateString() + '</strong><br>📍 ' + (e.location?.name || '?') + ' | 🐝 ' + (e.hornets
-                    ?.filter(h => h.flights?.length).length || 0) + ' ' + t('flights_label') + '</div>').join('') :
-                '<div class="history-item">📭 ' + t('history_empty') + '</div>';
+            const hist = getHist().filter(e => new Date(e.date) > Date.now() - 15 * 86400000);
+            drawLines(hist);
         }
 
-        // ==================== EXPORT ====================
-        function downloadBlob(blob, name) {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+        // ===== EXPORT =====
+        function dl(b, n) { const a = document.createElement('a');
+            a.href = URL.createObjectURL(b);
+            a.download = n;
+            a.click(); }
 
         function exportJSON() {
-            const data = {
-                version: '1.1',
-                date: new Date().toISOString(),
-                surveyLocation,
-                inspectorName,
-                notes,
-                hornets: hornets.map(h => ({
-                    name: h.name,
-                    direction: h.direction,
-                    flights: h.flights,
-                    average: getAverage(h),
-                    distance: getDistance(getAverage(h))
-                }))
-            };
-            downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), 'vespatimer_' + new Date()
-                .toISOString().slice(0, 10) + '.json');
-            console.log('JSON exported');
+            dl(new Blob([JSON.stringify({ hornets, loc, date: new Date().toISOString() })], { type: 'application/json' }),
+                'vespatimer.json');
         }
 
         function exportGPX() {
-            let g = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="VespaTimer">\n';
-            g += '<wpt lat="' + surveyLocation.lat + '" lon="' + surveyLocation.lng +
-            '"><name>Pot-à-Mèche</name></wpt>\n';
+            let g = '<?xml version="1.0"?><gpx version="1.1" creator="VespaTimer">';
+            g +=
+            `<wpt lat="${loc.lat}" lon="${loc.lng}"><name>Pot</name></wpt>`;
             hornets.forEach(h => {
                 if (!h.flights.length) return;
-                const d = getDistance(getAverage(h));
+                const d = dist(h);
                 if (d <= 0) return;
-                const r = (h.direction * Math.PI) / 180;
-                g += '<wpt lat="' + (surveyLocation.lat + (d / 111320) * Math.cos(r)).toFixed(6) + '" lon="' + (
-                    surveyLocation.lng + (d / (111320 * Math.cos(surveyLocation.lat * Math.PI / 180))) * Math.sin(
-                    r)).toFixed(6) + '"><name>' + h.name + '</name></wpt>\n';
+                const r = (h.dir * Math.PI) / 180;
+                g +=
+                    `<wpt lat="${(loc.lat+(d/111320)*Math.cos(r)).toFixed(6)}" lon="${(loc.lng+(d/(111320*Math.cos(loc.lat*Math.PI/180)))*Math.sin(r)).toFixed(6)}"><name>${h.name}</name></wpt>`;
             });
             g += '</gpx>';
-            downloadBlob(new Blob([g], { type: 'application/gpx+xml' }), 'vespatimer.gpx');
-            console.log('GPX exported');
+            dl(new Blob([g], { type: 'application/gpx+xml' }), 'vespatimer.gpx');
         }
 
         function exportKML() {
-            let k = '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n<Document>\n';
-            k += '<Placemark><name>Pot-à-Mèche</name><Point><coordinates>' + surveyLocation.lng + ',' + surveyLocation.lat +
-                ',0</coordinates></Point></Placemark>\n';
+            let k = '<?xml version="1.0"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document>';
+            k +=
+            `<Placemark><name>Pot</name><Point><coordinates>${loc.lng},${loc.lat},0</coordinates></Point></Placemark>`;
             hornets.forEach(h => {
                 if (!h.flights.length) return;
-                const d = getDistance(getAverage(h));
+                const d = dist(h);
                 if (d <= 0) return;
-                const r = (h.direction * Math.PI) / 180;
-                k += '<Placemark><name>' + h.name + '</name><Point><coordinates>' +
-                    (surveyLocation.lng + (d / (111320 * Math.cos(surveyLocation.lat * Math.PI / 180))) * Math.sin(r))
-                    .toFixed(6) + ',' +
-                    (surveyLocation.lat + (d / 111320) * Math.cos(r)).toFixed(6) +
-                    ',0</coordinates></Point></Placemark>\n';
+                const r = (h.dir * Math.PI) / 180;
+                k +=
+                    `<Placemark><name>${h.name}</name><Point><coordinates>${(loc.lng+(d/(111320*Math.cos(loc.lat*Math.PI/180)))*Math.sin(r)).toFixed(6)},${(loc.lat+(d/111320)*Math.cos(r)).toFixed(6)},0</coordinates></Point></Placemark>`;
             });
-            k += '</Document>\n</kml>';
-            downloadBlob(new Blob([k], { type: 'application/vnd.google-earth.kml+xml' }), 'vespatimer.kml');
-            console.log('KML exported');
-        }
-
-        function exportPDF() {
-            let r = '=== RAPPORT VESPATIMER v1.1 ===\n';
-            r += 'Date: ' + new Date().toLocaleString() + '\n';
-            r += 'Lieu: ' + (surveyLocation.name || 'N/A') + '\n';
-            r += 'Coordonnées: ' + surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5) + '\n';
-            r += 'Inspecteur: ' + (inspectorName || 'N/A') + '\n'
-            hornets.forEach(h => {
-                const avg = getAverage(h);
-                r += h.name + ': Dir=' + h.direction + '° | Vols=' + h.flights.join('s, ') + 's | Moy=' + avg.toFixed(
-                    1) + 's | Dist=' + getDistance(avg).toFixed(0) + 'm\n';
-            });
-            navigator.clipboard.writeText(r).then(() => {
-                alert('✅ Rapport copié dans le presse-papier. Utilisez Ctrl+P pour imprimer en PDF.');
-            }).catch(() => {
-                alert('Rapport:\n\n' + r + '\n\nUtilisez Ctrl+P pour imprimer en PDF.');
-            });
-            window.print();
+            k += '</Document></kml>';
+            dl(new Blob([k], { type: 'application/vnd.google-earth.kml+xml' }), 'vespatimer.kml');
         }
 
         function importData(e) {
             const f = e.target.files[0];
             if (!f) return;
-            const reader = new FileReader();
-            reader.onload = function(ev) {
+            const r = new FileReader();
+            r.onload = ev => {
                 try {
                     const d = JSON.parse(ev.target.result);
-                    if (d.hornets && Array.isArray(d.hornets)) {
-                        hornets = d.hornets.map(h => ({
-                            ...createHornet(h.name || 'Frelon'),
-                            direction: h.direction || 0,
-                            flights: h.flights || []
-                        }));
-                    }
-                    if (d.surveyLocation) surveyLocation = d.surveyLocation;
-                    inspectorName = d.inspectorName || '';
-                    notes = d.notes || '';
-                    updatePotMarker();
-                    renderAll();
-                    alert(t('import_success'));
-                } catch (ex) { alert(t('import_error')); }
+                    if (d.hornets) hornets = d.hornets.map(h => ({ ...h, running: false, start: null,
+                        elapsed: 0 }));
+                    if (d.loc) loc = d.loc;
+                    updateMarker();
+                    render();
+                    alert(_('importOk'));
+                } catch (ex) { alert(_('importFail')); }
             };
-            reader.readAsText(f);
+            r.readAsText(f);
             e.target.value = '';
         }
 
         function resetAll() {
-            if (!confirm(t('confirm_reset'))) return;
-            saveHistory();
-            hornets = [createHornet('Frelon 1')];
-            surveyLocation = { lat: 46.8, lng: 6.8, name: '' };
-            inspectorName = '';
-            notes = '';
-            document.getElementById('locationInput').value = '';
-            document.getElementById('inspectorInput').value = '';
-            document.getElementById('notesField').value = '';
+            if (!confirm(_('confirmReset'))) return;
+            saveHist();
+            hornets = [{ id: Date.now(), name: 'Frelon 1', dir: 0, flights: [], running: false, start: null,
+            elapsed: 0 }];
+            loc = { lat: 46.8, lng: 6.8, name: '' };
             clearMap();
-            updatePotMarker();
-            renderAll();
-            console.log('All data reset');
+            updateMarker();
+            render();
         }
 
-        // ==================== RENDER ====================
-        function renderAll() {
-            // Hornet cards
-            const container = document.getElementById('hornetContainer');
-            container.innerHTML = hornets.map((h, idx) => {
-                const avg = getAverage(h);
-                const dist = getDistance(avg);
+        // ===== RENDER =====
+        function render() {
+            document.getElementById('hornets').innerHTML = hornets.map((h, i) => {
+                const a = avg(h);
+                const d = dist(h);
                 const fc = h.flights.length;
-                let timerText = '00:00';
-                if (h.timerRunning && h.timerStart) {
-                    const s = Math.floor((Date.now() - h.timerStart) / 1000);
-                    timerText = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2,
+                let timeText = '00:00';
+                if (h.running && h.start) {
+                    const s = Math.floor((Date.now() - h.start) / 1000);
+                    timeText = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2,
                     '0');
-                } else if (h.elapsedSeconds > 0) {
-                    timerText = h.elapsedSeconds.toFixed(0) + 's';
                 }
-
-                const badgeBg = h.timerRunning ? '#c47b6b' : (fc > 0 ? '#5f7d6b' : '#d4a853');
-                const badgeText = h.timerRunning ? '⏳ ' + t('running') : (fc > 0 ? '✅ ' + fc + '/5 ' + t(
-                    'flights_label') : '🆕 ' + t('ready'));
-
+                const badgeColor = h.running ? '#c47b6b' : (fc > 0 ? '#5f7d6b' : '#d4a853');
+                const badgeText = h.running ? '⏳ ' + _('running') : (fc > 0 ? '✅ ' + fc + '/5' : '🆕 ' + _(
+                'ready'));
                 return `
-            <div class="hornet-card" style="border-left:4px solid ${COLORS[idx % COLORS.length]};">
-              <div class="hornet-header">
-                <input class="hornet-name-input" value="${h.name}" style="color:${COLORS[idx % COLORS.length]}" onchange="updateName(${h.id}, this.value)">
-                <span class="badge" style="background:${badgeBg}">${badgeText}</span>
-              </div>
-              <div class="flex-row" style="margin:6px 0;">
-                <span>🧭 <input type="number" class="dir-input" value="${h.direction}" min="0" max="359" onchange="updateDirection(${h.id}, this.value)">°</span>
-                <span class="timer-display">${timerText}</span>
-              </div>
-              <div class="flex-row">
-                <button class="btn-gold btn-sm" onclick="startTimer(${h.id})" ${h.timerRunning || fc >= 5 ? 'disabled' : ''}>▶ Start</button>
-                <button class="btn-grey btn-sm" onclick="stopTimer(${h.id})" ${!h.timerRunning ? 'disabled' : ''}>⏹ Stop</button>
-                <button class="btn-red btn-sm" onclick="resetTimer(${h.id})">↺ Reset</button>
-                <button class="btn-grey btn-sm" onclick="deleteFlight(${h.id})" ${!fc ? 'disabled' : ''}>🗑️ Vol</button>
-              </div>
-              <div class="flights-text">📊 ${t('flights_label')}: ${fc ? h.flights.map(s => s + 's').join(', ') : '—'}</div>
-              <div class="stat-line">📏 ${t('average')}: <strong>${avg.toFixed(1)}s</strong> · 🗺️ ${t('distance')}: <strong>${dist.toFixed(0)}m</strong></div>
+            <div class="hornet" style="border-left:5px solid ${colors[i%5]};">
+              <b><input value="${h.name}" style="border:none;background:none;font-weight:bold;color:${colors[i%5]};width:120px;" onchange="updateName(${h.id},this.value)"></b>
+              <span style="background:${badgeColor};color:white;padding:3px 10px;border-radius:12px;font-size:12px;">${badgeText}</span>
+              <br>
+              🧭 <input type="number" value="${h.dir}" min="0" max="359" style="width:65px;text-align:center;" onchange="updateDir(${h.id},this.value)">°
+              <span class="timer">${timeText}</span>
+              <br>
+              <button class="gold" onclick="startTimer(${h.id})" ${h.running||fc>=5?'disabled':''}>▶ START</button>
+              <button onclick="stopTimer(${h.id})" ${!h.running?'disabled':''}>⏹ STOP</button>
+              <button class="red" onclick="resetTimer(${h.id})">↺ RESET</button>
+              <button onclick="delFlight(${h.id})" ${!fc?'disabled':''}>🗑️</button>
+              <br>
+              📊 ${_('flights')}: ${fc?h.flights.map(s=>s+'s').join(', '):'—'}
+              <br>
+              📏 ${_('avg')}: <b>${a.toFixed(1)}s</b> | 🗺️ ${_('dist')}: <b>${d.toFixed(0)}m</b>
             </div>`;
             }).join('');
 
-            // Info
-            document.getElementById('locationDisplay').textContent =
-                surveyLocation.name || surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5);
-            document.getElementById('datetime').textContent = new Date().toLocaleString();
-            document.getElementById('inspectorInput').value = inspectorName;
-            document.getElementById('notesField').value = notes;
-            document.getElementById('liveBanner').style.display = hornets.some(h => h.timerRunning) ? 'block' : 'none';
+            document.getElementById('locDisplay').textContent = loc.name || loc.lat.toFixed(5) + ', ' + loc.lng.toFixed(
+            5);
+            document.getElementById('stats').textContent = hornets.filter(h => h.flights.length).length ?
+                hornets.filter(h => h.flights.length).map(h => h.name + ': ' + avg(h).toFixed(1) + 's').join(' | ') :
+                _('noData');
 
-            // Stats
-            const hwf = hornets.filter(h => h.flights.length > 0);
-            const statsDiv = document.getElementById('statsContent');
-            if (!hwf.length) {
-                statsDiv.innerHTML = t('no_flights_stats');
-            } else {
-                let html = hwf.map((h) => {
-                    const idx = hornets.indexOf(h);
-                    return '<span style="color:' + COLORS[idx % COLORS.length] + ';">● ' + h.name + ': ' +
-                        getAverage(h).toFixed(1) + 's (' + h.flights.length + ' ' + t('flights_label') +
-                        ')</span>';
-                }).join(' ');
-                const globalAvg = hwf.reduce((s, h) => s + getAverage(h), 0) / hwf.length;
-                const totalFlights = hwf.reduce((s, h) => s + h.flights.length, 0);
-                html += '<br>📈 Moy. globale: <strong>' + globalAvg.toFixed(1) + 's</strong> · Total: ' + totalFlights +
-                    ' ' + t('flights_label');
-                statsDiv.innerHTML = html;
-            }
-
-            saveAll();
-            if (map) drawAnalysis();
+            save();
+            if (map) drawLines();
         }
 
-        // ==================== LIVE UPDATE ====================
+        // ===== LIVE UPDATE =====
         setInterval(() => {
-            if (hornets.some(h => h.timerRunning)) {
-                renderAll();
-            }
-            document.getElementById('datetime').textContent = new Date().toLocaleString();
+            if (hornets.some(h => h.running)) render();
         }, 500);
 
-        // ==================== INIT ====================
-        function boot() {
-            loadAll();
-            applyTranslations();
-            document.getElementById('langSelect').value = currentLang;
-            renderAll();
-            setTimeout(initMap, 500);
-            console.log('🐝 VespaTimer v1.1 démarré - Langue:', currentLang);
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', boot);
-        } else {
-            boot();
-        }
+        // ===== BOOT =====
+        load();
+        render();
+        setTimeout(initMap, 400);
     </script>
 </body>
 </html>
