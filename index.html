@@ -615,7 +615,8 @@
                 personal_info_label: 'Info personnelle',
                 manual_time: 'Ou ajouter un temps manuellement (secondes)',
                 add_manual: 'Ajouter',
-                manual_time_placeholder: 'ex: 45'
+                manual_time_placeholder: 'ex: 45',
+                hist_pot: 'Pot historique',
             },
             en: {
                 about_btn: 'About',
@@ -672,7 +673,8 @@
                 personal_info_label: 'Personal info',
                 manual_time: 'Or add time manually (seconds)',
                 add_manual: 'Add',
-                manual_time_placeholder: 'e.g. 45'
+                manual_time_placeholder: 'e.g. 45',
+                hist_pot: 'Historical pot',
             },
             de: {
                 about_btn: 'Über',
@@ -729,7 +731,8 @@
                 personal_info_label: 'Persönliche Info',
                 manual_time: 'Oder Zeit manuell hinzufügen (Sekunden)',
                 add_manual: 'Hinzufügen',
-                manual_time_placeholder: 'z.B. 45'
+                manual_time_placeholder: 'z.B. 45',
+                hist_pot: 'Historischer Pot',
             },
             it: {
                 about_btn: 'Info',
@@ -786,7 +789,8 @@
                 personal_info_label: 'Info personali',
                 manual_time: 'O aggiungi tempo manualmente (secondi)',
                 add_manual: 'Aggiungi',
-                manual_time_placeholder: 'es. 45'
+                manual_time_placeholder: 'es. 45',
+                hist_pot: 'Pot storico',
             }
         };
 
@@ -1016,7 +1020,7 @@
         }
 
         // ==================== MAP ====================
-        function initMap() {
+                function initMap() {
             const mapEl = document.getElementById('map');
             if (!mapEl || map) return;
             map = L.map('map', { zoomControl: true }).setView([surveyLocation.lat, surveyLocation.lng], 16);
@@ -1031,9 +1035,10 @@
         function updatePotMarker() {
             if (!map) return;
             if (potMarker) map.removeLayer(potMarker);
-            potMarker = L.marker([surveyLocation.lat, surveyLocation.lng], { draggable: true })
+            const beeIcon = L.divIcon({ html: '🐝', iconSize: [30, 30], iconAnchor: [15, 15], className: '' });
+            potMarker = L.marker([surveyLocation.lat, surveyLocation.lng], { draggable: true, icon: beeIcon })
                 .addTo(map)
-                .bindPopup('📍 ' + t('pot_label'))
+                .bindPopup('📍 ' + t('pot_label') + '<br>' + surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5))
                 .openPopup();
             potMarker.on('dragend', function(e) {
                 surveyLocation.lat = e.target.getLatLng().lat;
@@ -1052,54 +1057,78 @@
             document.getElementById('historyPanel').style.display = 'none';
         }
 
+        function getNestCoordsForHornet(h, location) {
+            const d = getDistance(getAverage(h));
+            if (d <= 0) return null;
+            const rad = (h.direction * Math.PI) / 180;
+            const loc = location || surveyLocation;
+            return {
+                lat: loc.lat + (d / 111320) * Math.cos(rad),
+                lng: loc.lng + (d / (111320 * Math.cos(loc.lat * Math.PI / 180))) * Math.sin(rad)
+            };
+        }
+
         function drawAnalysis(historyData) {
             if (!map) return;
             mapLines.forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
             mapLines = [];
             const predictions = [];
 
+            // Current hornets using current pot location
             hornets.forEach((h, idx) => {
                 if (!h.flights.length) return;
                 const d = getDistance(getAverage(h));
                 if (d <= 0) return;
-                const dkm = d / 1000;
-                const rad = (h.direction * Math.PI) / 180;
+                const nest = getNestCoordsForHornet(h, surveyLocation);
+                if (!nest) return;
                 const pot = L.latLng(surveyLocation.lat, surveyLocation.lng);
-                const nest = L.latLng(
-                    pot.lat + (dkm / 111.32) * Math.cos(rad),
-                    pot.lng + (dkm / (111.32 * Math.cos(pot.lat * Math.PI / 180))) * Math.sin(rad)
-                );
+                const nestPt = L.latLng(nest.lat, nest.lng);
 
                 // Line only (no cone/sector)
-                mapLines.push(L.polyline([pot, nest], { color: COLORS[idx % 5], weight: 3, dashArray: '5,5' }).addTo(map));
+                mapLines.push(L.polyline([pot, nestPt], { color: COLORS[idx % 5], weight: 3, dashArray: '5,5' }).addTo(map));
 
                 // 50m radius circle around nest
-                mapLines.push(L.circle(nest, { radius: 50, color: COLORS[idx % 5], fillOpacity: 0.12, weight: 1.5, dashArray: '3,6' }).addTo(map));
+                mapLines.push(L.circle(nestPt, { radius: 50, color: COLORS[idx % 5], fillOpacity: 0.12, weight: 1.5, dashArray: '3,6' }).addTo(map));
 
                 // Nest marker
-                const marker = L.circleMarker(nest, { radius: 7, color: COLORS[idx % 5], fillOpacity: 0.7 }).addTo(map);
+                const marker = L.circleMarker(nestPt, { radius: 7, color: COLORS[idx % 5], fillOpacity: 0.7 }).addTo(map);
                 marker.bindPopup('<b>' + h.name + ' (' + COLOR_NAMES[idx % 5] + ')</b><br>~' + d.toFixed(0) + 'm<br>🧭 ' + h.direction + '°<br>📍 ' + nest.lat.toFixed(5) + ', ' + nest.lng.toFixed(5) + '<br>⭕ Cercle: 50m');
                 mapLines.push(marker);
-                predictions.push({ name: h.name, color: COLOR_NAMES[idx % 5], point: nest, dist: d, direction: h.direction });
+                predictions.push({ name: h.name, color: COLOR_NAMES[idx % 5], point: nestPt, dist: d, direction: h.direction });
             });
 
+            // History - use the HISTORICAL pot location for each entry
             if (historyData && historyData.length) {
                 historyData.forEach(entry => {
                     if (!entry.location || !entry.hornets) return;
+                    const histLoc = entry.location;
+                    const histPot = L.latLng(histLoc.lat, histLoc.lng);
+
+                    // Draw historical pot marker
+                    const histPotIcon = L.divIcon({ html: '📍', iconSize: [20, 20], iconAnchor: [10, 10], className: '' });
+                    const histPotMarker = L.marker([histLoc.lat, histLoc.lng], { icon: histPotIcon, opacity: 0.7 }).addTo(map);
+                    histPotMarker.bindPopup('<b>' + t('hist_pot') + '</b><br>📅 ' + new Date(entry.date).toLocaleDateString() + '<br>📍 ' + histLoc.lat.toFixed(5) + ', ' + histLoc.lng.toFixed(5));
+                    mapLines.push(histPotMarker);
+
                     entry.hornets.forEach((hh, j) => {
                         if (!hh.flights || !hh.flights.length) return;
                         const avg = hh.flights.reduce((a, b) => a + b, 0) / hh.flights.length;
                         const dm = (avg - 30) * 2.5;
                         if (dm <= 0) return;
-                        const dkm = dm / 1000;
                         const dr = (hh.direction * Math.PI) / 180;
-                        const ph = L.latLng(entry.location.lat, entry.location.lng);
                         const nh = L.latLng(
-                            ph.lat + (dkm / 111.32) * Math.cos(dr),
-                            ph.lng + (dkm / (111.32 * Math.cos(ph.lat * Math.PI / 180))) * Math.sin(dr)
+                            histLoc.lat + (dm / 111320) * Math.cos(dr),
+                            histLoc.lng + (dm / (111320 * Math.cos(histLoc.lat * Math.PI / 180))) * Math.sin(dr)
                         );
+
+                        // Line from historical pot to historical nest
+                        mapLines.push(L.polyline([histPot, nh], { color: '#999', weight: 2, dashArray: '3,7', opacity: 0.6 }).addTo(map));
+
+                        // 50m circle around historical nest
+                        mapLines.push(L.circle(nh, { radius: 50, color: '#999', fillOpacity: 0.06, weight: 1, dashArray: '2,4', opacity: 0.5 }).addTo(map));
+
                         const hm = L.circleMarker(nh, { radius: 4, color: '#888', fillOpacity: 0.5, weight: 1 }).addTo(map);
-                        hm.bindPopup('<b>Hist: ' + hh.name + '</b><br>📅 ' + new Date(entry.date).toLocaleDateString() + '<br>📍 ' + nh.lat.toFixed(5) + ', ' + nh.lng.toFixed(5));
+                        hm.bindPopup('<b>Hist: ' + hh.name + '</b><br>📅 ' + new Date(entry.date).toLocaleDateString() + '<br>📍 Pot: ' + histLoc.lat.toFixed(4) + ', ' + histLoc.lng.toFixed(4) + '<br>🎯 Nid: ' + nh.lat.toFixed(5) + ', ' + nh.lng.toFixed(5));
                         mapLines.push(hm);
                     });
                 });
@@ -1115,7 +1144,7 @@
             }
 
             document.getElementById('predictionPanel').innerHTML = predictions.length ?
-                '🔍 ' + predictions.map(p => p.name + ' (' + p.color + ') → ~' + p.dist.toFixed(0) + 'm') .join(' · ') :
+                '🔍 ' + predictions.map(p => p.name + ' (' + p.color + ') → ~' + p.dist.toFixed(0) + 'm').join(' · ') :
                 '⚠️ ' + t('no_flights');
         }
 
@@ -1127,7 +1156,7 @@
             const panel = document.getElementById('historyPanel');
             panel.style.display = 'block';
             panel.innerHTML = recent.length ?
-                recent.reverse().map(e => '<div class="history-item"><strong>📅 ' + new Date(e.date).toLocaleDateString() + ' ' + new Date(e.date).toLocaleTimeString() + '</strong><br>📍 ' + (e.location?.name || '?') + ' | 🐝 ' + (e.hornets?.filter(h => h.flights?.length).length || 0) + ' ' + t('flights_label') + '<br>' + (e.hornets?.filter(h => h.flights?.length).map(h => '• ' + h.name).join(' ') || '') + '</div>').join('') :
+                recent.reverse().map(e => '<div class="history-item"><strong>📅 ' + new Date(e.date).toLocaleDateString() + ' ' + new Date(e.date).toLocaleTimeString() + '</strong><br>📍 Pot: ' + (e.location?.name || e.location?.lat?.toFixed(4) + ', ' + e.location?.lng?.toFixed(4) || '?') + ' | 🐝 ' + (e.hornets?.filter(h => h.flights?.length).length || 0) + ' ' + t('flights_label') + '<br>' + (e.hornets?.filter(h => h.flights?.length).map(h => '• ' + h.name).join(' ') || '') + '</div>').join('') :
                 '<div class="history-item">📭 ' + t('history_empty') + '</div>';
         }
 
@@ -1151,13 +1180,7 @@
         }
 
         function getNestCoords(h) {
-            const d = getDistance(getAverage(h));
-            if (d <= 0) return null;
-            const rad = (h.direction * Math.PI) / 180;
-            return {
-                lat: surveyLocation.lat + (d / 111320) * Math.cos(rad),
-                lng: surveyLocation.lng + (d / (111320 * Math.cos(surveyLocation.lat * Math.PI / 180))) * Math.sin(rad)
-            };
+            return getNestCoordsForHornet(h, surveyLocation);
         }
 
         function exportJSON() {
