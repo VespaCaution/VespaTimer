@@ -645,6 +645,9 @@
                 hist_pot: 'Pot historique',
                 collapse: 'Cliquer pour déplier/replier',
                 flight_delete: 'Supprimer ce vol',
+                start_btn: 'DÉMARRER',
+stop_btn: 'ARRÊTER',
+reset_btn_label: 'EFFACER',
             },
             en: {
                 about_btn: 'About',
@@ -706,7 +709,9 @@
                 hist_pot: 'Historical pot',
                 collapse: 'Click to collapse/expand',
                 flight_delete: 'Delete this flight',
-            },
+            },start_btn: 'START',
+stop_btn: 'STOP',
+reset_btn_label: 'RESET',
             de: {
                 about_btn: 'Über',
                 personal_info: 'Persönliche Daten',
@@ -767,7 +772,9 @@
                 hist_pot: 'Historischer Pot',
                 collapse: 'Klicken zum Ein-/Ausklappen',
                 flight_delete: 'Diesen Flug löschen',
-            },
+            },start_btn: 'START',
+stop_btn: 'STOPP',
+reset_btn_label: 'ZURÜCK',
             it: {
                 about_btn: 'Info',
                 personal_info: 'Informazioni personali',
@@ -828,6 +835,9 @@
                 hist_pot: 'Pot storico',
                 collapse: 'Clicca per comprimere/espandere',
                 flight_delete: 'Elimina questo volo',
+                start_btn: 'AVVIA',
+stop_btn: 'FERMA',
+reset_btn_label: 'AZZERA',
             }
         };
 
@@ -1640,9 +1650,9 @@
                 html += '<div class="hornet-body' + (isCollapsed ? ' collapsed' : '') + '">';
                 html += '<div class="flex-row" style="margin:6px 0;"><span>🧭 <input type="number" class="dir-input" value="' + h.direction + '" min="0" max="359" onchange="updateDirection(' + h.id + ',this.value)">°</span><span class="timer-display">' + timerText + '</span></div>';
                 html += '<div class="flex-row">';
-                html += '<button class="btn-gold btn-sm" onclick="startTimer(' + h.id + ')" ' + (h.timerRunning || fc >= 5 ? 'disabled' : '') + '>▶ START</button>';
-                html += '<button class="btn-grey btn-sm" onclick="stopTimer(' + h.id + ')" ' + (!h.timerRunning ? 'disabled' : '') + '>⏹ STOP</button>';
-                html += '<button class="btn-red btn-sm" onclick="resetTimer(' + h.id + ')">↺ RESET</button>';
+                html += '<button class="btn-gold btn-sm" onclick="startTimer(' + h.id + ')" ' + (h.timerRunning || fc >= 5 ? 'disabled' : '') + '>▶ ' + t('start_btn') + '</button>';
+html += '<button class="btn-grey btn-sm" onclick="stopTimer(' + h.id + ')" ' + (!h.timerRunning ? 'disabled' : '') + '>⏹ ' + t('stop_btn') + '</button>';
+html += '<button class="btn-red btn-sm" onclick="resetTimer(' + h.id + ')">↺ ' + t('reset_btn_label') + '</button>';
                 html += '</div>';
                 html += '<div class="flights-text">📊 ' + t('flights_label') + ': ' + flightsHtml + '</div>';
                 html += '<div class="stat-line">📏 ' + t('average') + ': <strong>' + avg.toFixed(1) + 's</strong> · 🗺️ ' + t('distance') + ': <strong>' + dist.toFixed(0) + 'm</strong></div>';
