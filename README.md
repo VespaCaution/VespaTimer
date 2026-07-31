@@ -1,8 +1,8 @@
-# 🐝 VespaTimer v1.3
+# 🐝 VespaTimer v1.4
 
 **Assistant digital pour relevés Pot-à-Mèche et triangulation de nids de frelons asiatiques**
 
-![Version](https://img.shields.io/badge/version-1.3-gold)
+![Version](https://img.shields.io/badge/version-1.4-gold)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-GitHub%20Pages-blue)
 
