@@ -472,11 +472,6 @@
             margin-top: 6px;
             font-size: 0.85rem;
         }
-
-        .editing-allowed {
-            border: 2px dashed var(--gold) !important;
-            background: #fffdf5 !important;
-        }
     </style>
 </head>
 <body>
@@ -858,6 +853,7 @@
             }
         };
 
+        // ==================== HELPER FUNCTIONS ====================
         function t(key) {
             return (translations[currentLang] && translations[currentLang][key]) || key;
         }
@@ -996,6 +992,7 @@
                 return JSON.parse(localStorage.getItem('vespatimer_history') || '[]');
             } catch (e) {
                 return [];
+         
             }
         }
 
@@ -1073,32 +1070,26 @@
             renderAll();
         }
 
-        // NEW: Direction is now editable during timer
+        // UPDATED: Direction editable during timer
         function updateDirection(id, val) {
             var h = hornets.find(function(x) { return x.id === id; });
             if (!h) return;
             h.direction = Math.min(359, Math.max(0, parseInt(val) || 0));
-            // Only re-render if timer is NOT running (if running, direction updates live)
+            saveAll();
+            if (map) drawAnalysis();
             if (!h.timerRunning) {
                 renderAll();
-            } else {
-                // Update just the direction display without full re-render
-                var input = document.getElementById('dirInput_' + id);
-                if (input) input.value = h.direction;
-                saveAll();
-                if (map) drawAnalysis();
             }
         }
 
-        // NEW: Name is now editable during timer
+        // UPDATED: Name editable during timer
         function updateName(id, val) {
             var h = hornets.find(function(x) { return x.id === id; });
             if (!h) return;
             h.name = val || 'Frelon';
+            saveAll();
             if (!h.timerRunning) {
                 renderAll();
-            } else {
-                saveAll();
             }
         }
 
@@ -1261,6 +1252,7 @@
             mapLines = [];
             var predictions = [];
 
+            // Draw current hornets
             for (var idx = 0; idx < hornets.length; idx++) {
                 var h = hornets[idx];
                 if (!h.flights.length) continue;
@@ -1269,6 +1261,7 @@
                 var pot = L.latLng(surveyLocation.lat, surveyLocation.lng);
                 var nestPt = L.latLng(nestData.lat, nestData.lng);
 
+                // Dashed line from pot to nest
                 var line = L.polyline([pot, nestPt], {
                     color: COLORS[idx % COLORS.length],
                     weight: 3,
@@ -1276,6 +1269,7 @@
                 }).addTo(map);
                 mapLines.push(line);
 
+                // Oval around nest
                 var ovalPts = createOvalPoints(nestPt, nestData.direction);
                 var oval = L.polygon(ovalPts, {
                     color: COLORS[idx % COLORS.length],
@@ -1285,6 +1279,7 @@
                 }).addTo(map);
                 mapLines.push(oval);
 
+                // Nest marker
                 var marker = L.circleMarker(nestPt, {
                     radius: 7,
                     color: COLORS[idx % COLORS.length],
@@ -1307,6 +1302,7 @@
                 });
             }
 
+            // Draw historical data
             if (historyData && historyData.length) {
                 for (var ei = 0; ei < historyData.length; ei++) {
                     var entry = historyData[ei];
@@ -1314,6 +1310,7 @@
                     var histLoc = entry.location;
                     var histPot = L.latLng(histLoc.lat, histLoc.lng);
 
+                    // Historical pot marker
                     var histPotIcon = L.divIcon({
                         html: '📍',
                         iconSize: [20, 20],
@@ -1330,6 +1327,7 @@
                     );
                     mapLines.push(histPotMarker);
 
+                    // Draw each historical hornet
                     for (var hi = 0; hi < entry.hornets.length; hi++) {
                         var hh = entry.hornets[hi];
                         if (!hh.flights || !hh.flights.length) continue;
@@ -1346,6 +1344,7 @@
                             histLoc.lng + (dm / (111320 * Math.cos(histLoc.lat * Math.PI / 180))) * Math.sin(dr)
                         );
 
+                        // Line from historical pot to nest
                         var histLine = L.polyline([histPot, nh], {
                             color: '#999',
                             weight: 2,
@@ -1354,6 +1353,7 @@
                         }).addTo(map);
                         mapLines.push(histLine);
 
+                        // Oval around historical nest
                         var histOvalPts = createOvalPoints(nh, hh.direction);
                         var histOval = L.polygon(histOvalPts, {
                             color: '#999',
@@ -1364,6 +1364,7 @@
                         }).addTo(map);
                         mapLines.push(histOval);
 
+                        // Historical nest marker
                         var hm = L.circleMarker(nh, {
                             radius: 4,
                             color: '#888',
@@ -1382,6 +1383,7 @@
                 }
             }
 
+            // Priority zone
             if (predictions.length >= 2) {
                 var clat = 0,
                     clng = 0;
@@ -1402,6 +1404,7 @@
                 mapLines.push(star);
             }
 
+            // Update prediction panel
             var predictionText = '';
             if (predictions.length) {
                 var parts = [];
@@ -1486,7 +1489,6 @@
             };
             downloadBlob(
                 new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
-                'vespatimer_' + new Date().toISOString().slice(0, 10) + '.json' }),
                 'vespatimer_' + new Date().toISOString().slice(0, 10) + '.json'
             );
         }
@@ -1669,7 +1671,7 @@
                 html += '</div>';
                 html += '<div class="hornet-body' + (isCollapsed ? ' collapsed' : '') + '">';
                 html += '<div class="flex-row" style="margin:6px 0;">';
-                html += '<span>🧭 <input type="number" class="dir-input' + (h.timerRunning ? ' editing-allowed' : '') + '" id="dirInput_' + h.id + '" value="' + h.direction + '" min="0" max="359" onchange="updateDirection(' + h.id + ',this.value)"' + (h.timerRunning ? '' : '') + '>°</span>';
+                html += '<span>🧭 <input type="number" class="dir-input" value="' + h.direction + '" min="0" max="359" onchange="updateDirection(' + h.id + ',this.value)">°</span>';
                 html += '<span class="timer-display' + (h.timerRunning ? ' running' : '') + '">' + timerText + '</span>';
                 html += '</div>';
                 html += '<div class="flex-row">';
@@ -1725,28 +1727,10 @@
         // ==================== LIVE UPDATE ====================
         setInterval(function() {
             if (hornets.some(function(h) { return h.timerRunning; })) {
-                // Update only timer displays without full re-render
-                for (var i = 0; i < hornets.length; i++) {
-                    var h = hornets[i];
-                    if (h.timerRunning && h.timerStart) {
-                        var s = Math.floor((Date.now() - h.timerStart) / 1000);
-                        var timerText = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
-                        // Update all timer displays for this hornet
-                        var cards = document.querySelectorAll('.hornet-card');
-                        if (cards[i]) {
-                            var displays = cards[i].querySelectorAll('.timer-display');
-                            for (var d = 0; d < displays.length; d++) {
-                                displays[d].textContent = timerText;
-                            }
-                        }
-                    }
-                }
-                document.getElementById('liveBanner').style.display = 'block';
-            } else {
-                document.getElementById('liveBanner').style.display = 'none';
+                renderAll();
             }
             document.getElementById('datetime').textContent = new Date().toLocaleString();
-        }, 200);
+        }, 500);
 
         // ==================== AUTO-UPDATE SERVICE WORKER ====================
         if ('serviceWorker' in navigator) {
@@ -1787,3 +1771,4 @@
     </script>
 </body>
 </html>
+      
