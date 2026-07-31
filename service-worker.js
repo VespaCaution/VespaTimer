@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vespatimer-' + Date.now();
+const CACHE_NAME = 'vespatimer-v1.4-' + Date.now();
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -12,7 +12,7 @@ const ASSETS_TO_CACHE = [
 
 // Install event - cache assets
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Installing new version...');
+  console.log('[Service Worker] Installing v1.4...');
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -23,9 +23,9 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate event - clean old caches
+// Activate event - clean ALL old caches
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activating...');
+  console.log('[Service Worker] Activating v1.4...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -71,7 +71,10 @@ self.addEventListener('fetch', (event) => {
           if (event.request.mode === 'navigate') {
             return caches.match('./index.html');
           }
-          return new Response('Offline', { status: 503 });
+          return new Response('Offline - Please connect to internet', { 
+            status: 503,
+            headers: { 'Content-Type': 'text/plain' }
+          });
         });
       })
   );
