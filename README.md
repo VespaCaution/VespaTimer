@@ -1,8 +1,8 @@
-# 🐝 VespaTimer v1.2
+# 🐝 VespaTimer v1.3
 
 **Assistant digital pour relevés Pot-à-Mèche et triangulation de nids de frelons asiatiques**
 
-![Version](https://img.shields.io/badge/version-1.2-gold)
+![Version](https://img.shields.io/badge/version-1.3-gold)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-GitHub%20Pages-blue)
 
@@ -17,7 +17,7 @@ L'application permet de :
 - 🧭 Enregistrer les directions de vol (0-359°)
 - 🗺️ Estimer la position du nid par triangulation sur une carte interactive
 - 📊 Calculer automatiquement les moyennes et distances estimées
-- 💾 Sauvegarder et exporter les données (JSON, GPX, KML)
+- 💾 Sauvegarder et exporter les données (JSON, GPX, KML,PDF)
 - 📱 Fonctionner sur mobile et ordinateur 
 
 ---
