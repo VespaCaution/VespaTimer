@@ -1708,11 +1708,27 @@ html += '<button class="btn-red btn-sm" onclick="resetTimer(' + h.id + ')">↺ '
         }, 500);
 
         // ==================== SERVICE WORKER ====================
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('service-worker.js').catch(function() {});
-            });
+        // Auto-update service worker
+if ('serviceWorker' in navigator) {
+    var refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function() {
+        if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
         }
+    });
+    
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js').catch(function() {});
+    });
+    
+    // Check for updates every 5 minutes
+    setInterval(function() {
+        navigator.serviceWorker.getRegistration().then(function(reg) {
+            if (reg) reg.update();
+        });
+    }, 300000);
+}
 
         // ==================== BOOT ====================
         function boot() {
