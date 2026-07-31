@@ -196,15 +196,6 @@
             user-select: none;
         }
 
-        .hornet-header-collapsed {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            width: 100%;
-        }
-
         .hornet-name-input {
             border: none !important;
             background: transparent !important;
@@ -338,13 +329,8 @@
         }
 
         @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.65;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.65; }
         }
 
         .flex-row {
@@ -502,11 +488,13 @@
     <div class="card">
         <h2>👤 <span data-lang="personal_info">Informations personnelles</span></h2>
         <div class="grid-2">
-            <input type="text" id="firstName" data-lang-placeholder="first_name" placeholder="Prénom" onchange="savePersonalInfo()">
-            <input type="text" id="lastName" data-lang-placeholder="last_name" placeholder="Nom" onchange="savePersonalInfo()">
+            <input type="text" id="firstName" data-lang-placeholder="first_name" placeholder="Prénom" onchange="saveAll()">
+            <input type="text" id="lastName" data-lang-placeholder="last_name" placeholder="Nom" onchange="saveAll()">
         </div>
-        <input type="tel" id="phone" data-lang-placeholder="phone" placeholder="📞 Téléphone" onchange="savePersonalInfo()" style="margin-top:6px;">
-        <div class="flex-row" style="margin-top:6px;"><span>🕐</span> <span id="datetime">---</span></div>
+        <input type="tel" id="phone" data-lang-placeholder="phone" placeholder="📞 Téléphone" onchange="saveAll()" style="margin-top:6px;">
+        <div class="flex-row" style="margin-top:6px;">
+            <span>🕐</span> <span id="datetime">---</span>
+        </div>
         <hr>
         <h2>📍 <span data-lang="pot_label">Pot-à-Mèche</span></h2>
         <div class="flex-row">
@@ -514,8 +502,8 @@
             <button class="btn-gold" onclick="setLocation()">💾 <span data-lang="save_btn">Enregistrer</span></button>
         </div>
         <div class="flex-row" style="margin-top:4px;"><span id="locationDisplay">---</span></div>
-        <input type="text" id="inspectorInput" data-lang-placeholder="inspector_placeholder" placeholder="👤 Inspecteur (télémètre)" onchange="inspectorName=this.value;saveAll()" style="margin-top:6px;">
-        <textarea id="notesField" data-lang-placeholder="notes_placeholder" placeholder="📝 Notes de relevé..." onchange="notes=this.value;saveAll()" style="margin-top:6px;"></textarea>
+        <input type="text" id="inspectorInput" data-lang-placeholder="inspector_placeholder" placeholder="👤 Inspecteur (télémètre)" onchange="saveAll()" style="margin-top:6px;">
+        <textarea id="notesField" data-lang-placeholder="notes_placeholder" placeholder="📝 Notes de relevé..." onchange="saveAll()" style="margin-top:6px;"></textarea>
         <div class="banner-live" id="liveBanner" data-lang="timer_active">⏱️ Chronomètre actif</div>
     </div>
 
@@ -578,24 +566,25 @@
         </div>
     </div>
 
+    <!-- ==================== JAVASCRIPT ==================== -->
     <script>
         // ==================== GLOBAL STATE ====================
-        let hornets = [];
-        let surveyLocation = { lat: 46.8, lng: 6.8, name: '' };
-        let inspectorName = '';
-        let notes = '';
-        let personalInfo = { firstName: '', lastName: '', phone: '' };
-        let currentLang = 'fr';
-        let map = null;
-        let potMarker = null;
-        let mapLines = [];
-        let collapsedCards = {};
-        const COLORS = ['#d4a853', '#b85c3a', '#5f7d6b', '#7b5e7b', '#3a6b8c', '#c47b6b', '#4a8c6f'];
-        const COLOR_NAMES = ['Doré', 'Rouge', 'Vert', 'Violet', 'Bleu', 'Saumon', 'Émeraude'];
-        const MAX_HORNETS = 7;
+        var hornets = [];
+        var surveyLocation = { lat: 46.8, lng: 6.8, name: '' };
+        var inspectorName = '';
+        var notes = '';
+        var personalInfo = { firstName: '', lastName: '', phone: '' };
+        var currentLang = 'fr';
+        var map = null;
+        var potMarker = null;
+        var mapLines = [];
+        var collapsedCards = {};
+        var COLORS = ['#d4a853', '#b85c3a', '#5f7d6b', '#7b5e7b', '#3a6b8c', '#c47b6b', '#4a8c6f'];
+        var COLOR_NAMES = ['Doré', 'Rouge', 'Vert', 'Violet', 'Bleu', 'Saumon', 'Émeraude'];
+        var MAX_HORNETS = 7;
 
         // ==================== TRANSLATIONS ====================
-        const translations = {
+        var translations = {
             fr: {
                 about_btn: 'À propos',
                 personal_info: 'Informations personnelles',
@@ -842,7 +831,10 @@
             }
         };
 
-        function t(key) { return (translations[currentLang] && translations[currentLang][key]) || key; }
+        // ==================== HELPER FUNCTIONS ====================
+        function t(key) {
+            return (translations[currentLang] && translations[currentLang][key]) || key;
+        }
 
         function changeLanguage(lang) {
             currentLang = lang;
@@ -853,66 +845,135 @@
         }
 
         function applyTranslations() {
-            document.querySelectorAll('[data-lang]').forEach(el => { el.textContent = t(el.getAttribute('data-lang')); });
-            document.querySelectorAll('[data-lang-placeholder]').forEach(el => { el.placeholder = t(el.getAttribute('data-lang-placeholder')); });
+            var elements = document.querySelectorAll('[data-lang]');
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].textContent = t(elements[i].getAttribute('data-lang'));
+            }
+            var placeholders = document.querySelectorAll('[data-lang-placeholder]');
+            for (var j = 0; j < placeholders.length; j++) {
+                placeholders[j].placeholder = t(placeholders[j].getAttribute('data-lang-placeholder'));
+            }
         }
 
+        // ==================== HORNET FUNCTIONS ====================
         function createHornet(name) {
-            return { id: Date.now() + Math.random(), name: name || 'Frelon 1', direction: 0, flights: [], timerRunning: false, timerStart: null, elapsedSeconds: 0 };
+            return {
+                id: Date.now() + Math.random(),
+                name: name || 'Frelon 1',
+                direction: 0,
+                flights: [],
+                timerRunning: false,
+                timerStart: null,
+                elapsedSeconds: 0
+            };
         }
 
-        function getAverage(h) { if (!h.flights.length) return 0; return h.flights.reduce((a, b) => a + b, 0) / h.flights.length; }
+        function getAverage(h) {
+            if (!h.flights.length) return 0;
+            var sum = 0;
+            for (var i = 0; i < h.flights.length; i++) {
+                sum += h.flights[i];
+            }
+            return sum / h.flights.length;
+        }
 
-        function getDistance(avg) { if (avg <= 30) return 0; return (avg - 30) * 2.5; }
+        function getDistance(avg) {
+            if (avg <= 30) return 0;
+            return (avg - 30) * 2.5;
+        }
 
-        function saveAll() { try { localStorage.setItem('vespatimer_data', JSON.stringify({ hornets, surveyLocation, inspectorName, notes, personalInfo, collapsedCards })); } catch (e) {} }
-
-        function savePersonalInfo() {
-            personalInfo.firstName = document.getElementById('firstName').value;
-            personalInfo.lastName = document.getElementById('lastName').value;
-            personalInfo.phone = document.getElementById('phone').value;
-            saveAll();
+        // ==================== PERSISTENCE ====================
+        function saveAll() {
+            try {
+                var data = {
+                    hornets: hornets,
+                    surveyLocation: surveyLocation,
+                    inspectorName: inspectorName,
+                    notes: notes,
+                    personalInfo: personalInfo,
+                    collapsedCards: collapsedCards
+                };
+                localStorage.setItem('vespatimer_data', JSON.stringify(data));
+            } catch (e) {
+                console.warn('Could not save data:', e);
+            }
         }
 
         function loadAll() {
             try {
-                const d = JSON.parse(localStorage.getItem('vespatimer_data'));
-                if (d) {
-                    if (d.hornets && Array.isArray(d.hornets)) hornets = d.hornets;
-                    if (d.surveyLocation) surveyLocation = d.surveyLocation;
-                    inspectorName = d.inspectorName || '';
-                    notes = d.notes || '';
-                    if (d.personalInfo) personalInfo = d.personalInfo;
-                    if (d.collapsedCards) collapsedCards = d.collapsedCards;
+                var saved = localStorage.getItem('vespatimer_data');
+                if (saved) {
+                    var data = JSON.parse(saved);
+                    if (data.hornets && Array.isArray(data.hornets)) hornets = data.hornets;
+                    if (data.surveyLocation) surveyLocation = data.surveyLocation;
+                    inspectorName = data.inspectorName || '';
+                    notes = data.notes || '';
+                    if (data.personalInfo) personalInfo = data.personalInfo;
+                    if (data.collapsedCards) collapsedCards = data.collapsedCards;
                 }
-            } catch (e) {}
-            const savedLang = localStorage.getItem('vespatimer_lang');
-            if (savedLang && translations[savedLang]) currentLang = savedLang;
+            } catch (e) {
+                console.warn('Could not load data:', e);
+            }
+            var savedLang = localStorage.getItem('vespatimer_lang');
+            if (savedLang && translations[savedLang]) {
+                currentLang = savedLang;
+            }
             document.getElementById('langSelect').value = currentLang;
             document.getElementById('firstName').value = personalInfo.firstName || '';
             document.getElementById('lastName').value = personalInfo.lastName || '';
             document.getElementById('phone').value = personalInfo.phone || '';
-            if (!hornets.length) hornets.push(createHornet('Frelon 1'));
+            if (!hornets.length) {
+                hornets.push(createHornet('Frelon 1'));
+            }
         }
 
         function saveHistory() {
-            if (!hornets.some(h => h.flights.length > 0)) return;
-            let history = [];
-            try { history = JSON.parse(localStorage.getItem('vespatimer_history') || '[]'); } catch (e) {}
+            if (!hornets.some(function(h) { return h.flights.length > 0; })) return;
+            var history = [];
+            try {
+                history = JSON.parse(localStorage.getItem('vespatimer_history') || '[]');
+            } catch (e) {
+                history = [];
+            }
             history.push({
                 date: new Date().toISOString(),
-                location: { ...surveyLocation },
-                hornets: hornets.map(h => ({ name: h.name, direction: h.direction, flights: [...h.flights] })),
-                notes,
-                inspectorName,
-                personalInfo: { ...personalInfo }
+                location: {
+                    lat: surveyLocation.lat,
+                    lng: surveyLocation.lng,
+                    name: surveyLocation.name
+                },
+                hornets: hornets.map(function(h) {
+                    return {
+                        name: h.name,
+                        direction: h.direction,
+                        flights: h.flights.slice()
+                    };
+                }),
+                notes: notes,
+                inspectorName: inspectorName,
+                personalInfo: {
+                    firstName: personalInfo.firstName,
+                    lastName: personalInfo.lastName,
+                    phone: personalInfo.phone
+                }
             });
             if (history.length > 100) history = history.slice(-100);
-            try { localStorage.setItem('vespatimer_history', JSON.stringify(history)); } catch (e) {}
+            try {
+                localStorage.setItem('vespatimer_history', JSON.stringify(history));
+            } catch (e) {
+                console.warn('Could not save history:', e);
+            }
         }
 
-        function getHistory() { try { return JSON.parse(localStorage.getItem('vespatimer_history') || '[]'); } catch (e) { return []; } }
+        function getHistory() {
+            try {
+                return JSON.parse(localStorage.getItem('vespatimer_history') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
 
+        // ==================== TIMER ACTIONS ====================
         function toggleCollapse(id) {
             collapsedCards[id] = !collapsedCards[id];
             saveAll();
@@ -921,7 +982,7 @@
         }
 
         function startTimer(id) {
-            const h = hornets.find(x => x.id === id);
+            var h = hornets.find(function(x) { return x.id === id; });
             if (!h || h.timerRunning || h.flights.length >= 5) return;
             h.timerRunning = true;
             h.timerStart = Date.now() - (h.elapsedSeconds * 1000);
@@ -929,9 +990,9 @@
         }
 
         function stopTimer(id) {
-            const h = hornets.find(x => x.id === id);
+            var h = hornets.find(function(x) { return x.id === id; });
             if (!h || !h.timerRunning) return;
-            const elapsed = Math.floor((Date.now() - h.timerStart) / 1000);
+            var elapsed = Math.floor((Date.now() - h.timerStart) / 1000);
             h.timerRunning = false;
             h.timerStart = null;
             if (elapsed > 0) {
@@ -944,7 +1005,7 @@
         }
 
         function resetTimer(id) {
-            const h = hornets.find(x => x.id === id);
+            var h = hornets.find(function(x) { return x.id === id; });
             if (!h) return;
             h.timerRunning = false;
             h.timerStart = null;
@@ -953,19 +1014,22 @@
         }
 
         function deleteFlight(hornetId, flightIndex) {
-            const h = hornets.find(x => x.id === hornetId);
+            var h = hornets.find(function(x) { return x.id === hornetId; });
             if (!h || flightIndex < 0 || flightIndex >= h.flights.length) return;
             h.flights.splice(flightIndex, 1);
             renderAll();
         }
 
         function addManualTime(id) {
-            const h = hornets.find(x => x.id === id);
+            var h = hornets.find(function(x) { return x.id === id; });
             if (!h || h.flights.length >= 5) return;
-            const input = document.getElementById('mt_' + id);
+            var input = document.getElementById('mt_' + id);
             if (!input) return;
-            const val = parseInt(input.value);
-            if (isNaN(val) || val <= 0) { alert('Temps invalide'); return; }
+            var val = parseInt(input.value);
+            if (isNaN(val) || val <= 0) {
+                alert('Veuillez entrer un temps valide en secondes.');
+                return;
+            }
             h.flights.push(val);
             if (h.flights.length > 5) h.flights.shift();
             input.value = '';
@@ -974,95 +1038,130 @@
         }
 
         function deleteHornet(id) {
-            if (hornets.length <= 1) { alert('Gardez au moins un frelon.'); return; }
-            hornets = hornets.filter(x => x.id !== id);
+            if (hornets.length <= 1) {
+                alert('Gardez au moins un frelon.');
+                return;
+            }
+            hornets = hornets.filter(function(x) { return x.id !== id; });
             delete collapsedCards[id];
             renderAll();
         }
 
         function updateDirection(id, val) {
-            const h = hornets.filter(x => x.id !== id);
-            delete collapsedCards[id];
-            renderAll();
-        }
-
-        function updateDirection(id, val) {
-            const h = hornets.find(x => x.id === id);
+            var h = hornets.find(function(x) { return x.id === id; });
             if (!h) return;
             h.direction = Math.min(359, Math.max(0, parseInt(val) || 0));
             renderAll();
         }
 
         function updateName(id, val) {
-            const h = hornets.find(x => x.id === id);
+            var h = hornets.find(function(x) { return x.id === id; });
             if (!h) return;
             h.name = val || 'Frelon';
             renderAll();
         }
 
         function addHornet() {
-            if (hornets.length >= MAX_HORNETS) { alert(t('max_hornets')); return; }
+            if (hornets.length >= MAX_HORNETS) {
+                alert(t('max_hornets'));
+                return;
+            }
             hornets.push(createHornet('Frelon ' + (hornets.length + 1)));
             renderAll();
         }
 
+        // ==================== LOCATION FUNCTIONS ====================
         function setLocation() {
-            const val = document.getElementById('locationInput').value.trim();
+            var val = document.getElementById('locationInput').value.trim();
             if (!val) return;
             surveyLocation.name = val;
-            const m = val.match(/([-+]?\d+\.?\d*)\s*[,;]\s*([-+]?\d+\.?\d*)/);
-            if (m) {
-                surveyLocation.lat = parseFloat(m[1]);
-                surveyLocation.lng = parseFloat(m[2]);
+            var match = val.match(/([-+]?\d+\.?\d*)\s*[,;]\s*([-+]?\d+\.?\d*)/);
+            if (match) {
+                surveyLocation.lat = parseFloat(match[1]);
+                surveyLocation.lng = parseFloat(match[2]);
             }
             updatePotMarker();
             renderAll();
         }
 
         function getGPS() {
-            if (!navigator.geolocation) { alert(t('gps_error')); return; }
+            if (!navigator.geolocation) {
+                alert(t('gps_error'));
+                return;
+            }
             navigator.geolocation.getCurrentPosition(
                 function(pos) {
                     surveyLocation.lat = pos.coords.latitude;
                     surveyLocation.lng = pos.coords.longitude;
-                    document.getElementById('locationInput').value = pos.coords.latitude.toFixed(5) + ', ' + pos.coords.longitude.toFixed(5);
+                    document.getElementById('locationInput').value =
+                        pos.coords.latitude.toFixed(5) + ', ' + pos.coords.longitude.toFixed(5);
                     updatePotMarker();
                     renderAll();
                 },
-                function() { alert(t('gps_error')); }, { enableHighAccuracy: true, timeout: 10000 }
+                function() {
+                    alert(t('gps_error'));
+                }, { enableHighAccuracy: true, timeout: 10000 }
             );
         }
 
         function manualCoords() {
-            const lat = prompt('Latitude:', surveyLocation.lat.toFixed(5));
+            var lat = prompt('Latitude:', surveyLocation.lat.toFixed(5));
             if (lat === null) return;
-            const lng = prompt('Longitude:', surveyLocation.lng.toFixed(5));
+            var lng = prompt('Longitude:', surveyLocation.lng.toFixed(5));
             if (lng === null) return;
-            surveyLocation.lat = parseFloat(lat);
-            surveyLocation.lng = parseFloat(lng);
-            document.getElementById('locationInput').value = lat + ', ' + lng;
+            var latNum = parseFloat(lat);
+            var lngNum = parseFloat(lng);
+            if (isNaN(latNum) || isNaN(lngNum)) {
+                alert('Coordonnées invalides');
+                return;
+            }
+            surveyLocation.lat = latNum;
+            surveyLocation.lng = lngNum;
+            document.getElementById('locationInput').value = latNum.toFixed(5) + ', ' + lngNum.toFixed(5);
             updatePotMarker();
             renderAll();
         }
 
+        // ==================== MAP FUNCTIONS ====================
         function initMap() {
-            const el = document.getElementById('map');
-            if (!el || map) return;
+            var mapElement = document.getElementById('map');
+            if (!mapElement) {
+                setTimeout(initMap, 500);
+                return;
+            }
+            if (map) {
+                map.invalidateSize();
+                return;
+            }
             map = L.map('map', { zoomControl: true }).setView([surveyLocation.lat, surveyLocation.lng], 16);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(map);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            }).addTo(map);
             updatePotMarker();
-            setTimeout(() => { if (map) map.invalidateSize(); }, 400);
+            setTimeout(function() {
+                if (map) map.invalidateSize();
+            }, 400);
         }
 
         function updatePotMarker() {
             if (!map) return;
             if (potMarker) map.removeLayer(potMarker);
-            const beeIcon = L.divIcon({ html: '🐝', iconSize: [30, 30], iconAnchor: [15, 15], className: '' });
-            potMarker = L.marker([surveyLocation.lat, surveyLocation.lng], { draggable: true, icon: beeIcon }).addTo(map).bindPopup('📍 ' + t('pot_label')).openPopup();
+            var beeIcon = L.divIcon({
+                html: '🐝',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
+                className: ''
+            });
+            potMarker = L.marker([surveyLocation.lat, surveyLocation.lng], {
+                draggable: true,
+                icon: beeIcon
+            }).addTo(map).bindPopup('📍 ' + t('pot_label')).openPopup();
             potMarker.on('dragend', function(e) {
                 surveyLocation.lat = e.target.getLatLng().lat;
                 surveyLocation.lng = e.target.getLatLng().lng;
-                document.getElementById('locationDisplay').textContent = surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5);
+                document.getElementById('locationDisplay').textContent =
+                    surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5);
                 saveAll();
                 drawAnalysis();
             });
@@ -1070,17 +1169,19 @@
 
         function clearMap() {
             if (!map) return;
-            mapLines.forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
+            for (var i = 0; i < mapLines.length; i++) {
+                if (map.hasLayer(mapLines[i])) map.removeLayer(mapLines[i]);
+            }
             mapLines = [];
             document.getElementById('predictionPanel').innerHTML = '⚠️ ' + t('no_flights');
             document.getElementById('historyPanel').style.display = 'none';
         }
 
         function getNestCoordsForHornet(h, location) {
-            const d = getDistance(getAverage(h));
+            var d = getDistance(getAverage(h));
             if (d <= 0) return null;
-            const rad = (h.direction * Math.PI) / 180;
-            const loc = location || surveyLocation;
+            var rad = (h.direction * Math.PI) / 180;
+            var loc = location || surveyLocation;
             return {
                 lat: loc.lat + (d / 111320) * Math.cos(rad),
                 lng: loc.lng + (d / (111320 * Math.cos(loc.lat * Math.PI / 180))) * Math.sin(rad),
@@ -1093,22 +1194,19 @@
             return getNestCoordsForHornet(h, surveyLocation);
         }
 
-        // Creates an oval (ellipse) perpendicular to the flight direction
-        // 50m high (along flight line) × 100m wide (perpendicular to flight line)
-        function createOvalPoints(center, directionDegrees, color, opacity) {
-            const points = [];
-            const halfWidth = 50; // 100m wide total, so 50m half-width (perpendicular)
-            const halfHeight = 25; // 50m high total, so 25m half-height (along flight)
-            const dirRad = (directionDegrees * Math.PI) / 180;
-            const perpRad = dirRad + Math.PI / 2; // perpendicular to flight direction
-            const steps = 64;
-            for (let i = 0; i < steps; i++) {
-                const angle = (i / steps) * 2 * Math.PI;
-                // rx = along flight direction (height), ry = perpendicular (width)
-                const rx = halfHeight * Math.cos(angle);
-                const ry = halfWidth * Math.sin(angle);
-                const lat = center.lat + (rx / 111320) * Math.cos(dirRad) - (ry / 111320) * Math.cos(perpRad);
-                const lng = center.lng + (rx / (111320 * Math.cos(center.lat * Math.PI / 180))) * Math.sin(dirRad) - (ry / (111320 * Math.cos(center.lat * Math.PI / 180))) * Math.sin(perpRad);
+        function createOvalPoints(center, directionDegrees) {
+            var points = [];
+            var halfWidth = 50;
+            var halfHeight = 25;
+            var dirRad = (directionDegrees * Math.PI) / 180;
+            var perpRad = dirRad + Math.PI / 2;
+            var steps = 64;
+            for (var i = 0; i < steps; i++) {
+                var angle = (i / steps) * 2 * Math.PI;
+                var rx = halfHeight * Math.cos(angle);
+                var ry = halfWidth * Math.sin(angle);
+                var lat = center.lat + (rx / 111320) * Math.cos(dirRad) - (ry / 111320) * Math.cos(perpRad);
+                var lng = center.lng + (rx / (111320 * Math.cos(center.lat * Math.PI / 180))) * Math.sin(dirRad) - (ry / (111320 * Math.cos(center.lat * Math.PI / 180))) * Math.sin(perpRad);
                 points.push(L.latLng(lat, lng));
             }
             return points;
@@ -1116,29 +1214,32 @@
 
         function drawAnalysis(historyData) {
             if (!map) return;
-            mapLines.forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
+            for (var i = 0; i < mapLines.length; i++) {
+                if (map.hasLayer(mapLines[i])) map.removeLayer(mapLines[i]);
+            }
             mapLines = [];
-            const predictions = [];
+            var predictions = [];
 
             // Draw current hornets
-            hornets.forEach((h, idx) => {
-                if (!h.flights.length) return;
-                const nestData = getNestCoordsForHornet(h, surveyLocation);
-                if (!nestData) return;
-                const pot = L.latLng(surveyLocation.lat, surveyLocation.lng);
-                const nestPt = L.latLng(nestData.lat, nestData.lng);
+            for (var idx = 0; idx < hornets.length; idx++) {
+                var h = hornets[idx];
+                if (!h.flights.length) continue;
+                var nestData = getNestCoordsForHornet(h, surveyLocation);
+                if (!nestData) continue;
+                var pot = L.latLng(surveyLocation.lat, surveyLocation.lng);
+                var nestPt = L.latLng(nestData.lat, nestData.lng);
 
                 // Dashed line from pot to nest
-                const line = L.polyline([pot, nestPt], {
+                var line = L.polyline([pot, nestPt], {
                     color: COLORS[idx % COLORS.length],
                     weight: 3,
                     dashArray: '5,5'
                 }).addTo(map);
                 mapLines.push(line);
 
-                // Oval around nest (50m high × 100m wide, perpendicular to flight)
-                const ovalPts = createOvalPoints(nestPt, nestData.direction, COLORS[idx % COLORS.length]);
-                const oval = L.polygon(ovalPts, {
+                // Oval around nest
+                var ovalPts = createOvalPoints(nestPt, nestData.direction);
+                var oval = L.polygon(ovalPts, {
                     color: COLORS[idx % COLORS.length],
                     fillOpacity: 0.15,
                     weight: 1.5,
@@ -1147,7 +1248,7 @@
                 mapLines.push(oval);
 
                 // Nest marker
-                const marker = L.circleMarker(nestPt, {
+                var marker = L.circleMarker(nestPt, {
                     radius: 7,
                     color: COLORS[idx % COLORS.length],
                     fillOpacity: 0.7
@@ -1167,35 +1268,52 @@
                     dist: nestData.distance,
                     direction: h.direction
                 });
-            });
+            }
 
-            // Draw historical data with ovals too (not circles)
+            // Draw historical data
             if (historyData && historyData.length) {
-                historyData.forEach(entry => {
-                    if (!entry.location || !entry.hornets) return;
-                    const histLoc = entry.location;
-                    const histPot = L.latLng(histLoc.lat, histLoc.lng);
+                for (var ei = 0; ei < historyData.length; ei++) {
+                    var entry = historyData[ei];
+                    if (!entry.location || !entry.hornets) continue;
+                    var histLoc = entry.location;
+                    var histPot = L.latLng(histLoc.lat, histLoc.lng);
 
                     // Historical pot marker
-                    const histPotIcon = L.divIcon({ html: '📍', iconSize: [20, 20], iconAnchor: [10, 10], className: '' });
-                    const histPotMarker = L.marker([histLoc.lat, histLoc.lng], { icon: histPotIcon, opacity: 0.7 }).addTo(map);
-                    histPotMarker.bindPopup('<b>' + t('hist_pot') + '</b><br>📅 ' + new Date(entry.date).toLocaleDateString());
+                    var histPotIcon = L.divIcon({
+                        html: '📍',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10],
+                        className: ''
+                    });
+                    var histPotMarker = L.marker([histLoc.lat, histLoc.lng], {
+                        icon: histPotIcon,
+                        opacity: 0.7
+                    }).addTo(map);
+                    histPotMarker.bindPopup(
+                        '<b>' + t('hist_pot') + '</b><br>' +
+                        '📅 ' + new Date(entry.date).toLocaleDateString()
+                    );
                     mapLines.push(histPotMarker);
 
                     // Draw each historical hornet
-                    entry.hornets.forEach((hh) => {
-                        if (!hh.flights || !hh.flights.length) return;
-                        const avg = hh.flights.reduce((a, b) => a + b, 0) / hh.flights.length;
-                        const dm = (avg - 30) * 2.5;
-                        if (dm <= 0) return;
-                        const dr = (hh.direction * Math.PI) / 180;
-                        const nh = L.latLng(
+                    for (var hi = 0; hi < entry.hornets.length; hi++) {
+                        var hh = entry.hornets[hi];
+                        if (!hh.flights || !hh.flights.length) continue;
+                        var avg = 0;
+                        for (var fi = 0; fi < hh.flights.length; fi++) {
+                            avg += hh.flights[fi];
+                        }
+                        avg = avg / hh.flights.length;
+                        var dm = (avg - 30) * 2.5;
+                        if (dm <= 0) continue;
+                        var dr = (hh.direction * Math.PI) / 180;
+                        var nh = L.latLng(
                             histLoc.lat + (dm / 111320) * Math.cos(dr),
                             histLoc.lng + (dm / (111320 * Math.cos(histLoc.lat * Math.PI / 180))) * Math.sin(dr)
                         );
 
-                        // Dashed line from historical pot to historical nest
-                        const histLine = L.polyline([histPot, nh], {
+                        // Line from historical pot to nest
+                        var histLine = L.polyline([histPot, nh], {
                             color: '#999',
                             weight: 2,
                             dashArray: '3,7',
@@ -1203,9 +1321,9 @@
                         }).addTo(map);
                         mapLines.push(histLine);
 
-                        // OVAL around historical nest (same 50m×100m, perpendicular to flight)
-                        const histOvalPts = createOvalPoints(nh, hh.direction);
-                        const histOval = L.polygon(histOvalPts, {
+                        // Oval around historical nest
+                        var histOvalPts = createOvalPoints(nh, hh.direction);
+                        var histOval = L.polygon(histOvalPts, {
                             color: '#999',
                             fillOpacity: 0.08,
                             weight: 1,
@@ -1215,7 +1333,7 @@
                         mapLines.push(histOval);
 
                         // Historical nest marker
-                        const hm = L.circleMarker(nh, {
+                        var hm = L.circleMarker(nh, {
                             radius: 4,
                             color: '#888',
                             fillOpacity: 0.5,
@@ -1229,44 +1347,87 @@
                             '⬭ Ovale: 50m×100m'
                         );
                         mapLines.push(hm);
-                    });
-                });
+                    }
+                }
             }
 
             // Priority zone
             if (predictions.length >= 2) {
-                const clat = predictions.reduce((s, p) => s + p.point.lat, 0) / predictions.length;
-                const clng = predictions.reduce((s, p) => s + p.point.lng, 0) / predictions.length;
-                const starIcon = L.divIcon({ html: '⭐', iconSize: [30, 30], iconAnchor: [15, 15], className: '' });
-                const star = L.marker([clat, clng], { icon: starIcon }).addTo(map);
+                var clat = 0,
+                    clng = 0;
+                for (var pi = 0; pi < predictions.length; pi++) {
+                    clat += predictions[pi].point.lat;
+                    clng += predictions[pi].point.lng;
+                }
+                clat = clat / predictions.length;
+                clng = clng / predictions.length;
+                var starIcon = L.divIcon({
+                    html: '⭐',
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15],
+                    className: ''
+                });
+                var star = L.marker([clat, clng], { icon: starIcon }).addTo(map);
                 star.bindPopup('<b>' + t('priority_zone') + '</b>');
                 mapLines.push(star);
             }
 
-            document.getElementById('predictionPanel').innerHTML = predictions.length ?
-                '🔍 ' + predictions.map(p => p.name + ' (' + p.color + ') → ~' + p.dist.toFixed(0) + 'm').join(' · ') :
-                '⚠️ ' + t('no_flights');
+            // Update prediction panel
+            var predictionText = '';
+            if (predictions.length) {
+                var parts = [];
+                for (var pi2 = 0; pi2 < predictions.length; pi2++) {
+                    parts.push(predictions[pi2].name + ' (' + predictions[pi2].color + ') → ~' + predictions[pi2].dist.toFixed(0) + 'm');
+                }
+                predictionText = '🔍 ' + parts.join(' · ');
+            } else {
+                predictionText = '⚠️ ' + t('no_flights');
+            }
+            document.getElementById('predictionPanel').innerHTML = predictionText;
         }
 
         function showHistory() {
-            const history = getHistory();
-            const recent = history.filter(e => new Date(e.date) > new Date(Date.now() - 60 * 24 * 60 * 60 * 1000));
+            var history = getHistory();
+            var cutoff = Date.now() - 60 * 24 * 60 * 60 * 1000;
+            var recent = history.filter(function(e) {
+                return new Date(e.date) > new Date(cutoff);
+            });
             drawAnalysis(recent);
-            const panel = document.getElementById('historyPanel');
+            var panel = document.getElementById('historyPanel');
             panel.style.display = 'block';
-            panel.innerHTML = recent.length ?
-                recent.reverse().map(e =>
-                    '<div class="history-item"><strong>📅 ' + new Date(e.date).toLocaleDateString() + '</strong><br>📍 Pot: ' + (e.location?.name || '?') + ' | 🐝 ' + (e.hornets?.filter(h => h.flights?.length).length || 0) + ' ' + t('flights_label') + '</div>'
-                ).join('') :
-                '<div class="history-item">📭 ' + t('history_empty') + '</div>';
+            if (recent.length) {
+                recent.reverse();
+                var html = '';
+                for (var i = 0; i < recent.length; i++) {
+                    var e = recent[i];
+                    var hornetCount = 0;
+                    if (e.hornets) {
+                        for (var j = 0; j < e.hornets.length; j++) {
+                            if (e.hornets[j].flights && e.hornets[j].flights.length) {
+                                hornetCount++;
+                            }
+                        }
+                    }
+                    html += '<div class="history-item"><strong>📅 ' + new Date(e.date).toLocaleDateString() + '</strong><br>📍 Pot: ' + (e.location && e.location.name ? e.location.name : '?') + ' | 🐝 ' + hornetCount + ' ' + t('flights_label') + '</div>';
+                }
+                panel.innerHTML = html;
+            } else {
+                panel.innerHTML = '<div class="history-item">📭 ' + t('history_empty') + '</div>';
+            }
         }
 
-        function openAbout() { document.getElementById('aboutModal').style.display = 'flex'; }
+        // ==================== MODALS ====================
+        function openAbout() {
+            document.getElementById('aboutModal').style.display = 'flex';
+        }
 
-        function closeAbout() { document.getElementById('aboutModal').style.display = 'none'; }
+        function closeAbout() {
+            document.getElementById('aboutModal').style.display = 'none';
+        }
 
+        // ==================== EXPORT FUNCTIONS ====================
         function downloadBlob(blob, name) {
-            const a = document.createElement('a');
+            var a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = name;
             document.body.appendChild(a);
@@ -1275,15 +1436,15 @@
         }
 
         function exportJSON() {
-            const data = {
+            var data = {
                 version: '1.3',
                 date: new Date().toISOString(),
-                personalInfo,
-                surveyLocation,
-                inspectorName,
-                notes,
-                hornets: hornets.map(h => {
-                    const coords = getNestCoords(h);
+                personalInfo: personalInfo,
+                surveyLocation: surveyLocation,
+                inspectorName: inspectorName,
+                notes: notes,
+                hornets: hornets.map(function(h) {
+                    var coords = getNestCoords(h);
                     return {
                         name: h.name,
                         direction: h.direction,
@@ -1294,65 +1455,106 @@
                     };
                 })
             };
-            downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), 'vespatimer_' + new Date().toISOString().slice(0, 10) + '.json');
+            downloadBlob(
+                new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
+                'vespatimer_' + new Date().toISOString().slice(0, 10) + '.json'
+            );
         }
 
         function exportPDF() {
-            let r = '══════ 🐝 ' + t('report_title') + ' v1.3 ══════\n\n';
-            r += '📅 ' + new Date().toLocaleString() + '\n\n';
-            r += '👤 ' + t('personal_info_label') + ': ' + (personalInfo.firstName || '?') + ' ' + (personalInfo.lastName || '?') + ' 📞 ' + (personalInfo.phone || '?') + '\n';
+            var r = '══════════════════════════════\n';
+            r += '  🐝 ' + t('report_title') + ' v1.3\n';
+            r += '══════════════════════════════\n\n';
+            r += '📅 Date: ' + new Date().toLocaleString() + '\n\n';
+            r += '👤 ' + t('personal_info_label') + ':\n';
+            r += '   ' + (personalInfo.firstName || '?') + ' ' + (personalInfo.lastName || '?') + '\n';
+            r += '   📞 ' + (personalInfo.phone || '?') + '\n\n';
             r += '👤 ' + t('triangulator') + ': ' + (inspectorName || 'N/A') + '\n\n';
-            r += '📍 ' + t('pot_location') + ': ' + (surveyLocation.name || 'N/A') + ' (' + surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5) + ')\n';
+            r += '📍 ' + t('pot_location') + ':\n';
+            r += '   ' + (surveyLocation.name || 'N/A') + '\n';
+            r += '   Coordonnées: ' + surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5) + '\n\n';
             r += '📝 Notes: ' + (notes || 'N/A') + '\n\n';
-            hornets.forEach((h, i) => {
-                const avg = getAverage(h);
-                const dist = getDistance(avg);
-                const nest = getNestCoords(h);
-                r += '• ' + h.name + ' (' + COLOR_NAMES[i % COLOR_NAMES.length] + ') 🧭 ' + h.direction + '° | Vols: ' + (h.flights.length ? h.flights.join('s, ') + 's' : '—') + ' | Moy: ' + avg.toFixed(1) + 's | Dist: ' + dist.toFixed(0) + 'm\n';
-                if (nest) r += '  📍 ' + t('nest_estimated') + ': ' + nest.lat.toFixed(5) + ', ' + nest.lng.toFixed(5) + '\n';
+            r += '──────────────────────────────\n';
+            r += '🐝 FRELONS:\n';
+            r += '──────────────────────────────\n\n';
+            for (var i = 0; i < hornets.length; i++) {
+                var h = hornets[i];
+                var avg =  getAverage(h);
+                var dist = getDistance(avg);
+                var nest = getNestCoords(h);
+                r += '• ' + h.name + ' (' + COLOR_NAMES[i % COLOR_NAMES.length] + ')\n';
+                r += '  🧭 Direction: ' + h.direction + '°\n';
+                r += '  ⏱️ Vols: ' + (h.flights.length ? h.flights.join('s, ') + 's' : '—') + '\n';
+                r += '  📏 Moyenne: ' + avg.toFixed(1) + 's\n';
+                r += '  🗺️ Distance estimée: ' + dist.toFixed(0) + 'm\n';
+                if (nest) {
+                    r += '  📍 ' + t('nest_estimated') + ': ' + nest.lat.toFixed(5) + ', ' + nest.lng.toFixed(5) + '\n';
+                } else {
+                    r += '  📍 ' + t('nest_estimated') + ': ' + t('no_nest') + '\n';
+                }
                 r += '\n';
+            }
+            r += '══════════════════════════════\n';
+            r += '  Signalement: frelonasiatique.ch\n';
+            r += '══════════════════════════════\n';
+
+            navigator.clipboard.writeText(r).then(function() {
+                alert('✅ Rapport copié dans le presse-papier.\n\nUtilisez Ctrl+P (ou Cmd+P) et choisissez "Enregistrer en PDF" pour sauvegarder.');
+            }).catch(function() {
+                alert('Rapport généré:\n\n' + r + '\n\nUtilisez Ctrl+P pour imprimer en PDF.');
             });
-            r += '══════════════════════\nSignalement: frelonasiatique.ch\n';
-            navigator.clipboard.writeText(r).then(() => { alert('✅ Rapport copié. Ctrl+P pour PDF.'); });
             window.print();
         }
 
         function exportGPX() {
-            let g = '<?xml version="1.0"?><gpx version="1.1" creator="VespaTimer v1.3">';
-            g += '<wpt lat="' + surveyLocation.lat + '" lon="' + surveyLocation.lng + '"><name>Pot</name></wpt>';
-            hornets.forEach(h => {
-                if (!h.flights.length) return;
-                const d = getDistance(getAverage(h));
-                if (d <= 0) return;
-                const nest = getNestCoords(h);
-                if (nest) g += '<wpt lat="' + nest.lat.toFixed(6) + '" lon="' + nest.lng.toFixed(6) + '"><name>' + h.name + '</name></wpt>';
-            });
+            var g = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="VespaTimer v1.3">\n';
+            g += '<wpt lat="' + surveyLocation.lat + '" lon="' + surveyLocation.lng + '"><name>Pot-à-Mèche</name></wpt>\n';
+            for (var i = 0; i < hornets.length; i++) {
+                var h = hornets[i];
+                if (!h.flights.length) continue;
+                var d = getDistance(getAverage(h));
+                if (d <= 0) continue;
+                var nest = getNestCoords(h);
+                if (nest) {
+                    g += '<wpt lat="' + nest.lat.toFixed(6) + '" lon="' + nest.lng.toFixed(6) + '"><name>' + h.name + ' (nest)</name></wpt>\n';
+                }
+            }
             g += '</gpx>';
             downloadBlob(new Blob([g], { type: 'application/gpx+xml' }), 'vespatimer.gpx');
         }
 
         function exportKML() {
-            let k = '<?xml version="1.0"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document>';
-            k += '<Placemark><name>Pot</name><Point><coordinates>' + surveyLocation.lng + ',' + surveyLocation.lat + ',0</coordinates></Point></Placemark>';
-            hornets.forEach(h => {
-                if (!h.flights.length) return;
-                const d = getDistance(getAverage(h));
-                if (d <= 0) return;
-                const nest = getNestCoords(h);
-                if (nest) k += '<Placemark><name>' + h.name + '</name><Point><coordinates>' + nest.lng.toFixed(6) + ',' + nest.lat.toFixed(6) + ',0</coordinates></Point></Placemark>';
-            });
-            k += '</Document></kml>';
+            var k = '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n<Document>\n';
+            k += '<Placemark><name>Pot-à-Mèche</name><Point><coordinates>' + surveyLocation.lng + ',' + surveyLocation.lat + ',0</coordinates></Point></Placemark>\n';
+            for (var i = 0; i < hornets.length; i++) {
+                var h = hornets[i];
+                if (!h.flights.length) continue;
+                var d = getDistance(getAverage(h));
+                if (d <= 0) continue;
+                var nest = getNestCoords(h);
+                if (nest) {
+                    k += '<Placemark><name>' + h.name + ' (nest)</name><Point><coordinates>' + nest.lng.toFixed(6) + ',' + nest.lat.toFixed(6) + ',0</coordinates></Point></Placemark>\n';
+                }
+            }
+            k += '</Document>\n</kml>';
             downloadBlob(new Blob([k], { type: 'application/vnd.google-earth.kml+xml' }), 'vespatimer.kml');
         }
 
         function importData(e) {
-            const f = e.target.files[0];
+            var f = e.target.files[0];
             if (!f) return;
-            const reader = new FileReader();
+            var reader = new FileReader();
             reader.onload = function(ev) {
                 try {
-                    const d = JSON.parse(ev.target.result);
-                    if (d.hornets) hornets = d.hornets.map(h => ({ ...createHornet(h.name), direction: h.direction || 0, flights: h.flights || [] }));
+                    var d = JSON.parse(ev.target.result);
+                    if (d.hornets && Array.isArray(d.hornets)) {
+                        hornets = d.hornets.map(function(h) {
+                            var newH = createHornet(h.name || 'Frelon');
+                            newH.direction = h.direction || 0;
+                            newH.flights = h.flights || [];
+                            return newH;
+                        });
+                    }
                     if (d.surveyLocation) surveyLocation = d.surveyLocation;
                     if (d.personalInfo) personalInfo = d.personalInfo;
                     inspectorName = d.inspectorName || '';
@@ -1363,7 +1565,9 @@
                     updatePotMarker();
                     renderAll();
                     alert(t('import_success'));
-                } catch (ex) { alert(t('import_error')); }
+                } catch (ex) {
+                    alert(t('import_error'));
+                }
             };
             reader.readAsText(f);
             e.target.value = '';
@@ -1387,93 +1591,120 @@
             clearMap();
             updatePotMarker();
             renderAll();
-        }t.getElementById('hornetContainer');
-            container.innerHTML = hornets.map((h, idx) => {
-                const avg = getAverage(h);
-                const dist = getDistance(avg);
-                const fc = h.flights.length;
-                const isCollapsed = collapsedCards[h.id] || false;
-                let timerText = '00:00';
+        }
+
+        // ==================== RENDER ====================
+        function renderAll() {
+            var container = document.getElementById('hornetContainer');
+            var html = '';
+            for (var idx = 0; idx < hornets.length; idx++) {
+                var h = hornets[idx];
+                var avg = getAverage(h);
+                var dist = getDistance(avg);
+                var fc = h.flights.length;
+                var isCollapsed = collapsedCards[h.id] || false;
+                var timerText = '00:00';
                 if (h.timerRunning && h.timerStart) {
-                    const s = Math.floor((Date.now() - h.timerStart) / 1000);
+                    var s = Math.floor((Date.now() - h.timerStart) / 1000);
                     timerText = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
                 }
-                const badgeBg = h.timerRunning ? '#c47b6b' : (fc > 0 ? '#5f7d6b' : '#d4a853');
-                const badgeText = h.timerRunning ? '⏳ ' + t('running') : (fc > 0 ? '✅ ' + fc + '/5 ' + t('flights_label') : '🆕 ' + t('ready'));
-                const nest = getNestCoords(h);
-                const flightsHtml = fc ? h.flights.map((s, i) =>
-                    '<span class="flight-item">' + s + 's <button class="flight-delete-btn" onclick="event.stopPropagation();deleteFlight(' + h.id + ',' + i + ')" title="' + t('flight_delete') + '">✕</button></span>'
-                ).join(' ') : '—';
+                var badgeBg = h.timerRunning ? '#c47b6b' : (fc > 0 ? '#5f7d6b' : '#d4a853');
+                var badgeText = h.timerRunning ? '⏳ ' + t('running') : (fc > 0 ? '✅ ' + fc + '/5 ' + t('flights_label') : '🆕 ' + t('ready'));
+                var nest = getNestCoords(h);
 
-                return `
-            <div class="hornet-card${isCollapsed ? ' collapsed-card' : ''}" style="border-left:5px solid ${COLORS[idx % COLORS.length]};">
-              <div class="hornet-header" onclick="toggleCollapse(${h.id})" title="${t('collapse')}">
-                <div class="hornet-header-collapsed">
-                  <input class="hornet-name-input" value="${h.name}" style="color:${COLORS[idx % COLORS.length]};" onclick="event.stopPropagation()" onchange="updateName(${h.id}, this.value)">
-                  <span style="display:flex;align-items:center;gap:6px;">
-                    <span class="badge" style="background:${badgeBg}">${badgeText}</span>
-                    <span class="collapse-icon${!isCollapsed ? ' open' : ''}">▶</span>
-                    <button class="delete-hornet-btn" onclick="event.stopPropagation();deleteHornet(${h.id})" title="${t('delete')}">✕</button>
-                  </span>
-                </div>
-                ${isCollapsed ? '<div class="collapsed-info"><span>🧭 ' + h.direction + '°</span><span class="timer-display" style="font-size:1.2rem;min-width:70px;padding:4px 10px;">' + timerText + '</span></div>' : ''}
-              </div>
-              <div class="hornet-body${isCollapsed ? ' collapsed' : ''}">
-                <div class="flex-row" style="margin:6px 0;">
-                  <span>🧭 <input type="number" class="dir-input" value="${h.direction}" min="0" max="359" onchange="updateDirection(${h.id}, this.value)">°</span>
-                  <span class="timer-display">${timerText}</span>
-                </div>
-                <div class="flex-row">
-                  <button class="btn-gold btn-sm" onclick="startTimer(${h.id})" ${h.timerRunning || fc >= 5 ? 'disabled' : ''}>▶ START</button>
-                  <button class="btn-grey btn-sm" onclick="stopTimer(${h.id})" ${!h.timerRunning ? 'disabled' : ''}>⏹ STOP</button>
-                  <button class="btn-red btn-sm" onclick="resetTimer(${h.id})">↺ RESET</button>
-                </div>
-                <div class="flights-text">📊 ${t('flights_label')}: ${flightsHtml}</div>
-                <div class="stat-line">📏 ${t('average')}: <strong>${avg.toFixed(1)}s</strong> · 🗺️ ${t('distance')}: <strong>${dist.toFixed(0)}m</strong></div>
-                ${nest ? '<div class="stat-line" style="font-size:0.78rem;">📍 Nid estimé: <strong>' + nest.lat.toFixed(5) + ', ' + nest.lng.toFixed(5) + '</strong></div>' : ''}
-                <div class="manual-time-section">
-                  <span style="font-size:0.8rem;">✍️ ${t('manual_time')}:</span>
-                  <div class="flex-row" style="margin-top:4px;">
-                    <input type="number" id="mt_${h.id}" class="time-input" placeholder="${t('manual_time_placeholder')}" min="1">
-                    <button class="btn-gold btn-sm" onclick="addManualTime(${h.id})" ${fc >= 5 ? 'disabled' : ''}>➕ ${t('add_manual')}</button>
-                  </div>
-                </div>
-              </div>
-            </div>`;
-            }).join('');
+                var flightsHtml = '—';
+                if (fc) {
+                    var flightSpans = [];
+                    for (var fi = 0; fi < h.flights.length; fi++) {
+                        flightSpans.push(
+                            '<span class="flight-item">' + h.flights[fi] + 's ' +
+                            '<button class="flight-delete-btn" onclick="event.stopPropagation();deleteFlight(' + h.id + ',' + fi + ')" title="' + t('flight_delete') + '">✕</button></span>'
+                        );
+                    }
+                    flightsHtml = flightSpans.join(' ');
+                }
 
-            document.getElementById('locationDisplay').textContent = surveyLocation.name || surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5);
+                html += '<div class="hornet-card' + (isCollapsed ? ' collapsed-card' : '') + '" style="border-left:5px solid ' + COLORS[idx % COLORS.length] + ';">';
+                html += '<div class="hornet-header" onclick="toggleCollapse(' + h.id + ')" title="' + t('collapse') + '">';
+                html += '<div style="display:flex;justify-content:space-between;align-items:center;width:100%;flex-wrap:wrap;gap:8px;">';
+                html += '<input class="hornet-name-input" value="' + h.name + '" style="color:' + COLORS[idx % COLORS.length] + ';" onclick="event.stopPropagation()" onchange="updateName(' + h.id + ',this.value)">';
+                html += '<span style="display:flex;align-items:center;gap:6px;">';
+                html += '<span class="badge" style="background:' + badgeBg + '">' + badgeText + '</span>';
+                html += '<span class="collapse-icon' + (!isCollapsed ? ' open' : '') + '">▶</span>';
+                html += '<button class="delete-hornet-btn" onclick="event.stopPropagation();deleteHornet(' + h.id + ')" title="' + t('delete') + '">✕</button>';
+                html += '</span></div>';
+                if (isCollapsed) {
+                    html += '<div class="collapsed-info"><span>🧭 ' + h.direction + '°</span><span class="timer-display" style="font-size:1rem;min-width:60px;padding:4px 8px;">' + timerText + '</span></div>';
+                }
+                html += '</div>';
+                html += '<div class="hornet-body' + (isCollapsed ? ' collapsed' : '') + '">';
+                html += '<div class="flex-row" style="margin:6px 0;"><span>🧭 <input type="number" class="dir-input" value="' + h.direction + '" min="0" max="359" onchange="updateDirection(' + h.id + ',this.value)">°</span><span class="timer-display">' + timerText + '</span></div>';
+                html += '<div class="flex-row">';
+                html += '<button class="btn-gold btn-sm" onclick="startTimer(' + h.id + ')" ' + (h.timerRunning || fc >= 5 ? 'disabled' : '') + '>▶ START</button>';
+                html += '<button class="btn-grey btn-sm" onclick="stopTimer(' + h.id + ')" ' + (!h.timerRunning ? 'disabled' : '') + '>⏹ STOP</button>';
+                html += '<button class="btn-red btn-sm" onclick="resetTimer(' + h.id + ')">↺ RESET</button>';
+                html += '</div>';
+                html += '<div class="flights-text">📊 ' + t('flights_label') + ': ' + flightsHtml + '</div>';
+                html += '<div class="stat-line">📏 ' + t('average') + ': <strong>' + avg.toFixed(1) + 's</strong> · 🗺️ ' + t('distance') + ': <strong>' + dist.toFixed(0) + 'm</strong></div>';
+                if (nest) {
+                    html += '<div class="stat-line" style="font-size:0.78rem;">📍 Nid estimé: <strong>' + nest.lat.toFixed(5) + ', ' + nest.lng.toFixed(5) + '</strong></div>';
+                }
+                html += '<div class="manual-time-section">';
+                html += '<span style="font-size:0.8rem;">✍️ ' + t('manual_time') + ':</span>';
+                html += '<div class="flex-row" style="margin-top:4px;">';
+                html += '<input type="number" id="mt_' + h.id + '" class="time-input" placeholder="' + t('manual_time_placeholder') + '" min="1">';
+                html += '<button class="btn-gold btn-sm" onclick="addManualTime(' + h.id + ')" ' + (fc >= 5 ? 'disabled' : '') + '>➕ ' + t('add_manual') + '</button>';
+                html += '</div></div></div></div>';
+            }
+            container.innerHTML = html;
+
+            document.getElementById('locationDisplay').textContent =
+                surveyLocation.name || surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5);
             document.getElementById('datetime').textContent = new Date().toLocaleString();
             document.getElementById('inspectorInput').value = inspectorName;
             document.getElementById('notesField').value = notes;
-            document.getElementById('liveBanner').style.display = hornets.some(h => h.timerRunning) ? 'block' : 'none';
+            document.getElementById('liveBanner').style.display = hornets.some(function(h) { return h.timerRunning; }) ? 'block' : 'none';
 
-            const hwf = hornets.filter(h => h.flights.length > 0);
-            const statsDiv = document.getElementById('statsContent');
+            var hwf = hornets.filter(function(h) { return h.flights.length > 0; });
+            var statsDiv = document.getElementById('statsContent');
             if (!hwf.length) {
                 statsDiv.innerHTML = t('no_flights_stats');
             } else {
-                let html = hwf.map(h => {
-                    const idx = hornets.indexOf(h);
-                    return '<span style="color:' + COLORS[idx % COLORS.length] + ';">● ' + h.name + ' (' + COLOR_NAMES[idx % COLOR_NAMES.length] + '): ' + getAverage(h).toFixed(1) + 's</span>';
-                }).join('<br>');
-                html += '<br><strong>📈 Moy. globale: ' + (hwf.reduce((s, h) => s + getAverage(h), 0) / hwf.length).toFixed(1) + 's</strong>';
-                statsDiv.innerHTML = html;
+                var statsHtml = '';
+                for (var si = 0; si < hwf.length; si++) {
+                    var sh = hwf[si];
+                    var sidx = hornets.indexOf(sh);
+                    statsHtml += '<span style="color:' + COLORS[sidx % COLORS.length] + ';">● ' + sh.name + ' (' + COLOR_NAMES[sidx % COLOR_NAMES.length] + '): ' + getAverage(sh).toFixed(1) + 's</span><br>';
+                }
+                var globalAvg = 0;
+                for (var gi = 0; gi < hwf.length; gi++) {
+                    globalAvg += getAverage(hwf[gi]);
+                }
+                globalAvg = globalAvg / hwf.length;
+                statsHtml += '<strong>📈 Moy. globale: ' + globalAvg.toFixed(1) + 's</strong>';
+                statsDiv.innerHTML = statsHtml;
             }
 
             saveAll();
             if (map) drawAnalysis();
         }
 
-        setInterval(() => {
-            if (hornets.some(h => h.timerRunning)) renderAll();
+        // ==================== LIVE UPDATE ====================
+        setInterval(function() {
+            if (hornets.some(function(h) { return h.timerRunning; })) {
+                renderAll();
+            }
             document.getElementById('datetime').textContent = new Date().toLocaleString();
         }, 500);
 
+        // ==================== SERVICE WORKER ====================
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => { navigator.serviceWorker.register('service-worker.js').catch(() => {}); });
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js').catch(function() {});
+            });
         }
 
+        // ==================== BOOT ====================
         function boot() {
             loadAll();
             applyTranslations();
@@ -1481,8 +1712,15 @@
             setTimeout(initMap, 500);
         }
 
-        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', boot); } else { boot(); }
-        document.getElementById('aboutModal').addEventListener('click', function(e) { if (e.target === this) closeAbout(); });
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot);
+        } else {
+            boot();
+        }
+
+        document.getElementById('aboutModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAbout();
+        });
     </script>
 </body>
 </html>
