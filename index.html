@@ -1383,28 +1383,9 @@
                 }
             }
 
-            // Priority zone
-            if (predictions.length >= 2) {
-                var clat = 0,
-                    clng = 0;
-                for (var pi = 0; pi < predictions.length; pi++) {
-                    clat += predictions[pi].point.lat;
-                    clng += predictions[pi].point.lng;
-                }
-                clat = clat / predictions.length;
-                clng = clng / predictions.length;
-                var starIcon = L.divIcon({
-                    html: '⭐',
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 15],
-                    className: ''
-                });
-                var star = L.marker([clat, clng], { icon: starIcon }).addTo(map);
-                star.bindPopup('<b>' + t('priority_zone') + '</b>');
-                mapLines.push(star);
-            }
 
-            // Update prediction panel
+
+          // Update prediction panel
             var predictionText = '';
             if (predictions.length) {
                 var parts = [];
