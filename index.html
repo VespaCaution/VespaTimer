@@ -12,8 +12,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="VespaTimer">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐝</text></svg>">
-    <title>🐝 VespaTimer v1.3</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='36' fill='%23d4a853'/%3E%3Ctext x='90' y='130' font-size='110' text-anchor='middle'%3E🐝%3C/text%3E%3C/svg%3E">
+    <title>🐝 VespaTimer v1.4</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -230,6 +230,17 @@
             letter-spacing: 1px;
         }
 
+        .timer-display.running {
+            background: #c47b6b;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
         .badge {
             display: inline-block;
             padding: 4px 12px;
@@ -253,7 +264,7 @@
 
         .hornet-body {
             transition: max-height 0.3s ease-out, opacity 0.3s;
-            max-height: 500px;
+            max-height: 600px;
             opacity: 1;
             overflow: hidden;
         }
@@ -326,11 +337,6 @@
             font-weight: bold;
             animation: pulse 1.5s infinite;
             text-align: center;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.65; }
         }
 
         .flex-row {
@@ -466,13 +472,18 @@
             margin-top: 6px;
             font-size: 0.85rem;
         }
+
+        .editing-allowed {
+            border: 2px dashed var(--gold) !important;
+            background: #fffdf5 !important;
+        }
     </style>
 </head>
 <body>
 
     <!-- ==================== HEADER ==================== -->
     <div class="header">
-        <h1>🐝 VespaTimer <span style="font-size:0.8rem;color:#888;">v1.3</span></h1>
+        <h1>🐝 VespaTimer <span style="font-size:0.8rem;color:#888;">v1.4</span></h1>
         <div class="header-buttons">
             <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
                 <option value="fr">🇫🇷 FR</option>
@@ -646,8 +657,9 @@
                 collapse: 'Cliquer pour déplier/replier',
                 flight_delete: 'Supprimer ce vol',
                 start_btn: 'DÉMARRER',
-stop_btn: 'ARRÊTER',
-reset_btn_label: 'EFFACER',
+                stop_btn: 'ARRÊTER',
+                reset_btn_label: 'EFFACER',
+                edit_during_timer: 'Modifier pendant le chrono',
             },
             en: {
                 about_btn: 'About',
@@ -709,9 +721,11 @@ reset_btn_label: 'EFFACER',
                 hist_pot: 'Historical pot',
                 collapse: 'Click to collapse/expand',
                 flight_delete: 'Delete this flight',
-            },start_btn: 'START',
-stop_btn: 'STOP',
-reset_btn_label: 'RESET',
+                start_btn: 'START',
+                stop_btn: 'STOP',
+                reset_btn_label: 'RESET',
+                edit_during_timer: 'Edit while timing',
+            },
             de: {
                 about_btn: 'Über',
                 personal_info: 'Persönliche Daten',
@@ -772,9 +786,11 @@ reset_btn_label: 'RESET',
                 hist_pot: 'Historischer Pot',
                 collapse: 'Klicken zum Ein-/Ausklappen',
                 flight_delete: 'Diesen Flug löschen',
-            },start_btn: 'START',
-stop_btn: 'STOPP',
-reset_btn_label: 'ZURÜCK',
+                start_btn: 'START',
+                stop_btn: 'STOPP',
+                reset_btn_label: 'ZURÜCK',
+                edit_during_timer: 'Während Timer bearbeiten',
+            },
             it: {
                 about_btn: 'Info',
                 personal_info: 'Informazioni personali',
@@ -836,12 +852,12 @@ reset_btn_label: 'ZURÜCK',
                 collapse: 'Clicca per comprimere/espandere',
                 flight_delete: 'Elimina questo volo',
                 start_btn: 'AVVIA',
-stop_btn: 'FERMA',
-reset_btn_label: 'AZZERA',
+                stop_btn: 'FERMA',
+                reset_btn_label: 'AZZERA',
+                edit_during_timer: 'Modifica durante timer',
             }
         };
 
-        // ==================== HELPER FUNCTIONS ====================
         function t(key) {
             return (translations[currentLang] && translations[currentLang][key]) || key;
         }
@@ -967,7 +983,7 @@ reset_btn_label: 'AZZERA',
                     phone: personalInfo.phone
                 }
             });
-            if (history.length > 100) history = history.slice(-100);
+            if (history.length > 200) history = history.slice(-200);
             try {
                 localStorage.setItem('vespatimer_history', JSON.stringify(history));
             } catch (e) {
@@ -1057,18 +1073,33 @@ reset_btn_label: 'AZZERA',
             renderAll();
         }
 
+        // NEW: Direction is now editable during timer
         function updateDirection(id, val) {
             var h = hornets.find(function(x) { return x.id === id; });
             if (!h) return;
             h.direction = Math.min(359, Math.max(0, parseInt(val) || 0));
-            renderAll();
+            // Only re-render if timer is NOT running (if running, direction updates live)
+            if (!h.timerRunning) {
+                renderAll();
+            } else {
+                // Update just the direction display without full re-render
+                var input = document.getElementById('dirInput_' + id);
+                if (input) input.value = h.direction;
+                saveAll();
+                if (map) drawAnalysis();
+            }
         }
 
+        // NEW: Name is now editable during timer
         function updateName(id, val) {
             var h = hornets.find(function(x) { return x.id === id; });
             if (!h) return;
             h.name = val || 'Frelon';
-            renderAll();
+            if (!h.timerRunning) {
+                renderAll();
+            } else {
+                saveAll();
+            }
         }
 
         function addHornet() {
@@ -1206,8 +1237,8 @@ reset_btn_label: 'AZZERA',
 
         function createOvalPoints(center, directionDegrees) {
             var points = [];
-            var halfWidth = 100;
-            var halfHeight = 37.5;
+            var halfWidth = 50;
+            var halfHeight = 25;
             var dirRad = (directionDegrees * Math.PI) / 180;
             var perpRad = dirRad + Math.PI / 2;
             var steps = 64;
@@ -1230,7 +1261,6 @@ reset_btn_label: 'AZZERA',
             mapLines = [];
             var predictions = [];
 
-            // Draw current hornets
             for (var idx = 0; idx < hornets.length; idx++) {
                 var h = hornets[idx];
                 if (!h.flights.length) continue;
@@ -1239,7 +1269,6 @@ reset_btn_label: 'AZZERA',
                 var pot = L.latLng(surveyLocation.lat, surveyLocation.lng);
                 var nestPt = L.latLng(nestData.lat, nestData.lng);
 
-                // Dashed line from pot to nest
                 var line = L.polyline([pot, nestPt], {
                     color: COLORS[idx % COLORS.length],
                     weight: 3,
@@ -1247,7 +1276,6 @@ reset_btn_label: 'AZZERA',
                 }).addTo(map);
                 mapLines.push(line);
 
-                // Oval around nest
                 var ovalPts = createOvalPoints(nestPt, nestData.direction);
                 var oval = L.polygon(ovalPts, {
                     color: COLORS[idx % COLORS.length],
@@ -1257,7 +1285,6 @@ reset_btn_label: 'AZZERA',
                 }).addTo(map);
                 mapLines.push(oval);
 
-                // Nest marker
                 var marker = L.circleMarker(nestPt, {
                     radius: 7,
                     color: COLORS[idx % COLORS.length],
@@ -1280,7 +1307,6 @@ reset_btn_label: 'AZZERA',
                 });
             }
 
-            // Draw historical data
             if (historyData && historyData.length) {
                 for (var ei = 0; ei < historyData.length; ei++) {
                     var entry = historyData[ei];
@@ -1288,7 +1314,6 @@ reset_btn_label: 'AZZERA',
                     var histLoc = entry.location;
                     var histPot = L.latLng(histLoc.lat, histLoc.lng);
 
-                    // Historical pot marker
                     var histPotIcon = L.divIcon({
                         html: '📍',
                         iconSize: [20, 20],
@@ -1305,7 +1330,6 @@ reset_btn_label: 'AZZERA',
                     );
                     mapLines.push(histPotMarker);
 
-                    // Draw each historical hornet
                     for (var hi = 0; hi < entry.hornets.length; hi++) {
                         var hh = entry.hornets[hi];
                         if (!hh.flights || !hh.flights.length) continue;
@@ -1322,7 +1346,6 @@ reset_btn_label: 'AZZERA',
                             histLoc.lng + (dm / (111320 * Math.cos(histLoc.lat * Math.PI / 180))) * Math.sin(dr)
                         );
 
-                        // Line from historical pot to nest
                         var histLine = L.polyline([histPot, nh], {
                             color: '#999',
                             weight: 2,
@@ -1331,7 +1354,6 @@ reset_btn_label: 'AZZERA',
                         }).addTo(map);
                         mapLines.push(histLine);
 
-                        // Oval around historical nest
                         var histOvalPts = createOvalPoints(nh, hh.direction);
                         var histOval = L.polygon(histOvalPts, {
                             color: '#999',
@@ -1342,7 +1364,6 @@ reset_btn_label: 'AZZERA',
                         }).addTo(map);
                         mapLines.push(histOval);
 
-                        // Historical nest marker
                         var hm = L.circleMarker(nh, {
                             radius: 4,
                             color: '#888',
@@ -1361,7 +1382,6 @@ reset_btn_label: 'AZZERA',
                 }
             }
 
-            // Priority zone
             if (predictions.length >= 2) {
                 var clat = 0,
                     clng = 0;
@@ -1382,7 +1402,6 @@ reset_btn_label: 'AZZERA',
                 mapLines.push(star);
             }
 
-            // Update prediction panel
             var predictionText = '';
             if (predictions.length) {
                 var parts = [];
@@ -1447,7 +1466,7 @@ reset_btn_label: 'AZZERA',
 
         function exportJSON() {
             var data = {
-                version: '1.3',
+                version: '1.4',
                 date: new Date().toISOString(),
                 personalInfo: personalInfo,
                 surveyLocation: surveyLocation,
@@ -1467,13 +1486,14 @@ reset_btn_label: 'AZZERA',
             };
             downloadBlob(
                 new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
+                'vespatimer_' + new Date().toISOString().slice(0, 10) + '.json' }),
                 'vespatimer_' + new Date().toISOString().slice(0, 10) + '.json'
             );
         }
 
         function exportPDF() {
             var r = '══════════════════════════════\n';
-            r += '  🐝 ' + t('report_title') + ' v1.3\n';
+            r += '  🐝 ' + t('report_title') + ' v1.4\n';
             r += '══════════════════════════════\n\n';
             r += '📅 Date: ' + new Date().toLocaleString() + '\n\n';
             r += '👤 ' + t('personal_info_label') + ':\n';
@@ -1489,7 +1509,7 @@ reset_btn_label: 'AZZERA',
             r += '──────────────────────────────\n\n';
             for (var i = 0; i < hornets.length; i++) {
                 var h = hornets[i];
-                var avg =  getAverage(h);
+                var avg = getAverage(h);
                 var dist = getDistance(avg);
                 var nest = getNestCoords(h);
                 r += '• ' + h.name + ' (' + COLOR_NAMES[i % COLOR_NAMES.length] + ')\n';
@@ -1517,7 +1537,7 @@ reset_btn_label: 'AZZERA',
         }
 
         function exportGPX() {
-            var g = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="VespaTimer v1.3">\n';
+            var g = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="VespaTimer v1.4">\n';
             g += '<wpt lat="' + surveyLocation.lat + '" lon="' + surveyLocation.lng + '"><name>Pot-à-Mèche</name></wpt>\n';
             for (var i = 0; i < hornets.length; i++) {
                 var h = hornets[i];
@@ -1644,15 +1664,18 @@ reset_btn_label: 'AZZERA',
                 html += '<button class="delete-hornet-btn" onclick="event.stopPropagation();deleteHornet(' + h.id + ')" title="' + t('delete') + '">✕</button>';
                 html += '</span></div>';
                 if (isCollapsed) {
-                    html += '<div class="collapsed-info"><span>🧭 ' + h.direction + '°</span><span class="timer-display" style="font-size:1rem;min-width:60px;padding:4px 8px;">' + timerText + '</span></div>';
+                    html += '<div class="collapsed-info"><span>🧭 ' + h.direction + '°</span><span class="timer-display' + (h.timerRunning ? ' running' : '') + '" style="font-size:1rem;min-width:60px;padding:4px 8px;">' + timerText + '</span></div>';
                 }
                 html += '</div>';
                 html += '<div class="hornet-body' + (isCollapsed ? ' collapsed' : '') + '">';
-                html += '<div class="flex-row" style="margin:6px 0;"><span>🧭 <input type="number" class="dir-input" value="' + h.direction + '" min="0" max="359" onchange="updateDirection(' + h.id + ',this.value)">°</span><span class="timer-display">' + timerText + '</span></div>';
+                html += '<div class="flex-row" style="margin:6px 0;">';
+                html += '<span>🧭 <input type="number" class="dir-input' + (h.timerRunning ? ' editing-allowed' : '') + '" id="dirInput_' + h.id + '" value="' + h.direction + '" min="0" max="359" onchange="updateDirection(' + h.id + ',this.value)"' + (h.timerRunning ? '' : '') + '>°</span>';
+                html += '<span class="timer-display' + (h.timerRunning ? ' running' : '') + '">' + timerText + '</span>';
+                html += '</div>';
                 html += '<div class="flex-row">';
                 html += '<button class="btn-gold btn-sm" onclick="startTimer(' + h.id + ')" ' + (h.timerRunning || fc >= 5 ? 'disabled' : '') + '>▶ ' + t('start_btn') + '</button>';
-html += '<button class="btn-grey btn-sm" onclick="stopTimer(' + h.id + ')" ' + (!h.timerRunning ? 'disabled' : '') + '>⏹ ' + t('stop_btn') + '</button>';
-html += '<button class="btn-red btn-sm" onclick="resetTimer(' + h.id + ')">↺ ' + t('reset_btn_label') + '</button>';
+                html += '<button class="btn-grey btn-sm" onclick="stopTimer(' + h.id + ')" ' + (!h.timerRunning ? 'disabled' : '') + '>⏹ ' + t('stop_btn') + '</button>';
+                html += '<button class="btn-red btn-sm" onclick="resetTimer(' + h.id + ')">↺ ' + t('reset_btn_label') + '</button>';
                 html += '</div>';
                 html += '<div class="flights-text">📊 ' + t('flights_label') + ': ' + flightsHtml + '</div>';
                 html += '<div class="stat-line">📏 ' + t('average') + ': <strong>' + avg.toFixed(1) + 's</strong> · 🗺️ ' + t('distance') + ': <strong>' + dist.toFixed(0) + 'm</strong></div>';
@@ -1702,33 +1725,47 @@ html += '<button class="btn-red btn-sm" onclick="resetTimer(' + h.id + ')">↺ '
         // ==================== LIVE UPDATE ====================
         setInterval(function() {
             if (hornets.some(function(h) { return h.timerRunning; })) {
-                renderAll();
+                // Update only timer displays without full re-render
+                for (var i = 0; i < hornets.length; i++) {
+                    var h = hornets[i];
+                    if (h.timerRunning && h.timerStart) {
+                        var s = Math.floor((Date.now() - h.timerStart) / 1000);
+                        var timerText = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+                        // Update all timer displays for this hornet
+                        var cards = document.querySelectorAll('.hornet-card');
+                        if (cards[i]) {
+                            var displays = cards[i].querySelectorAll('.timer-display');
+                            for (var d = 0; d < displays.length; d++) {
+                                displays[d].textContent = timerText;
+                            }
+                        }
+                    }
+                }
+                document.getElementById('liveBanner').style.display = 'block';
+            } else {
+                document.getElementById('liveBanner').style.display = 'none';
             }
             document.getElementById('datetime').textContent = new Date().toLocaleString();
-        }, 500);
+        }, 200);
 
-        // ==================== SERVICE WORKER ====================
-        // Auto-update service worker
-if ('serviceWorker' in navigator) {
-    var refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', function() {
-        if (!refreshing) {
-            refreshing = true;
-            window.location.reload();
+        // ==================== AUTO-UPDATE SERVICE WORKER ====================
+        if ('serviceWorker' in navigator) {
+            var refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', function() {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js').catch(function() {});
+            });
+            setInterval(function() {
+                navigator.serviceWorker.getRegistration().then(function(reg) {
+                    if (reg) reg.update();
+                });
+            }, 300000);
         }
-    });
-    
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('service-worker.js').catch(function() {});
-    });
-    
-    // Check for updates every 5 minutes
-    setInterval(function() {
-        navigator.serviceWorker.getRegistration().then(function(reg) {
-            if (reg) reg.update();
-        });
-    }, 300000);
-}
 
         // ==================== BOOT ====================
         function boot() {
