@@ -19,7 +19,7 @@ L'application permet de :
 - 📊 Calculer automatiquement les moyennes et distances estimées
 - 💾 Sauvegarder et exporter les données (JSON, GPX, KML,PDF)
 - 📱 Fonctionner sur mobile et ordinateur 
-
+- support multilingue
 ---
 
 ## 🚀 Déploiement sur GitHub Pages
