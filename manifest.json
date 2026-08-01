@@ -4,6 +4,7 @@
   "description": "Assistant digital pour relevés Pot-à-Mèche et triangulation de nids de frelons asiatiques",
   "start_url": "./index.html",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#f5f2e6",
   "theme_color": "#d4a853",
   "orientation": "portrait-primary",
@@ -16,8 +17,5 @@
     }
   ],
   "lang": "fr",
-  "categories": ["utilities", "productivity"],
-  "screenshots": [],
-  "related_applications": [],
-  "prefer_related_applications": false
+  "categories": ["utilities", "productivity"]
 }
