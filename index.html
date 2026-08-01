@@ -17,1758 +17,306 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        :root {
-            --bg: #f5f2e6;
-            --card: #ffffff;
-            --text: #3b2e1e;
-            --gold: #d4a853;
-            --danger: #c47b6b;
-            --green: #5f7d6b;
-            --border: #e7d7b8;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: var(--bg);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 8px;
-            color: var(--text);
-            max-width: 750px;
-            margin: 0 auto;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 8px;
-            background: var(--card);
-            padding: 12px 16px;
-            border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        }
-
-        .header h1 {
-            font-size: 1.6rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .header-buttons {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .card {
-            background: var(--card);
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            transition: box-shadow 0.2s;
-        }
-
-        .card:hover {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        }
-
-        h2 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--text);
-        }
-
-        button {
-            padding: 10px 16px;
-            border-radius: 25px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.85rem;
-            margin: 2px;
-            transition: all 0.15s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-
-        button:hover {
-            opacity: 0.85;
-            transform: translateY(-1px);
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
-
-        button:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .btn-gold {
-            background: var(--gold);
-            color: white;
-        }
-
-        .btn-red {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-grey {
-            background: #e8e0d0;
-            color: var(--text);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--gold);
-            color: var(--gold);
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 0.78rem;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="tel"],
-        textarea,
-        select {
-            font-size: 16px;
-            padding: 10px 14px;
-            border-radius: 14px;
-            border: 2px solid #e0d5c0;
-            width: 100%;
-            background: #fefdf9;
-            transition: border-color 0.2s;
-        }
-
-        input:focus,
-        textarea:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--gold);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 50px;
-        }
-
-        .hornet-card {
-            background: #fefaf2;
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            padding: 14px;
-            margin-bottom: 10px;
-            transition: border-color 0.2s;
-        }
-
-        .hornet-card:hover {
-            border-color: var(--gold);
-        }
-
-        .hornet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .hornet-name-input {
-            border: none !important;
-            background: transparent !important;
-            font-weight: 700;
-            font-size: 1.05rem !important;
-            width: 130px !important;
-            padding: 2px !important;
-        }
-
-        .dir-input {
-            width: 70px !important;
-            text-align: center;
-            display: inline-block;
-        }
-
-        .time-input {
-            width: 65px !important;
-            text-align: center;
-            display: inline-block;
-            padding: 4px !important;
-        }
-
-        .timer-display {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: #f0ede5;
-            padding: 6px 16px;
-            border-radius: 30px;
-            display: inline-block;
-            min-width: 100px;
-            text-align: center;
-            letter-spacing: 1px;
-        }
-
-        .timer-display.running {
-            background: #c47b6b;
-            color: white;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: white;
-            white-space: nowrap;
-            letter-spacing: 0.5px;
-        }
-
-        .collapse-icon {
-            font-size: 1.2rem;
-            transition: transform 0.3s;
-            display: inline-block;
-        }
-
-        .collapse-icon.open {
-            transform: rotate(90deg);
-        }
-
-        .hornet-body {
-            transition: max-height 0.3s ease-out, opacity 0.3s;
-            max-height: 600px;
-            opacity: 1;
-            overflow: hidden;
-        }
-
-        .hornet-body.collapsed {
-            max-height: 0;
-            opacity: 0;
-            padding: 0;
-            margin: 0;
-        }
-
-        .collapsed-info {
-            display: none;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .hornet-card.collapsed-card .collapsed-info {
-            display: flex;
-        }
-
-        .hornet-card.collapsed-card .hornet-body {
-            max-height: 0;
-            opacity: 0;
-            margin: 0;
-            padding: 0;
-        }
-
-        .flight-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: #e8e0d0;
-            padding: 3px 10px;
-            border-radius: 15px;
-            margin: 2px;
-            font-size: 0.85rem;
-        }
-
-        .flight-delete-btn {
-            background: none;
-            border: none;
-            color: #c47b6b;
-            cursor: pointer;
-            font-size: 0.9rem;
-            padding: 0 2px;
-            opacity: 0.7;
-        }
-
-        .flight-delete-btn:hover {
-            opacity: 1;
-        }
-
-        #map {
-            height: 350px;
-            width: 100%;
-            border-radius: 16px;
-            background: #e8e0d0;
-            z-index: 1;
-        }
-
-        .banner-live {
-            background: var(--danger);
-            color: white;
-            padding: 10px 16px;
-            border-radius: 20px;
-            display: none;
-            margin-top: 8px;
-            font-weight: bold;
-            animation: pulse 1.5s infinite;
-            text-align: center;
-        }
-
-        .flex-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        @media (max-width: 400px) {
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-            button {
-                padding: 8px 12px;
-                font-size: 0.8rem;
-            }
-            .timer-display {
-                font-size: 1.3rem;
-                min-width: 80px;
-                padding: 4px 12px;
-            }
-        }
-
-        #historyPanel {
-            max-height: 250px;
-            overflow-y: auto;
-            display: none;
-            margin-top: 10px;
-            background: #f9f4e8;
-            border-radius: 14px;
-            padding: 8px;
-        }
-
-        .history-item {
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 6px 0;
-            font-size: 0.85rem;
-            border-left: 4px solid var(--gold);
-        }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 999;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            max-width: 550px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 14px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            background: none;
-            border: none;
-        }
-
-        .lang-select {
-            width: auto !important;
-            padding: 6px 10px !important;
-            border-radius: 20px !important;
-            font-size: 0.9rem !important;
-        }
-
-        .about-text {
-            font-size: 0.9rem;
-            line-height: 1.7;
-        }
-
-        .about-text a {
-            color: #b85c3a;
-            font-weight: 600;
-        }
-
-        hr {
-            border: none;
-            border-top: 2px dashed #e0cfaa;
-            margin: 12px 0;
-        }
-
-        .delete-hornet-btn {
-            background: none;
-            border: none;
-            color: #c47b6b;
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding: 2px 6px;
-            opacity: 0.6;
-        }
-
-        .delete-hornet-btn:hover {
-            opacity: 1;
-        }
-
-        .manual-time-section {
-            background: #f9f4e8;
-            border-radius: 12px;
-            padding: 8px 12px;
-            margin-top: 6px;
-            font-size: 0.85rem;
-        }
+        :root { --bg: #f5f2e6; --card: #ffffff; --text: #3b2e1e; --gold: #d4a853; --danger: #c47b6b; --green: #5f7d6b; --border: #e7d7b8; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--bg); font-family:Arial,sans-serif; padding:8px; color:var(--text); max-width:750px; margin:0 auto; }
+        .header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px; background:var(--card); padding:12px 16px; border-radius:20px; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
+        .header h1 { font-size:1.6rem; }
+        .card { background:var(--card); border-radius:20px; padding:16px; margin-bottom:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+        h2 { font-size:1.2rem; margin-bottom:10px; }
+        button { padding:10px 16px; border-radius:25px; border:none; font-weight:600; cursor:pointer; font-size:0.85rem; margin:2px; }
+        button:active { transform:scale(0.95); }
+        button:disabled { opacity:0.35; cursor:not-allowed; }
+        .btn-gold { background:var(--gold); color:white; }
+        .btn-red { background:var(--danger); color:white; }
+        .btn-grey { background:#e8e0d0; color:var(--text); }
+        .btn-outline { background:transparent; border:2px solid var(--gold); color:var(--gold); }
+        .btn-sm { padding:6px 12px; font-size:0.78rem; }
+        input, textarea, select { font-size:16px; padding:10px; border-radius:14px; border:2px solid #e0d5c0; width:100%; background:#fefdf9; margin:4px 0; }
+        .hornet-card { background:#fefaf2; border:2px solid var(--border); border-radius:16px; padding:14px; margin-bottom:10px; }
+        .hornet-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; cursor:pointer; }
+        .hornet-name-input { border:none!important; background:transparent!important; font-weight:700; font-size:1.05rem!important; width:130px!important; padding:2px!important; }
+        .dir-input { width:70px!important; text-align:center; display:inline-block; }
+        .timer-display { font-size:1.5rem; font-weight:700; background:#f0ede5; padding:6px 16px; border-radius:30px; display:inline-block; min-width:100px; text-align:center; }
+        .timer-display.running { background:#c47b6b; color:white; }
+        .badge { display:inline-block; padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:700; color:white; }
+        .collapse-icon { font-size:1.2rem; transition:transform 0.3s; display:inline-block; }
+        .collapse-icon.open { transform:rotate(90deg); }
+        .hornet-body { max-height:600px; opacity:1; overflow:hidden; transition:max-height 0.3s,opacity 0.3s; }
+        .hornet-body.collapsed { max-height:0; opacity:0; }
+        .collapsed-info { display:none; align-items:center; gap:12px; flex-wrap:wrap; }
+        .hornet-card.collapsed-card .collapsed-info { display:flex; }
+        .hornet-card.collapsed-card .hornet-body { max-height:0; opacity:0; }
+        .flight-item { display:inline-flex; align-items:center; gap:4px; background:#e8e0d0; padding:3px 10px; border-radius:15px; margin:2px; font-size:0.85rem; }
+        .flight-delete-btn { background:none; border:none; color:#c47b6b; cursor:pointer; font-size:0.9rem; padding:0 2px; }
+        #map { height:350px; width:100%; border-radius:16px; background:#e8e0d0; }
+        .banner-live { background:var(--danger); color:white; padding:10px 16px; border-radius:20px; display:none; margin-top:8px; font-weight:bold; text-align:center; }
+        .flex-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        @media (max-width:400px) { .grid-2{grid-template-columns:1fr} }
+        #historyPanel { max-height:250px; overflow-y:auto; display:none; margin-top:10px; background:#f9f4e8; border-radius:14px; padding:8px; }
+        .history-item { background:white; padding:10px; border-radius:10px; margin:6px 0; font-size:0.85rem; border-left:4px solid var(--gold); }
+        .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999; justify-content:center; align-items:center; }
+        .modal { background:white; border-radius:20px; padding:20px; max-width:550px; width:90%; max-height:80vh; overflow-y:auto; position:relative; }
+        .modal-close { position:absolute; top:10px; right:14px; font-size:1.5rem; cursor:pointer; background:none; border:none; }
+        .lang-select { width:auto!important; padding:6px 10px!important; border-radius:20px!important; }
+        .delete-hornet-btn { background:none; border:none; color:#c47b6b; cursor:pointer; font-size:1.2rem; padding:2px 6px; opacity:0.6; }
     </style>
 </head>
 <body>
 
-    <!-- ==================== HEADER ==================== -->
-    <div class="header">
-        <h1>🐝 VespaTimer <span style="font-size:0.8rem;color:#888;">v1.4</span></h1>
-        <div class="header-buttons">
-            <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
-                <option value="fr">🇫🇷 FR</option>
-                <option value="en">🇬🇧 EN</option>
-                <option value="de">🇩🇪 DE</option>
-                <option value="it">🇮🇹 IT</option>
-            </select>
-            <button class="btn-outline btn-sm" onclick="openAbout()">ℹ️ <span data-lang="about_btn">À propos</span></button>
+<div class="header">
+    <h1>🐝 VespaTimer <span style="font-size:0.8rem;color:#888;">v1.4</span></h1>
+    <div style="display:flex;gap:6px;align-items:center;">
+        <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
+            <option value="fr">🇫🇷 FR</option>
+            <option value="en">🇬🇧 EN</option>
+            <option value="de">🇩🇪 DE</option>
+            <option value="it">🇮🇹 IT</option>
+        </select>
+        <button class="btn-outline btn-sm" onclick="openAbout()">ℹ️ À propos</button>
+    </div>
+</div>
+
+<div class="card">
+    <h2>👤 Infos personnelles</h2>
+    <div class="grid-2">
+        <input type="text" id="firstName" placeholder="Prénom" onchange="saveAll()">
+        <input type="text" id="lastName" placeholder="Nom" onchange="saveAll()">
+    </div>
+    <input type="tel" id="phone" placeholder="📞 Téléphone" onchange="saveAll()" style="margin-top:6px;">
+    <div style="margin-top:6px;">🕐 <span id="datetime"></span></div>
+    <hr style="border:1px dashed #e0cfaa;margin:12px 0;">
+    <h2>📍 Pot-à-Mèche</h2>
+    <div class="flex-row">
+        <input type="text" id="locationInput" placeholder="Nom du lieu ou lat,lng" style="flex:1;">
+        <button class="btn-gold" onclick="setLocation()">💾 Enregistrer</button>
+    </div>
+    <div style="margin-top:4px;"><span id="locationDisplay"></span></div>
+    <input type="text" id="inspectorInput" placeholder="👤 Inspecteur (télémètre)" onchange="saveAll()" style="margin-top:6px;">
+    <textarea id="notesField" placeholder="📝 Notes..." onchange="saveAll()" style="margin-top:6px;min-height:50px;"></textarea>
+    <div class="banner-live" id="liveBanner">⏱️ Chronomètre actif</div>
+</div>
+
+<div class="card">
+    <h2>🐝 Frelons (max 7)</h2>
+    <div id="hornetContainer"></div>
+    <button class="btn-grey" onclick="addHornet()" style="margin-top:8px;">➕ Ajouter un frelon</button>
+</div>
+
+<div class="card">
+    <h2>🗺️ Triangulation</h2>
+    <div id="map"></div>
+    <div class="flex-row" style="margin-top:8px;">
+        <button class="btn-grey btn-sm" onclick="getGPS()">📍 Ma position</button>
+        <button class="btn-grey btn-sm" onclick="manualCoords()">✍️ Coordonnées</button>
+        <button class="btn-gold btn-sm" onclick="showHistory()">📋 Historique 60j</button>
+        <button class="btn-red btn-sm" onclick="clearMap()">🗑️ Effacer</button>
+    </div>
+    <div id="predictionPanel" style="margin-top:8px;padding:8px;background:#f9f4e8;border-radius:12px;font-size:0.85rem;">⚠️ Ajoutez des vols pour voir les estimations</div>
+    <div id="historyPanel"></div>
+</div>
+
+<div class="card">
+    <h2>📊 Statistiques</h2>
+    <div id="statsContent" style="font-size:0.9rem;"></div>
+</div>
+
+<div class="card">
+    <div class="flex-row" style="justify-content:center;">
+        <button class="btn-grey btn-sm" onclick="exportJSON()">📤 JSON</button>
+        <button class="btn-grey btn-sm" onclick="exportPDF()">📄 PDF</button>
+        <button class="btn-grey btn-sm" onclick="exportGPX()">📍 GPX</button>
+        <button class="btn-grey btn-sm" onclick="exportKML()">🌍 KML</button>
+        <button class="btn-grey btn-sm" onclick="document.getElementById('importFile').click()">📥 Importer</button>
+        <button class="btn-red btn-sm" onclick="resetAll()">🔄 Nouveau</button>
+        <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+    </div>
+</div>
+
+<div class="modal-overlay" id="aboutModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeAbout()">✕</button>
+        <h2>ℹ️ À propos de VespaTimer</h2>
+        <div style="font-size:0.9rem;line-height:1.7;">
+            <p>Bienvenue sur VespaTimer*, un site qui facilite le travail du pot à mèche**.</p>
+            <p>Téléchargez le format souhaité (souvent PDF) et transmettez-le à votre télémètre régional.</p>
+            <p>Pour refaire l'exercice, appuyez sur nouveau.</p>
+            <p>⚠️ Signalez vos observations sur : <a href="https://frelonasiatique.ch" target="_blank">frelonasiatique.ch</a></p>
+            <p>🐝 Bonne chasse ! 🙂</p>
+            <p style="margin-top:8px;">Instructions : remplissez les infos, chronométrez les frelons, exportez (PDF pour télémètre, JSON pour réimporter, GPX/KML pour cartes).</p>
+            <hr style="border:1px dashed #e0cfaa;margin:12px 0;">
+            <p style="font-size:0.78rem;color:#888;">* Connexion Internet requise. Signalez les bugs.<br>** Plus d'infos : <a href="https://www.youtube.com/watch?v=HurtOt4qiM8" target="_blank">vidéo Grégoire Hupka</a></p>
         </div>
     </div>
+</div>
 
-    <!-- ==================== PERSONAL INFO + SURVEY CARD ==================== -->
-    <div class="card">
-        <h2>👤 <span data-lang="personal_info">Informations personnelles</span></h2>
-        <div class="grid-2">
-            <input type="text" id="firstName" data-lang-placeholder="first_name" placeholder="Prénom" onchange="saveAll()">
-            <input type="text" id="lastName" data-lang-placeholder="last_name" placeholder="Nom" onchange="saveAll()">
-        </div>
-        <input type="tel" id="phone" data-lang-placeholder="phone" placeholder="📞 Téléphone" onchange="saveAll()" style="margin-top:6px;">
-        <div class="flex-row" style="margin-top:6px;">
-            <span>🕐</span> <span id="datetime">---</span>
-        </div>
-        <hr>
-        <h2>📍 <span data-lang="pot_label">Pot-à-Mèche</span></h2>
-        <div class="flex-row">
-            <input type="text" id="locationInput" data-lang-placeholder="location_placeholder" placeholder="Nom du lieu ou lat,lng" style="flex:1;">
-            <button class="btn-gold" onclick="setLocation()">💾 <span data-lang="save_btn">Enregistrer</span></button>
-        </div>
-        <div class="flex-row" style="margin-top:4px;"><span id="locationDisplay">---</span></div>
-        <input type="text" id="inspectorInput" data-lang-placeholder="inspector_placeholder" placeholder="👤 Inspecteur (télémètre)" onchange="saveAll()" style="margin-top:6px;">
-        <textarea id="notesField" data-lang-placeholder="notes_placeholder" placeholder="📝 Notes de relevé..." onchange="saveAll()" style="margin-top:6px;"></textarea>
-        <div class="banner-live" id="liveBanner" data-lang="timer_active">⏱️ Chronomètre actif</div>
-    </div>
+<script>
+// ============ GLOBAL STATE ============
+var hornets = [];
+var surveyLocation = { lat: 46.8, lng: 6.8, name: '' };
+var inspectorName = '';
+var notes = '';
+var personalInfo = { firstName: '', lastName: '', phone: '' };
+var currentLang = 'fr';
+var map = null;
+var potMarker = null;
+var mapLines = [];
+var collapsedCards = {};
+var COLORS = ['#d4a853','#b85c3a','#5f7d6b','#7b5e7b','#3a6b8c','#c47b6b','#4a8c6f'];
+var COLOR_NAMES = ['Doré','Rouge','Vert','Violet','Bleu','Saumon','Émeraude'];
+var MAX_HORNETS = 7;
 
-    <!-- ==================== HORNETS CARD ==================== -->
-    <div class="card">
-        <h2>🐝 <span data-lang="hornets_title">Frelons</span> <small style="font-weight:400;">(max 7)</small></h2>
-        <div id="hornetContainer"></div>
-        <button class="btn-grey" onclick="addHornet()" style="margin-top:8px;">➕ <span data-lang="add_hornet">Ajouter un frelon</span></button>
-    </div>
+// ============ TRANSLATIONS ============
+var translations = {
+    fr: { no_flights:'Ajoutez des vols pour voir les estimations', no_flights_stats:'Aucun vol', ready:'Prêt', running:'En cours', flights_label:'vols', history_empty:'Aucun historique (60 jours)', import_success:'✅ Importé !', import_error:'❌ Fichier invalide', gps_error:'⚠️ GPS impossible', max_hornets:'Maximum 7 frelons', confirm_reset:'Tout effacer ?', delete:'Supprimer', manual_time:'Ou ajouter un temps (secondes)', add_manual:'Ajouter', manual_time_placeholder:'ex: 45', hist_pot:'Pot historique', flight_delete:'Supprimer ce vol', start_btn:'DÉMARRER', stop_btn:'ARRÊTER', reset_btn_label:'EFFACER' },
+    en: { no_flights:'Add flights to see estimates', no_flights_stats:'No flights', ready:'Ready', running:'Running', flights_label:'flights', history_empty:'No history (60 days)', import_success:'✅ Imported!', import_error:'❌ Invalid file', gps_error:'⚠️ GPS unavailable', max_hornets:'Max 7 hornets', confirm_reset:'Delete all?', delete:'Delete', manual_time:'Or add time (seconds)', add_manual:'Add', manual_time_placeholder:'e.g. 45', hist_pot:'Historical pot', flight_delete:'Delete flight', start_btn:'START', stop_btn:'STOP', reset_btn_label:'RESET' },
+    de: { no_flights:'Flüge hinzufügen', no_flights_stats:'Keine Flüge', ready:'Bereit', running:'Läuft', flights_label:'Flüge', history_empty:'Kein Verlauf (60 Tage)', import_success:'✅ Importiert!', import_error:'❌ Fehler', gps_error:'⚠️ GPS nicht verfügbar', max_hornets:'Max 7 Hornissen', confirm_reset:'Alles löschen?', delete:'Löschen', manual_time:'Zeit manuell (Sekunden)', add_manual:'Hinzufügen', manual_time_placeholder:'z.B. 45', hist_pot:'Historischer Pot', flight_delete:'Flug löschen', start_btn:'START', stop_btn:'STOPP', reset_btn_label:'ZURÜCK' },
+    it: { no_flights:'Aggiungi voli', no_flights_stats:'Nessun volo', ready:'Pronto', running:'In corso', flights_label:'voli', history_empty:'Nessuna cronologia (60 giorni)', import_success:'✅ Importato!', import_error:'❌ Errore', gps_error:'⚠️ GPS non disponibile', max_hornets:'Max 7 calabroni', confirm_reset:'Cancellare tutto?', delete:'Elimina', manual_time:'O aggiungi tempo (secondi)', add_manual:'Aggiungi', manual_time_placeholder:'es. 45', hist_pot:'Pot storico', flight_delete:'Elimina volo', start_btn:'AVVIA', stop_btn:'FERMA', reset_btn_label:'AZZERA' }
+};
 
-    <!-- ==================== MAP CARD ==================== -->
-    <div class="card">
-        <h2>🗺️ <span data-lang="map_title">Triangulation</span></h2>
-        <div id="map"></div>
-        <div class="flex-row" style="margin-top:8px;">
-            <button class="btn-grey btn-sm" onclick="getGPS()">📍 <span data-lang="gps_btn">Ma position</span></button>
-            <button class="btn-grey btn-sm" onclick="manualCoords()">✍️ <span data-lang="manual_coords">Coordonnées</span></button>
-            <button class="btn-gold btn-sm" onclick="showHistory()">📋 <span data-lang="history_btn">Historique 60j</span></button>
-            <button class="btn-red btn-sm" onclick="clearMap()">🗑️ <span data-lang="clear_map">Effacer</span></button>
-        </div>
-        <div id="predictionPanel" style="margin-top:8px;padding:8px;background:#f9f4e8;border-radius:12px;font-size:0.85rem;">⚠️ <span data-lang="no_flights">Ajoutez des vols pour voir les estimations</span></div>
-        <div id="historyPanel"></div>
-    </div>
+function t(key) { return (translations[currentLang] && translations[currentLang][key]) || key; }
+function changeLanguage(lang) { currentLang = lang; localStorage.setItem('vl', lang); renderAll(); if(map) drawAnalysis(); }
 
-    <!-- ==================== STATS CARD ==================== -->
-    <div class="card">
-        <h2>📊 <span data-lang="stats_title">Statistiques</span></h2>
-        <div id="statsContent" style="font-size:0.9rem;">---</div>
-    </div>
+// ============ HORNETS ============
+function createHornet(name) { return { id: Date.now()+Math.random(), name: name||'Frelon 1', direction: 0, flights: [], timerRunning: false, timerStart: null, elapsedSeconds: 0 }; }
+function getAvg(h) { if(!h.flights.length) return 0; var s=0; for(var i=0;i<h.flights.length;i++) s+=h.flights[i]; return s/h.flights.length; }
+function getDist(avg) { if(avg<=30) return 0; return (avg-30)*2.5; }
 
-    <!-- ==================== EXPORT CARD ==================== -->
-    <div class="card">
-        <div class="flex-row" style="justify-content:center;">
-            <button class="btn-grey btn-sm" onclick="exportJSON()">📤 JSON</button>
-            <button class="btn-grey btn-sm" onclick="exportPDF()">📄 <span data-lang="pdf_report">Rapport PDF</span></button>
-            <button class="btn-grey btn-sm" onclick="exportGPX()">📍 GPX</button>
-            <button class="btn-grey btn-sm" onclick="exportKML()">🌍 KML</button>
-            <button class="btn-grey btn-sm" onclick="document.getElementById('importFile').click()">📥 <span data-lang="import_btn">Importer</span></button>
-            <button class="btn-red btn-sm" onclick="resetAll()">🔄 <span data-lang="reset_btn">Nouveau</span></button>
-            <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
-        </div>
-    </div>
+// ============ STORAGE ============
+function saveAll() { try { localStorage.setItem('vd', JSON.stringify({ hornets:hornets, surveyLocation:surveyLocation, inspectorName:inspectorName, notes:notes, personalInfo:personalInfo, collapsedCards:collapsedCards })); } catch(e){} }
+function loadAll() {
+    try { var d=JSON.parse(localStorage.getItem('vd')); if(d){ if(d.hornets)hornets=d.hornets; if(d.surveyLocation)surveyLocation=d.surveyLocation; inspectorName=d.inspectorName||''; notes=d.notes||''; if(d.personalInfo)personalInfo=d.personalInfo; if(d.collapsedCards)collapsedCards=d.collapsedCards; } } catch(e){}
+    var sl=localStorage.getItem('vl'); if(sl&&translations[sl])currentLang=sl;
+    document.getElementById('langSelect').value=currentLang;
+    document.getElementById('firstName').value=personalInfo.firstName||'';
+    document.getElementById('lastName').value=personalInfo.lastName||'';
+    document.getElementById('phone').value=personalInfo.phone||'';
+    if(!hornets.length) hornets.push(createHornet('Frelon 1'));
+}
+function saveHist() {
+    if(!hornets.some(function(h){return h.flights.length>0})) return;
+    var hist=[]; try { hist=JSON.parse(localStorage.getItem('vh')||'[]'); } catch(e){}
+    hist.push({ date:new Date().toISOString(), location:{lat:surveyLocation.lat,lng:surveyLocation.lng,name:surveyLocation.name}, hornets:hornets.map(function(h){return {name:h.name,direction:h.direction,flights:h.flights.slice()};}), notes:notes, inspectorName:inspectorName });
+    if(hist.length>200) hist=hist.slice(-200);
+    try { localStorage.setItem('vh',JSON.stringify(hist)); } catch(e){}
+}
+function getHist() { try { return JSON.parse(localStorage.getItem('vh')||'[]'); } catch(e){ return[]; } }
 
-    <!-- ==================== ABOUT MODAL ==================== -->
-    <div class="modal-overlay" id="aboutModal">
-        <div class="modal">
-            <button class="modal-close" onclick="closeAbout()">✕</button>
-            <h2>ℹ️ <span data-lang="about_title">À propos de VespaTimer</span></h2>
-            <div class="about-text">
-                <p data-lang="about_text">Bienvenue sur VespaTimer*, un site internet qui facilite le travail du pot à mèche**, en faisant directement les moyennes et en triangulant le nid selon vos chronométrages.</p>
-                <p data-lang="about_instruction">Une fois vos relevés complétés, téléchargez le format souhaité (souvent PDF) puis transmettez-le à votre télémètre régional.</p>
-                <p data-lang="about_refresh">Pour refaire l'exercice, appuyez sur nouveau.</p>
-                <p>⚠️ <span data-lang="about_report">N'oubliez pas de signaler vos observations (frelon, nid, etc.) sur :</span> <a href="https://frelonasiatique.ch" target="_blank">frelonasiatique.ch</a></p>
-                <p>🐝 <span data-lang="about_happy">Bonne chasse ! 🙂</span></p>
-                <p style="margin-top:8px;" data-lang="about_instructions_detail">Instructions : remplissez les infos en haut, chronométrez les frelons plusieurs fois, voyez où se trouve potentiellement le nid, exportez dans le format souhaité (PDF pour le télémètre / JSON pour réimporter les données plus tard, GPX/KML pour charger sur des cartes).</p>
-                <hr>
-                <p style="font-size:0.78rem;color:#888;"><span data-lang="about_footer1">* Requiert une connexion Internet pour la date et l'heure ainsi que les services de localisation pour la précision de la carte. Veuillez signaler les bugs si vous en rencontrez.</span><br>
-                    <span data-lang="about_footer2">** Plus d'informations via :</span> <a href="https://www.youtube.com/watch?v=HurtOt4qiM8" target="_blank">vidéo de Grégoire Hupka</a></p>
-            </div>
-        </div>
-    </div>
+// ============ TIMER ============
+function toggleCollapse(id) { collapsedCards[id]=!collapsedCards[id]; saveAll(); renderAll(); if(map)drawAnalysis(); }
+function startTimer(id) { var h=hornets.find(function(x){return x.id===id}); if(!h||h.timerRunning||h.flights.length>=5) return; h.timerRunning=true; h.timerStart=Date.now()-(h.elapsedSeconds*1000); renderAll(); }
+function stopTimer(id) { var h=hornets.find(function(x){return x.id===id}); if(!h||!h.timerRunning) return; var elapsed=Math.floor((Date.now()-h.timerStart)/1000); h.timerRunning=false; h.timerStart=null; if(elapsed>0){ h.flights.push(elapsed); if(h.flights.length>5) h.flights.shift(); } h.elapsedSeconds=0; saveHist(); renderAll(); }
+function resetTimer(id) { var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.timerRunning=false; h.timerStart=null; h.elapsedSeconds=0; renderAll(); }
+function deleteFlight(hid,idx) { var h=hornets.find(function(x){return x.id===hid}); if(!h||idx<0||idx>=h.flights.length) return; h.flights.splice(idx,1); renderAll(); }
+function addManualTime(id) { var h=hornets.find(function(x){return x.id===id}); if(!h||h.flights.length>=5) return; var inp=document.getElementById('mt_'+id); if(!inp) return; var v=parseInt(inp.value); if(isNaN(v)||v<=0){ alert('Temps invalide'); return; } h.flights.push(v); if(h.flights.length>5) h.flights.shift(); inp.value=''; saveHist(); renderAll(); }
+function deleteHornet(id) { if(hornets.length<=1){ alert('Gardez au moins un frelon.'); return; } hornets=hornets.filter(function(x){return x.id!==id}); delete collapsedCards[id]; renderAll(); }
+function updateDir(id,val) { var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.direction=Math.min(359,Math.max(0,parseInt(val)||0)); saveAll(); if(map) drawAnalysis(); }
+function updateName(id,val) { var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.name=val||'Frelon'; saveAll(); }
+function addHornet() { if(hornets.length>=MAX_HORNETS){ alert(t('max_hornets')); return; } hornets.push(createHornet('Frelon '+(hornets.length+1))); renderAll(); }
 
-    <!-- ==================== JAVASCRIPT ==================== -->
-    <script>
-        // ==================== GLOBAL STATE ====================
-        var hornets = [];
-        var surveyLocation = { lat: 46.8, lng: 6.8, name: '' };
-        var inspectorName = '';
-        var notes = '';
-        var personalInfo = { firstName: '', lastName: '', phone: '' };
-        var currentLang = 'fr';
-        var map = null;
-        var potMarker = null;
-        var mapLines = [];
-        var collapsedCards = {};
-        var COLORS = ['#d4a853', '#b85c3a', '#5f7d6b', '#7b5e7b', '#3a6b8c', '#c47b6b', '#4a8c6f'];
-        var COLOR_NAMES = ['Doré', 'Rouge', 'Vert', 'Violet', 'Bleu', 'Saumon', 'Émeraude'];
-        var MAX_HORNETS = 7;
+// ============ LOCATION ============
+function setLocation() { var v=document.getElementById('locationInput').value.trim(); if(!v) return; surveyLocation.name=v; var m=v.match(/([-+]?\d+\.?\d*)\s*[,;]\s*([-+]?\d+\.?\d*)/); if(m){ surveyLocation.lat=parseFloat(m[1]); surveyLocation.lng=parseFloat(m[2]); } updatePotMarker(); renderAll(); }
+function getGPS() { if(!navigator.geolocation){ alert(t('gps_error')); return; } navigator.geolocation.getCurrentPosition(function(p){ surveyLocation.lat=p.coords.latitude; surveyLocation.lng=p.coords.longitude; document.getElementById('locationInput').value=p.coords.latitude.toFixed(5)+', '+p.coords.longitude.toFixed(5); updatePotMarker(); renderAll(); },function(){ alert(t('gps_error')); },{ enableHighAccuracy:true, timeout:10000 }); }
+function manualCoords() { var lat=prompt('Latitude:',surveyLocation.lat.toFixed(5)); if(lat===null) return; var lng=prompt('Longitude:',surveyLocation.lng.toFixed(5)); if(lng===null) return; surveyLocation.lat=parseFloat(lat); surveyLocation.lng=parseFloat(lng); document.getElementById('locationInput').value=lat+', '+lng; updatePotMarker(); renderAll(); }
 
-        // ==================== TRANSLATIONS ====================
-        var translations = {
-            fr: {
-                about_btn: 'À propos',
-                personal_info: 'Informations personnelles',
-                first_name: 'Prénom',
-                last_name: 'Nom',
-                phone: '📞 Téléphone',
-                pot_label: 'Pot-à-Mèche',
-                location_placeholder: 'Nom du lieu ou lat,lng',
-                save_btn: 'Enregistrer',
-                inspector_placeholder: '👤 Inspecteur (télémètre)',
-                notes_placeholder: '📝 Notes de relevé...',
-                timer_active: '⏱️ Chronomètre actif',
-                hornets_title: 'Frelons',
-                add_hornet: 'Ajouter un frelon',
-                map_title: 'Triangulation',
-                gps_btn: 'Ma position',
-                manual_coords: 'Coordonnées',
-                history_btn: 'Historique 60j',
-                clear_map: 'Effacer',
-                no_flights: 'Ajoutez des vols pour voir les estimations',
-                stats_title: 'Statistiques',
-                pdf_report: 'Rapport PDF',
-                import_btn: 'Importer',
-                reset_btn: 'Nouveau',
-                about_title: 'À propos de VespaTimer',
-                about_text: 'Bienvenue sur VespaTimer*, un site internet/PWA qui facilite le travail du pot à mèche**, en faisant directement les moyennes et en triangulant le nid selon vos chronométrages.',
-                about_instruction: 'Une fois vos relevés complétés, téléchargez le format souhaité (souvent PDF) puis transmettez-le à votre télémètre régional.',
-                about_refresh: 'Pour refaire l\'exercice, appuyez sur nouveau.',
-                about_report: 'N\'oubliez pas de signaler vos observations (frelon, nid, etc.) sur :',
-                about_happy: 'Bonne chasse ! 🙂',
-                about_instructions_detail: 'Instructions : remplissez les infos en haut, chronométrez les frelons plusieurs fois, voyez où se trouve potentiellement le nid, exportez dans le format souhaité (PDF pour le télémètre / JSON pour réimporter les données plus tard, GPX/KML pour charger sur des cartes).',
-                about_footer1: '* Requiert une connexion Internet pour la date et l\'heure ainsi que les services de localisation pour la précision de la carte. Veuillez signaler les bugs si vous en rencontrez.',
-                about_footer2: '** Plus d\'informations via :',
-                no_flights_stats: 'Aucun vol enregistré',
-                ready: 'Prêt',
-                running: 'En cours',
-                flights_label: 'vols',
-                direction: 'Direction',
-                distance: 'Dist',
-                average: 'Moy',
-                priority_zone: 'Zone prioritaire',
-                history_empty: 'Aucun historique récent (60 jours)',
-                import_success: '✅ Données importées !',
-                import_error: '❌ Fichier invalide',
-                gps_error: '⚠️ GPS impossible',
-                max_hornets: 'Maximum 7 frelons',
-                confirm_reset: 'Effacer toutes les données ?',
-                delete: 'Supprimer',
-                report_title: 'RAPPORT VESPATIMER',
-                triangulator: 'Triangulateur',
-                nest_estimated: 'Nid estimé',
-                no_nest: 'Pas assez de données',
-                pot_location: 'Lieu du pot',
-                personal_info_label: 'Info personnelle',
-                manual_time: 'Ou ajouter un temps manuellement (secondes)',
-                add_manual: 'Ajouter',
-                manual_time_placeholder: 'ex: 45',
-                hist_pot: 'Pot historique',
-                collapse: 'Cliquer pour déplier/replier',
-                flight_delete: 'Supprimer ce vol',
-                start_btn: 'DÉMARRER',
-                stop_btn: 'ARRÊTER',
-                reset_btn_label: 'EFFACER',
-                edit_during_timer: 'Modifier pendant le chrono',
-            },
-            en: {
-                about_btn: 'About',
-                personal_info: 'Personal Information',
-                first_name: 'First Name',
-                last_name: 'Last Name',
-                phone: '📞 Phone',
-                pot_label: 'Pot-à-Mèche',
-                location_placeholder: 'Location name or lat,lng',
-                save_btn: 'Save',
-                inspector_placeholder: '👤 Inspector (telemeter)',
-                notes_placeholder: '📝 Survey notes...',
-                timer_active: '⏱️ Timer active',
-                hornets_title: 'Hornets',
-                add_hornet: 'Add hornet',
-                map_title: 'Triangulation',
-                gps_btn: 'My position',
-                manual_coords: 'Coordinates',
-                history_btn: 'History 60d',
-                clear_map: 'Clear',
-                no_flights: 'Add flights to see estimates',
-                stats_title: 'Statistics',
-                pdf_report: 'PDF Report',
-                import_btn: 'Import',
-                reset_btn: 'New',
-                about_title: 'About VespaTimer',
-                about_text: 'Welcome to VespaTimer*, a website/PWA that facilitates pot-à-mèche work**, by directly calculating averages and triangulating the nest based on your timings.',
-                about_instruction: 'Once your readings are complete, download the preferred format (often PDF) then send it to your regional telemeter.',
-                about_refresh: 'To redo the exercise, press new.',
-                about_report: 'Don\'t forget to report your observations (hornet, nest, etc.) on:',
-                about_happy: 'Happy hunting! 🙂',
-                about_instructions_detail: 'Instructions: fill in the info at the top, time the hornets multiple times, see where there is potentially the nest, export in the preferred format (PDF for telemeter / JSON for later reimporting the info, GPX/KML for loading on maps).',
-                about_footer1: '* Requires Internet connection for date and time and location services for map precision. Please report bugs if you encounter any.',
-                about_footer2: '** More information via:',
-                no_flights_stats: 'No flights recorded',
-                ready: 'Ready',
-                running: 'Running',
-                flights_label: 'flights',
-                direction: 'Direction',
-                distance: 'Dist',
-                average: 'Avg',
-                priority_zone: 'Priority zone',
-                history_empty: 'No recent history (60 days)',
-                import_success: '✅ Data imported!',
-                import_error: '❌ Invalid file',
-                gps_error: '⚠️ GPS unavailable',
-                max_hornets: 'Maximum 7 hornets',
-                confirm_reset: 'Delete all data?',
-                delete: 'Delete',
-                report_title: 'VESPATIMER REPORT',
-                triangulator: 'Triangulator',
-                nest_estimated: 'Estimated nest',
-                no_nest: 'Not enough data',
-                pot_location: 'Pot location',
-                personal_info_label: 'Personal info',
-                manual_time: 'Or add time manually (seconds)',
-                add_manual: 'Add',
-                manual_time_placeholder: 'e.g. 45',
-                hist_pot: 'Historical pot',
-                collapse: 'Click to collapse/expand',
-                flight_delete: 'Delete this flight',
-                start_btn: 'START',
-                stop_btn: 'STOP',
-                reset_btn_label: 'RESET',
-                edit_during_timer: 'Edit while timing',
-            },
-            de: {
-                about_btn: 'Über',
-                personal_info: 'Persönliche Daten',
-                first_name: 'Vorname',
-                last_name: 'Nachname',
-                phone: '📞 Telefon',
-                pot_label: 'Pot-à-Mèche',
-                location_placeholder: 'Ortsname oder lat,lng',
-                save_btn: 'Speichern',
-                inspector_placeholder: '👤 Inspektor (Telemeter)',
-                notes_placeholder: '📝 Notizen...',
-                timer_active: '⏱️ Timer aktiv',
-                hornets_title: 'Hornissen',
-                add_hornet: 'Hornisse hinzufügen',
-                map_title: 'Triangulation',
-                gps_btn: 'Mein Standort',
-                manual_coords: 'Koordinaten',
-                history_btn: 'Verlauf 60T',
-                clear_map: 'Löschen',
-                no_flights: 'Flüge hinzufügen',
-                stats_title: 'Statistiken',
-                pdf_report: 'PDF Bericht',
-                import_btn: 'Importieren',
-                reset_btn: 'Neu',
-                about_title: 'Über VespaTimer',
-                about_text: 'Willkommen bei VespaTimer*, einer Website/PWA, die die Pot-à-Mèche-Arbeit erleichtert**, indem sie Durchschnittswerte berechnet und das Nest anhand Ihrer Zeitmessungen trianguliert.',
-                about_instruction: 'Sobald Ihre Messungen abgeschlossen sind, laden Sie das gewünschte Format herunter (oft PDF) und senden Sie es an Ihren regionalen Telemeter.',
-                about_refresh: 'Um die Übung zu wiederholen, drücken Sie neu.',
-                about_report: 'Vergessen Sie nicht, Ihre Beobachtungen zu melden auf:',
-                about_happy: 'Gute Jagd! 🙂',
-                about_instructions_detail: 'Anleitung: Füllen Sie die Infos oben aus, stoppen Sie die Hornissen mehrmals, sehen Sie, wo sich das Nest befinden könnte, exportieren Sie im gewünschten Format.',
-                about_footer1: '* Erfordert Internetverbindung für Datum/Uhrzeit und Standortdienste für Kartenpräzision. Bitte melden Sie Fehler.',
-                about_footer2: '** Weitere Informationen via:',
-                no_flights_stats: 'Keine Flüge',
-                ready: 'Bereit',
-                running: 'Läuft',
-                flights_label: 'Flüge',
-                direction: 'Richtung',
-                distance: 'Entf',
-                average: 'Mittel',
-                priority_zone: 'Prioritätszone',
-                history_empty: 'Kein Verlauf (60 Tage)',
-                import_success: '✅ Importiert!',
-                import_error: '❌ Fehler',
-                gps_error: '⚠️ GPS nicht verfügbar',
-                max_hornets: 'Max 7 Hornissen',
-                confirm_reset: 'Alles löschen?',
-                delete: 'Löschen',
-                report_title: 'VESPATIMER BERICHT',
-                triangulator: 'Triangulator',
-                nest_estimated: 'Geschätztes Nest',
-                no_nest: 'Nicht genug Daten',
-                pot_location: 'Pot Standort',
-                personal_info_label: 'Persönliche Info',
-                manual_time: 'Oder Zeit manuell hinzufügen (Sekunden)',
-                add_manual: 'Hinzufügen',
-                manual_time_placeholder: 'z.B. 45',
-                hist_pot: 'Historischer Pot',
-                collapse: 'Klicken zum Ein-/Ausklappen',
-                flight_delete: 'Diesen Flug löschen',
-                start_btn: 'START',
-                stop_btn: 'STOPP',
-                reset_btn_label: 'ZURÜCK',
-                edit_during_timer: 'Während Timer bearbeiten',
-            },
-            it: {
-                about_btn: 'Info',
-                personal_info: 'Informazioni personali',
-                first_name: 'Nome',
-                last_name: 'Cognome',
-                phone: '📞 Telefono',
-                pot_label: 'Pot-à-Mèche',
-                location_placeholder: 'Luogo o lat,lng',
-                save_btn: 'Salva',
-                inspector_placeholder: '👤 Ispettore (telemetro)',
-                notes_placeholder: '📝 Note...',
-                timer_active: '⏱️ Timer attivo',
-                hornets_title: 'Calabroni',
-                add_hornet: 'Aggiungi calabrone',
-                map_title: 'Triangolazione',
-                gps_btn: 'Mia posizione',
-                manual_coords: 'Coordinate',
-                history_btn: 'Cronologia 60g',
-                clear_map: 'Cancella',
-                no_flights: 'Aggiungi voli',
-                stats_title: 'Statistiche',
-                pdf_report: 'Rapporto PDF',
-                import_btn: 'Importa',
-                reset_btn: 'Nuovo',
-                about_title: 'Info VespaTimer',
-                about_text: 'Benvenuto su VespaTimer*, un sito/PWA che facilita il lavoro del pot-à-mèche**, calcolando direttamente le medie e triangolando il nido in base ai tuoi tempi.',
-                about_instruction: 'Una volta completate le letture, scarica il formato desiderato (spesso PDF) e invialo al tuo telemetro regionale.',
-                about_refresh: 'Per rifare l\'esercizio, premi nuovo.',
-                about_report: 'Non dimenticare di segnalare le tue osservazioni su:',
-                about_happy: 'Buona caccia! 🙂',
-                about_instructions_detail: 'Istruzioni: compila le info in alto, cronometra i calabroni più volte, vedi dove si trova potenzialmente il nido, esporta nel formato desiderato.',
-                about_footer1: '* Richiede connessione Internet per data/ora e servizi di localizzazione per la precisione della mappa. Segnala i bug.',
-                about_footer2: '** Maggiori informazioni via:',
-                no_flights_stats: 'Nessun volo',
-                ready: 'Pronto',
-                running: 'In corso',
-                flights_label: 'voli',
-                direction: 'Direzione',
-                distance: 'Dist',
-                average: 'Media',
-                priority_zone: 'Zona prioritaria',
-                history_empty: 'Nessuna cronologia (60 giorni)',
-                import_success: '✅ Importato!',
-                import_error: '❌ Errore',
-                gps_error: '⚠️ GPS non disponibile',
-                max_hornets: 'Max 7 calabroni',
-                confirm_reset: 'Cancellare tutto?',
-                delete: 'Elimina',
-                report_title: 'RAPPORTO VESPATIMER',
-                triangulator: 'Triangulatore',
-                nest_estimated: 'Nido stimato',
-                no_nest: 'Dati insufficienti',
-                pot_location: 'Posizione pot',
-                personal_info_label: 'Info personali',
-                manual_time: 'O aggiungi tempo manualmente (secondi)',
-                add_manual: 'Aggiungi',
-                manual_time_placeholder: 'es. 45',
-                hist_pot: 'Pot storico',
-                collapse: 'Clicca per comprimere/espandere',
-                flight_delete: 'Elimina questo volo',
-                start_btn: 'AVVIA',
-                stop_btn: 'FERMA',
-                reset_btn_label: 'AZZERA',
-                edit_during_timer: 'Modifica durante timer',
-            }
-        };
+// ============ MAP ============
+function initMap() { var el=document.getElementById('map'); if(!el){ setTimeout(initMap,500); return; } if(map){ map.invalidateSize(); return; } map=L.map('map',{zoomControl:true}).setView([surveyLocation.lat,surveyLocation.lng],16); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(map); updatePotMarker(); setTimeout(function(){ if(map) map.invalidateSize(); },400); }
+function updatePotMarker() { if(!map) return; if(potMarker) map.removeLayer(potMarker); var beeIcon=L.divIcon({html:'🐝',iconSize:[30,30],iconAnchor:[15,15],className:''}); potMarker=L.marker([surveyLocation.lat,surveyLocation.lng],{draggable:true,icon:beeIcon}).addTo(map).bindPopup('📍 Pot-à-Mèche').openPopup(); potMarker.on('dragend',function(e){ surveyLocation.lat=e.target.getLatLng().lat; surveyLocation.lng=e.target.getLatLng().lng; document.getElementById('locationDisplay').textContent=surveyLocation.lat.toFixed(5)+', '+surveyLocation.lng.toFixed(5); saveAll(); drawAnalysis(); }); }
+function clearMap() { if(!map) return; for(var i=0;i<mapLines.length;i++){ if(map.hasLayer(mapLines[i])) map.removeLayer(mapLines[i]); } mapLines=[]; document.getElementById('predictionPanel').innerHTML='⚠️ '+t('no_flights'); document.getElementById('historyPanel').style.display='none'; }
+function getNestCoordsForHornet(h,loc){ var d=getDist(getAvg(h)); if(d<=0) return null; var rad=(h.direction*Math.PI)/180; var l=loc||surveyLocation; return { lat:l.lat+(d/111320)*Math.cos(rad), lng:l.lng+(d/(111320*Math.cos(l.lat*Math.PI/180)))*Math.sin(rad), distance:d, direction:h.direction }; }
+function getNestCoords(h){ return getNestCoordsForHornet(h,surveyLocation); }
+function createOval(center,dirDeg){ var pts=[]; var hw=50,hh=25; var dirRad=(dirDeg*Math.PI)/180; var perpRad=dirRad+Math.PI/2; for(var i=0;i<64;i++){ var angle=(i/64)*2*Math.PI; var rx=hh*Math.cos(angle); var ry=hw*Math.sin(angle); pts.push(L.latLng(center.lat+(rx/111320)*Math.cos(dirRad)-(ry/111320)*Math.cos(perpRad), center.lng+(rx/(111320*Math.cos(center.lat*Math.PI/180)))*Math.sin(dirRad)-(ry/(111320*Math.cos(center.lat*Math.PI/180)))*Math.sin(perpRad))); } return pts; }
 
-        // ==================== HELPER FUNCTIONS ====================
-        function t(key) {
-            return (translations[currentLang] && translations[currentLang][key]) || key;
-        }
-
-        function changeLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('vespatimer_lang', lang);
-            applyTranslations();
-            renderAll();
-            if (map) drawAnalysis();
-        }
-
-        function applyTranslations() {
-            var elements = document.querySelectorAll('[data-lang]');
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].textContent = t(elements[i].getAttribute('data-lang'));
-            }
-            var placeholders = document.querySelectorAll('[data-lang-placeholder]');
-            for (var j = 0; j < placeholders.length; j++) {
-                placeholders[j].placeholder = t(placeholders[j].getAttribute('data-lang-placeholder'));
-            }
-        }
-
-        // ==================== HORNET FUNCTIONS ====================
-        function createHornet(name) {
-            return {
-                id: Date.now() + Math.random(),
-                name: name || 'Frelon 1',
-                direction: 0,
-                flights: [],
-                timerRunning: false,
-                timerStart: null,
-                elapsedSeconds: 0
-            };
-        }
-
-        function getAverage(h) {
-            if (!h.flights.length) return 0;
-            var sum = 0;
-            for (var i = 0; i < h.flights.length; i++) {
-                sum += h.flights[i];
-            }
-            return sum / h.flights.length;
-        }
-
-        function getDistance(avg) {
-            if (avg <= 30) return 0;
-            return (avg - 30) * 2.5;
-        }
-
-        // ==================== PERSISTENCE ====================
-        function saveAll() {
-            try {
-                var data = {
-                    hornets: hornets,
-                    surveyLocation: surveyLocation,
-                    inspectorName: inspectorName,
-                    notes: notes,
-                    personalInfo: personalInfo,
-                    collapsedCards: collapsedCards
-                };
-                localStorage.setItem('vespatimer_data', JSON.stringify(data));
-            } catch (e) {
-                console.warn('Could not save data:', e);
-            }
-        }
-
-        function loadAll() {
-            try {
-                var saved = localStorage.getItem('vespatimer_data');
-                if (saved) {
-                    var data = JSON.parse(saved);
-                    if (data.hornets && Array.isArray(data.hornets)) hornets = data.hornets;
-                    if (data.surveyLocation) surveyLocation = data.surveyLocation;
-                    inspectorName = data.inspectorName || '';
-                    notes = data.notes || '';
-                    if (data.personalInfo) personalInfo = data.personalInfo;
-                    if (data.collapsedCards) collapsedCards = data.collapsedCards;
-                }
-            } catch (e) {
-                console.warn('Could not load data:', e);
-            }
-            var savedLang = localStorage.getItem('vespatimer_lang');
-            if (savedLang && translations[savedLang]) {
-                currentLang = savedLang;
-            }
-            document.getElementById('langSelect').value = currentLang;
-            document.getElementById('firstName').value = personalInfo.firstName || '';
-            document.getElementById('lastName').value = personalInfo.lastName || '';
-            document.getElementById('phone').value = personalInfo.phone || '';
-            if (!hornets.length) {
-                hornets.push(createHornet('Frelon 1'));
-            }
-        }
-
-        function saveHistory() {
-            if (!hornets.some(function(h) { return h.flights.length > 0; })) return;
-            var history = [];
-            try {
-                history = JSON.parse(localStorage.getItem('vespatimer_history') || '[]');
-            } catch (e) {
-                history = [];
-            }
-            history.push({
-                date: new Date().toISOString(),
-                location: {
-                    lat: surveyLocation.lat,
-                    lng: surveyLocation.lng,
-                    name: surveyLocation.name
-                },
-                hornets: hornets.map(function(h) {
-                    return {
-                        name: h.name,
-                        direction: h.direction,
-                        flights: h.flights.slice()
-                    };
-                }),
-                notes: notes,
-                inspectorName: inspectorName,
-                personalInfo: {
-                    firstName: personalInfo.firstName,
-                    lastName: personalInfo.lastName,
-                    phone: personalInfo.phone
-                }
-            });
-            if (history.length > 200) history = history.slice(-200);
-            try {
-                localStorage.setItem('vespatimer_history', JSON.stringify(history));
-            } catch (e) {
-                console.warn('Could not save history:', e);
-            }
-        }
-
-        function getHistory() {
-            try {
-                return JSON.parse(localStorage.getItem('vespatimer_history') || '[]');
-            } catch (e) {
-                return [];
-         
-            }
-        }
-
-        // ==================== TIMER ACTIONS ====================
-        function toggleCollapse(id) {
-            collapsedCards[id] = !collapsedCards[id];
-            saveAll();
-            renderAll();
-            if (map) drawAnalysis();
-        }
-
-        function startTimer(id) {
-            var h = hornets.find(function(x) { return x.id === id; });
-            if (!h || h.timerRunning || h.flights.length >= 5) return;
-            h.timerRunning = true;
-            h.timerStart = Date.now() - (h.elapsedSeconds * 1000);
-            renderAll();
-        }
-
-        function stopTimer(id) {
-            var h = hornets.find(function(x) { return x.id === id; });
-            if (!h || !h.timerRunning) return;
-            var elapsed = Math.floor((Date.now() - h.timerStart) / 1000);
-            h.timerRunning = false;
-            h.timerStart = null;
-            if (elapsed > 0) {
-                h.flights.push(elapsed);
-                if (h.flights.length > 5) h.flights.shift();
-            }
-            h.elapsedSeconds = 0;
-            saveHistory();
-            renderAll();
-        }
-
-        function resetTimer(id) {
-            var h = hornets.find(function(x) { return x.id === id; });
-            if (!h) return;
-            h.timerRunning = false;
-            h.timerStart = null;
-            h.elapsedSeconds = 0;
-            renderAll();
-        }
-
-        function deleteFlight(hornetId, flightIndex) {
-            var h = hornets.find(function(x) { return x.id === hornetId; });
-            if (!h || flightIndex < 0 || flightIndex >= h.flights.length) return;
-            h.flights.splice(flightIndex, 1);
-            renderAll();
-        }
-
-        function addManualTime(id) {
-            var h = hornets.find(function(x) { return x.id === id; });
-            if (!h || h.flights.length >= 5) return;
-            var input = document.getElementById('mt_' + id);
-            if (!input) return;
-            var val = parseInt(input.value);
-            if (isNaN(val) || val <= 0) {
-                alert('Veuillez entrer un temps valide en secondes.');
-                return;
-            }
-            h.flights.push(val);
-            if (h.flights.length > 5) h.flights.shift();
-            input.value = '';
-            saveHistory();
-            renderAll();
-        }
-
-        function deleteHornet(id) {
-            if (hornets.length <= 1) {
-                alert('Gardez au moins un frelon.');
-                return;
-            }
-            hornets = hornets.filter(function(x) { return x.id !== id; });
-            delete collapsedCards[id];
-            renderAll();
-        }
-
-        // UPDATED: Direction editable during timer
-        function updateDirection(id, val) {
-    var h = hornets.find(function(x) { return x.id === id; });
-    if (!h) return;
-    h.direction = Math.min(359, Math.max(0, parseInt(val) || 0));
-    saveAll();
-    if (map) drawAnalysis();
-    // Only re-render if timer is NOT running
-    if (!h.timerRunning) {
-        renderAll();
+function drawAnalysis(histData){
+    if(!map) return;
+    for(var i=0;i<mapLines.length;i++){ if(map.hasLayer(mapLines[i])) map.removeLayer(mapLines[i]); }
+    mapLines=[]; var preds=[];
+    for(var idx=0;idx<hornets.length;idx++){ var h=hornets[idx]; if(!h.flights.length) continue; var nd=getNestCoordsForHornet(h,surveyLocation); if(!nd) continue; var pot=L.latLng(surveyLocation.lat,surveyLocation.lng); var nestPt=L.latLng(nd.lat,nd.lng);
+        mapLines.push(L.polyline([pot,nestPt],{color:COLORS[idx%7],weight:3,dashArray:'5,5'}).addTo(map));
+        mapLines.push(L.polygon(createOval(nestPt,nd.direction),{color:COLORS[idx%7],fillOpacity:0.15,weight:1.5,dashArray:'4,4'}).addTo(map));
+        var m=L.circleMarker(nestPt,{radius:7,color:COLORS[idx%7],fillOpacity:0.7}).addTo(map); m.bindPopup('<b>'+h.name+'</b><br>~'+nd.distance.toFixed(0)+'m<br>🧭 '+h.direction+'°<br>⬭ 50m×100m'); mapLines.push(m);
+        preds.push({name:h.name,point:nestPt,dist:nd.distance,direction:h.direction});
     }
-    // If timer IS running, map already updated above, no need to re-render
-        }
-        }
+    if(histData&&histData.length){ for(var ei=0;ei<histData.length;ei++){ var e=histData[ei]; if(!e.location||!e.hornets) continue; var hl=e.location,hp=L.latLng(hl.lat,hl.lng); var hpi=L.divIcon({html:'📍',iconSize:[20,20],iconAnchor:[10,10],className:''}); var hpm=L.marker([hl.lat,hl.lng],{icon:hpi,opacity:0.7}).addTo(map); hpm.bindPopup('<b>'+t('hist_pot')+'</b><br>📅 '+new Date(e.date).toLocaleDateString()); mapLines.push(hpm);
+        for(var hi=0;hi<e.hornets.length;hi++){ var hh=e.hornets[hi]; if(!hh.flights||!hh.flights.length) continue; var avg=0; for(var fi=0;fi<hh.flights.length;fi++) avg+=hh.flights[fi]; avg=avg/hh.flights.length; var dm=(avg-30)*2.5; if(dm<=0) continue; var dr=(hh.direction*Math.PI)/180; var nh=L.latLng(hl.lat+(dm/111320)*Math.cos(dr),hl.lng+(dm/(111320*Math.cos(hl.lat*Math.PI/180)))*Math.sin(dr));
+        mapLines.push(L.polyline([hp,nh],{color:'#999',weight:2,dashArray:'3,7',opacity:0.6}).addTo(map));
+        mapLines.push(L.polygon(createOval(nh,hh.direction),{color:'#999',fillOpacity:0.08,weight:1,dashArray:'3,5',opacity:0.5}).addTo(map));
+        var hm=L.circleMarker(nh,{radius:4,color:'#888',fillOpacity:0.5,weight:1}).addTo(map); hm.bindPopup('<b>Hist: '+hh.name+'</b><br>📅 '+new Date(e.date).toLocaleDateString()+'<br>⬭ 50m×100m'); mapLines.push(hm);
+    }}}
+    // NO STAR - removed priority zone marker
+    document.getElementById('predictionPanel').innerHTML=preds.length?'🔍 '+preds.map(function(p){return p.name+' → ~'+p.dist.toFixed(0)+'m'}).join(' · '):'⚠️ '+t('no_flights');
+}
 
-        // UPDATED: Name editable during timer
-        function updateName(id, val) {
-    var h = hornets.find(function(x) { return x.id === id; });
-    if (!h) return;
-    h.name = val || 'Frelon';
-    saveAll();
-    // Only re-render if timer is NOT running
-    if (!h.timerRunning) {
-        renderAll();
+function showHistory(){ var recent=getHist().filter(function(e){return new Date(e.date)>new Date(Date.now()-60*24*60*60*1000)}); drawAnalysis(recent); var panel=document.getElementById('historyPanel'); panel.style.display='block'; panel.innerHTML=recent.length?recent.reverse().map(function(e){return '<div class="history-item"><strong>📅 '+new Date(e.date).toLocaleDateString()+'</strong><br>📍 '+(e.location&&e.location.name?e.location.name:'?')+' | 🐝 '+(e.hornets?e.hornets.filter(function(h){return h.flights&&h.flights.length}).length:0)+' vols</div>'}).join(''):'<div class="history-item">📭 '+t('history_empty')+'</div>'; }
+
+// ============ MODALS ============
+function openAbout(){ document.getElementById('aboutModal').style.display='flex'; }
+function closeAbout(){ document.getElementById('aboutModal').style.display='none'; }
+
+// ============ EXPORT ============
+function dl(b,n){ var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=n; a.click(); }
+function exportJSON(){ dl(new Blob([JSON.stringify({version:'1.4',hornets:hornets,surveyLocation:surveyLocation,inspectorName:inspectorName,notes:notes,personalInfo:personalInfo})],{type:'application/json'}),'vespatimer.json'); }
+function exportPDF(){ var r='RAPPORT VESPATIMER v1.4\n'+new Date().toLocaleString()+'\n\n'; r+='Nom: '+(personalInfo.firstName||'?')+' '+(personalInfo.lastName||'?')+' | Tel: '+(personalInfo.phone||'?')+'\n'; r+='Triangulateur: '+(inspectorName||'?')+'\n'; r+='Pot: '+(surveyLocation.name||'?')+' ('+surveyLocation.lat.toFixed(5)+', '+surveyLocation.lng.toFixed(5)+')\n\n'; for(var i=0;i<hornets.length;i++){ var h=hornets[i],a=getAvg(h),d=getDist(a),n=getNestCoords(h); r+=h.name+' ('+COLOR_NAMES[i%7]+'): Dir='+h.direction+'° Vols='+h.flights.join(',')+'s Moy='+a.toFixed(1)+'s Dist='+d.toFixed(0)+'m'; if(n) r+=' | Nid: '+n.lat.toFixed(5)+', '+n.lng.toFixed(5); r+='\n'; } navigator.clipboard.writeText(r); alert('✅ Rapport copié. Ctrl+P pour PDF.'); window.print(); }
+function exportGPX(){ var g='<?xml version="1.0"?><gpx version="1.1"><wpt lat="'+surveyLocation.lat+'" lon="'+surveyLocation.lng+'"><name>Pot</name></wpt>'; for(var i=0;i<hornets.length;i++){ var h=hornets[i]; if(!h.flights.length) continue; var d=getDist(getAvg(h)); if(d<=0) continue; var n=getNestCoords(h); if(n) g+='<wpt lat="'+n.lat.toFixed(6)+'" lon="'+n.lng.toFixed(6)+'"><name>'+h.name+'</name></wpt>'; } g+='</gpx>'; dl(new Blob([g],{type:'application/gpx+xml'}),'vespatimer.gpx'); }
+function exportKML(){ var k='<?xml version="1.0"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark><name>Pot</name><Point><coordinates>'+surveyLocation.lng+','+surveyLocation.lat+',0</coordinates></Point></Placemark>'; for(var i=0;i<hornets.length;i++){ var h=hornets[i]; if(!h.flights.length) continue; var d=getDist(getAvg(h)); if(d<=0) continue; var n=getNestCoords(h); if(n) k+='<Placemark><name>'+h.name+'</name><Point><coordinates>'+n.lng.toFixed(6)+','+n.lat.toFixed(6)+',0</coordinates></Point></Placemark>'; } k+='</Document></kml>'; dl(new Blob([k],{type:'application/vnd.google-earth.kml+xml'}),'vespatimer.kml'); }
+function importData(e){ var f=e.target.files[0]; if(!f) return; var reader=new FileReader(); reader.onload=function(ev){ try{ var d=JSON.parse(ev.target.result); if(d.hornets)hornets=d.hornets; if(d.surveyLocation)surveyLocation=d.surveyLocation; inspectorName=d.inspectorName||''; notes=d.notes||''; if(d.personalInfo)personalInfo=d.personalInfo; updatePotMarker(); renderAll(); alert(t('import_success')); }catch(ex){ alert(t('import_error')); } }; reader.readAsText(f); e.target.value=''; }
+function resetAll(){ if(!confirm(t('confirm_reset'))) return; saveHist(); hornets=[createHornet('Frelon 1')]; surveyLocation={lat:46.8,lng:6.8,name:''}; inspectorName=''; notes=''; personalInfo={firstName:'',lastName:'',phone:''}; collapsedCards={}; document.getElementById('locationInput').value=''; document.getElementById('inspectorInput').value=''; document.getElementById('notesField').value=''; document.getElementById('firstName').value=''; document.getElementById('lastName').value=''; document.getElementById('phone').value=''; clearMap(); updatePotMarker(); renderAll(); }
+
+// ============ RENDER ============
+function renderAll(){
+    var container=document.getElementById('hornetContainer');
+    var html='';
+    for(var idx=0;idx<hornets.length;idx++){
+        var h=hornets[idx],avg=getAvg(h),dist=getDist(avg),fc=h.flights.length;
+        var isCollapsed=collapsedCards[h.id]||false;
+        var timerText='00:00';
+        if(h.timerRunning&&h.timerStart){ var s=Math.floor((Date.now()-h.timerStart)/1000); timerText=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+        var badgeBg=h.timerRunning?'#c47b6b':(fc>0?'#5f7d6b':'#d4a853');
+        var badgeText=h.timerRunning?'⏳ '+t('running'):(fc>0?'✅ '+fc+'/5 '+t('flights_label'):'🆕 '+t('ready'));
+        var nest=getNestCoords(h);
+        var flightsHtml='—';
+        if(fc){ var fs=[]; for(var fi=0;fi<h.flights.length;fi++){ fs.push('<span class="flight-item">'+h.flights[fi]+'s <button class="flight-delete-btn" onclick="event.stopPropagation();deleteFlight('+h.id+','+fi+')" title="'+t('flight_delete')+'">✕</button></span>'); } flightsHtml=fs.join(' '); }
+
+        html+='<div class="hornet-card'+(isCollapsed?' collapsed-card':'')+'" style="border-left:5px solid '+COLORS[idx%7]+';">';
+        html+='<div class="hornet-header" onclick="toggleCollapse('+h.id+')">';
+        html+='<div style="display:flex;justify-content:space-between;align-items:center;width:100%;flex-wrap:wrap;gap:8px;">';
+        html+='<input class="hornet-name-input" value="'+h.name+'" style="color:'+COLORS[idx%7]+';" onclick="event.stopPropagation()" onchange="updateName('+h.id+',this.value)">';
+        html+='<span style="display:flex;align-items:center;gap:6px;"><span class="badge" style="background:'+badgeBg+'">'+badgeText+'</span><span class="collapse-icon'+(isCollapsed?'':' open')+'">▶</span><button class="delete-hornet-btn" onclick="event.stopPropagation();deleteHornet('+h.id+')" title="'+t('delete')+'">✕</button></span>';
+        html+='</div>';
+        if(isCollapsed){ html+='<div class="collapsed-info"><span>🧭 '+h.direction+'°</span><span class="timer-display'+(h.timerRunning?' running':'')+'" style="font-size:1rem;min-width:60px;padding:4px 8px;">'+timerText+'</span></div>'; }
+        html+='</div>';
+        html+='<div class="hornet-body'+(isCollapsed?' collapsed':'')+'">';
+        html+='<div class="flex-row" style="margin:6px 0;"><span>🧭 <input type="number" class="dir-input" value="'+h.direction+'" min="0" max="359" onchange="updateDir('+h.id+',this.value)">°</span><span class="timer-display'+(h.timerRunning?' running':'')+'">'+timerText+'</span></div>';
+        html+='<div class="flex-row"><button class="btn-gold btn-sm" onclick="startTimer('+h.id+')" '+(h.timerRunning||fc>=5?'disabled':'')+'>▶ '+t('start_btn')+'</button><button class="btn-grey btn-sm" onclick="stopTimer('+h.id+')" '+(!h.timerRunning?'disabled':'')+'>⏹ '+t('stop_btn')+'</button><button class="btn-red btn-sm" onclick="resetTimer('+h.id+')">↺ '+t('reset_btn_label')+'</button></div>';
+        html+='<div style="margin:6px 0;font-size:0.85rem;">📊 '+t('flights_label')+': '+flightsHtml+'</div>';
+        html+='<div style="font-size:0.9rem;">📏 Moy: <strong>'+avg.toFixed(1)+'s</strong> · 🗺️ Dist: <strong>'+dist.toFixed(0)+'m</strong></div>';
+        if(nest){ html+='<div style="font-size:0.78rem;">📍 Nid: <strong>'+nest.lat.toFixed(5)+', '+nest.lng.toFixed(5)+'</strong></div>'; }
+        html+='<div style="background:#f9f4e8;border-radius:12px;padding:8px;margin-top:6px;"><span style="font-size:0.8rem;">✍️ '+t('manual_time')+':</span><div class="flex-row" style="margin-top:4px;"><input type="number" id="mt_'+h.id+'" style="width:60px;text-align:center;padding:4px;" placeholder="'+t('manual_time_placeholder')+'" min="1"><button class="btn-gold btn-sm" onclick="addManualTime('+h.id+')" '+(fc>=5?'disabled':'')+'>➕ '+t('add_manual')+'</button></div></div>';
+        html+='</div></div>';
     }
-        }
-        }
+    container.innerHTML=html;
+    document.getElementById('locationDisplay').textContent=surveyLocation.name||surveyLocation.lat.toFixed(5)+', '+surveyLocation.lng.toFixed(5);
+    document.getElementById('datetime').textContent=new Date().toLocaleString();
+    document.getElementById('inspectorInput').value=inspectorName;
+    document.getElementById('notesField').value=notes;
+    document.getElementById('liveBanner').style.display=hornets.some(function(h){return h.timerRunning})?'block':'none';
+    var hwf=hornets.filter(function(h){return h.flights.length>0});
+    var statsDiv=document.getElementById('statsContent');
+    if(!hwf.length){ statsDiv.innerHTML=t('no_flights_stats'); } else { var sh=''; for(var si=0;si<hwf.length;si++){ var shh=hwf[si],sidx=hornets.indexOf(shh); sh+='<span style="color:'+COLORS[sidx%7]+';">● '+shh.name+': '+getAvg(shh).toFixed(1)+'s</span><br>'; } var ga=0; for(var gi=0;gi<hwf.length;gi++) ga+=getAvg(hwf[gi]); ga/=hwf.length; sh+='<strong>📈 Moy. globale: '+ga.toFixed(1)+'s</strong>'; statsDiv.innerHTML=sh; }
+    saveAll(); if(map) drawAnalysis();
+}
 
-        function addHornet() {
-            if (hornets.length >= MAX_HORNETS) {
-                alert(t('max_hornets'));
-                return;
-            }
-            hornets.push(createHornet('Frelon ' + (hornets.length + 1)));
-            renderAll();
-        }
+// ============ LIVE UPDATE ============
+setInterval(function(){ if(hornets.some(function(h){return h.timerRunning})) renderAll(); document.getElementById('datetime').textContent=new Date().toLocaleString(); },500);
 
-        // ==================== LOCATION FUNCTIONS ====================
-        function setLocation() {
-            var val = document.getElementById('locationInput').value.trim();
-            if (!val) return;
-            surveyLocation.name = val;
-            var match = val.match(/([-+]?\d+\.?\d*)\s*[,;]\s*([-+]?\d+\.?\d*)/);
-            if (match) {
-                surveyLocation.lat = parseFloat(match[1]);
-                surveyLocation.lng = parseFloat(match[2]);
-            }
-            updatePotMarker();
-            renderAll();
-        }
+// ============ AUTO-UPDATE SW ============
+if('serviceWorker' in navigator){ var refreshing=false; navigator.serviceWorker.addEventListener('controllerchange',function(){ if(!refreshing){ refreshing=true; window.location.reload(); } }); window.addEventListener('load',function(){ navigator.serviceWorker.register('service-worker.js').catch(function(){}); }); setInterval(function(){ navigator.serviceWorker.getRegistration().then(function(reg){ if(reg) reg.update(); }); },300000); }
 
-        function getGPS() {
-            if (!navigator.geolocation) {
-                alert(t('gps_error'));
-                return;
-            }
-            navigator.geolocation.getCurrentPosition(
-                function(pos) {
-                    surveyLocation.lat = pos.coords.latitude;
-                    surveyLocation.lng = pos.coords.longitude;
-                    document.getElementById('locationInput').value =
-                        pos.coords.latitude.toFixed(5) + ', ' + pos.coords.longitude.toFixed(5);
-                    updatePotMarker();
-                    renderAll();
-                },
-                function() {
-                    alert(t('gps_error'));
-                }, { enableHighAccuracy: true, timeout: 10000 }
-            );
-        }
-
-        function manualCoords() {
-            var lat = prompt('Latitude:', surveyLocation.lat.toFixed(5));
-            if (lat === null) return;
-            var lng = prompt('Longitude:', surveyLocation.lng.toFixed(5));
-            if (lng === null) return;
-            var latNum = parseFloat(lat);
-            var lngNum = parseFloat(lng);
-            if (isNaN(latNum) || isNaN(lngNum)) {
-                alert('Coordonnées invalides');
-                return;
-            }
-            surveyLocation.lat = latNum;
-            surveyLocation.lng = lngNum;
-            document.getElementById('locationInput').value = latNum.toFixed(5) + ', ' + lngNum.toFixed(5);
-            updatePotMarker();
-            renderAll();
-        }
-
-        // ==================== MAP FUNCTIONS ====================
-        function initMap() {
-            var mapElement = document.getElementById('map');
-            if (!mapElement) {
-                setTimeout(initMap, 500);
-                return;
-            }
-            if (map) {
-                map.invalidateSize();
-                return;
-            }
-            map = L.map('map', { zoomControl: true }).setView([surveyLocation.lat, surveyLocation.lng], 16);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap',
-                maxZoom: 19
-            }).addTo(map);
-            updatePotMarker();
-            setTimeout(function() {
-                if (map) map.invalidateSize();
-            }, 400);
-        }
-
-        function updatePotMarker() {
-            if (!map) return;
-            if (potMarker) map.removeLayer(potMarker);
-            var beeIcon = L.divIcon({
-                html: '🐝',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15],
-                className: ''
-            });
-            potMarker = L.marker([surveyLocation.lat, surveyLocation.lng], {
-                draggable: true,
-                icon: beeIcon
-            }).addTo(map).bindPopup('📍 ' + t('pot_label')).openPopup();
-            potMarker.on('dragend', function(e) {
-                surveyLocation.lat = e.target.getLatLng().lat;
-                surveyLocation.lng = e.target.getLatLng().lng;
-                document.getElementById('locationDisplay').textContent =
-                    surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5);
-                saveAll();
-                drawAnalysis();
-            });
-        }
-
-        function clearMap() {
-            if (!map) return;
-            for (var i = 0; i < mapLines.length; i++) {
-                if (map.hasLayer(mapLines[i])) map.removeLayer(mapLines[i]);
-            }
-            mapLines = [];
-            document.getElementById('predictionPanel').innerHTML = '⚠️ ' + t('no_flights');
-            document.getElementById('historyPanel').style.display = 'none';
-        }
-
-        function getNestCoordsForHornet(h, location) {
-            var d = getDistance(getAverage(h));
-            if (d <= 0) return null;
-            var rad = (h.direction * Math.PI) / 180;
-            var loc = location || surveyLocation;
-            return {
-                lat: loc.lat + (d / 111320) * Math.cos(rad),
-                lng: loc.lng + (d / (111320 * Math.cos(loc.lat * Math.PI / 180))) * Math.sin(rad),
-                distance: d,
-                direction: h.direction
-            };
-        }
-
-        function getNestCoords(h) {
-            return getNestCoordsForHornet(h, surveyLocation);
-        }
-
-        function createOvalPoints(center, directionDegrees) {
-            var points = [];
-            var halfWidth = 100;
-            var halfHeight = 37.5;
-            var dirRad = (directionDegrees * Math.PI) / 180;
-            var perpRad = dirRad + Math.PI / 2;
-            var steps = 64;
-            for (var i = 0; i < steps; i++) {
-                var angle = (i / steps) * 2 * Math.PI;
-                var rx = halfHeight * Math.cos(angle);
-                var ry = halfWidth * Math.sin(angle);
-                var lat = center.lat + (rx / 111320) * Math.cos(dirRad) - (ry / 111320) * Math.cos(perpRad);
-                var lng = center.lng + (rx / (111320 * Math.cos(center.lat * Math.PI / 180))) * Math.sin(dirRad) - (ry / (111320 * Math.cos(center.lat * Math.PI / 180))) * Math.sin(perpRad);
-                points.push(L.latLng(lat, lng));
-            }
-            return points;
-        }
-
-        function drawAnalysis(historyData) {
-            if (!map) return;
-            for (var i = 0; i < mapLines.length; i++) {
-                if (map.hasLayer(mapLines[i])) map.removeLayer(mapLines[i]);
-            }
-            mapLines = [];
-            var predictions = [];
-
-            // Draw current hornets
-            for (var idx = 0; idx < hornets.length; idx++) {
-                var h = hornets[idx];
-                if (!h.flights.length) continue;
-                var nestData = getNestCoordsForHornet(h, surveyLocation);
-                if (!nestData) continue;
-                var pot = L.latLng(surveyLocation.lat, surveyLocation.lng);
-                var nestPt = L.latLng(nestData.lat, nestData.lng);
-
-                // Dashed line from pot to nest
-                var line = L.polyline([pot, nestPt], {
-                    color: COLORS[idx % COLORS.length],
-                    weight: 3,
-                    dashArray: '5,5'
-                }).addTo(map);
-                mapLines.push(line);
-
-                // Oval around nest
-                var ovalPts = createOvalPoints(nestPt, nestData.direction);
-                var oval = L.polygon(ovalPts, {
-                    color: COLORS[idx % COLORS.length],
-                    fillOpacity: 0.15,
-                    weight: 1.5,
-                    dashArray: '4,4'
-                }).addTo(map);
-                mapLines.push(oval);
-
-                // Nest marker
-                var marker = L.circleMarker(nestPt, {
-                    radius: 7,
-                    color: COLORS[idx % COLORS.length],
-                    fillOpacity: 0.7
-                }).addTo(map);
-                marker.bindPopup(
-                    '<b>' + h.name + ' (' + COLOR_NAMES[idx % COLOR_NAMES.length] + ')</b><br>' +
-                    '~' + nestData.distance.toFixed(0) + 'm<br>' +
-                    '🧭 ' + h.direction + '°<br>' +
-                    '📍 ' + nestData.lat.toFixed(5) + ', ' + nestData.lng.toFixed(5) + '<br>' +
-                    '⬭ Ovale: 50m×100m'
-                );
-                mapLines.push(marker);
-                predictions.push({
-                    name: h.name,
-                    color: COLOR_NAMES[idx % COLOR_NAMES.length],
-                    point: nestPt,
-                    dist: nestData.distance,
-                    direction: h.direction
-                });
-            }
-
-            // Draw historical data
-            if (historyData && historyData.length) {
-                for (var ei = 0; ei < historyData.length; ei++) {
-                    var entry = historyData[ei];
-                    if (!entry.location || !entry.hornets) continue;
-                    var histLoc = entry.location;
-                    var histPot = L.latLng(histLoc.lat, histLoc.lng);
-
-                    // Historical pot marker
-                    var histPotIcon = L.divIcon({
-                        html: '📍',
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10],
-                        className: ''
-                    });
-                    var histPotMarker = L.marker([histLoc.lat, histLoc.lng], {
-                        icon: histPotIcon,
-                        opacity: 0.7
-                    }).addTo(map);
-                    histPotMarker.bindPopup(
-                        '<b>' + t('hist_pot') + '</b><br>' +
-                        '📅 ' + new Date(entry.date).toLocaleDateString()
-                    );
-                    mapLines.push(histPotMarker);
-
-                    // Draw each historical hornet
-                    for (var hi = 0; hi < entry.hornets.length; hi++) {
-                        var hh = entry.hornets[hi];
-                        if (!hh.flights || !hh.flights.length) continue;
-                        var avg = 0;
-                        for (var fi = 0; fi < hh.flights.length; fi++) {
-                            avg += hh.flights[fi];
-                        }
-                        avg = avg / hh.flights.length;
-                        var dm = (avg - 30) * 2.5;
-                        if (dm <= 0) continue;
-                        var dr = (hh.direction * Math.PI) / 180;
-                        var nh = L.latLng(
-                            histLoc.lat + (dm / 111320) * Math.cos(dr),
-                            histLoc.lng + (dm / (111320 * Math.cos(histLoc.lat * Math.PI / 180))) * Math.sin(dr)
-                        );
-
-                        // Line from historical pot to nest
-                        var histLine = L.polyline([histPot, nh], {
-                            color: '#999',
-                            weight: 2,
-                            dashArray: '3,7',
-                            opacity: 0.6
-                        }).addTo(map);
-                        mapLines.push(histLine);
-
-                        // Oval around historical nest
-                        var histOvalPts = createOvalPoints(nh, hh.direction);
-                        var histOval = L.polygon(histOvalPts, {
-                            color: '#999',
-                            fillOpacity: 0.08,
-                            weight: 1,
-                            dashArray: '3,5',
-                            opacity: 0.5
-                        }).addTo(map);
-                        mapLines.push(histOval);
-
-                        // Historical nest marker
-                        var hm = L.circleMarker(nh, {
-                            radius: 4,
-                            color: '#888',
-                            fillOpacity: 0.5,
-                            weight: 1
-                        }).addTo(map);
-                        hm.bindPopup(
-                            '<b>Hist: ' + hh.name + '</b><br>' +
-                            '📅 ' + new Date(entry.date).toLocaleDateString() + '<br>' +
-                            '📍 Pot: ' + histLoc.lat.toFixed(4) + ', ' + histLoc.lng.toFixed(4) + '<br>' +
-                            '🎯 Nid: ' + nh.lat.toFixed(5) + ', ' + nh.lng.toFixed(5) + '<br>' +
-                            '⬭ Ovale: 50m×100m'
-                        );
-                        mapLines.push(hm);
-                    }
-                }
-            }
-
-
-
-          // Update prediction panel
-            var predictionText = '';
-            if (predictions.length) {
-                var parts = [];
-                for (var pi2 = 0; pi2 < predictions.length; pi2++) {
-                    parts.push(predictions[pi2].name + ' (' + predictions[pi2].color + ') → ~' + predictions[pi2].dist.toFixed(0) + 'm');
-                }
-                predictionText = '🔍 ' + parts.join(' · ');
-            } else {
-                predictionText = '⚠️ ' + t('no_flights');
-            }
-            document.getElementById('predictionPanel').innerHTML = predictionText;
-        }
-
-        function showHistory() {
-            var history = getHistory();
-            var cutoff = Date.now() - 60 * 24 * 60 * 60 * 1000;
-            var recent = history.filter(function(e) {
-                return new Date(e.date) > new Date(cutoff);
-            });
-            drawAnalysis(recent);
-            var panel = document.getElementById('historyPanel');
-            panel.style.display = 'block';
-            if (recent.length) {
-                recent.reverse();
-                var html = '';
-                for (var i = 0; i < recent.length; i++) {
-                    var e = recent[i];
-                    var hornetCount = 0;
-                    if (e.hornets) {
-                        for (var j = 0; j < e.hornets.length; j++) {
-                            if (e.hornets[j].flights && e.hornets[j].flights.length) {
-                                hornetCount++;
-                            }
-                        }
-                    }
-                    html += '<div class="history-item"><strong>📅 ' + new Date(e.date).toLocaleDateString() + '</strong><br>📍 Pot: ' + (e.location && e.location.name ? e.location.name : '?') + ' | 🐝 ' + hornetCount + ' ' + t('flights_label') + '</div>';
-                }
-                panel.innerHTML = html;
-            } else {
-                panel.innerHTML = '<div class="history-item">📭 ' + t('history_empty') + '</div>';
-            }
-        }
-
-        // ==================== MODALS ====================
-        function openAbout() {
-            document.getElementById('aboutModal').style.display = 'flex';
-        }
-
-        function closeAbout() {
-            document.getElementById('aboutModal').style.display = 'none';
-        }
-
-        // ==================== EXPORT FUNCTIONS ====================
-        function downloadBlob(blob, name) {
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function exportJSON() {
-            var data = {
-                version: '1.4',
-                date: new Date().toISOString(),
-                personalInfo: personalInfo,
-                surveyLocation: surveyLocation,
-                inspectorName: inspectorName,
-                notes: notes,
-                hornets: hornets.map(function(h) {
-                    var coords = getNestCoords(h);
-                    return {
-                        name: h.name,
-                        direction: h.direction,
-                        flights: h.flights,
-                        average: getAverage(h),
-                        distance: getDistance(getAverage(h)),
-                        estimatedNest: coords
-                    };
-                })
-            };
-            downloadBlob(
-                new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
-                'vespatimer_' + new Date().toISOString().slice(0, 10) + '.json'
-            );
-        }
-
-        function exportPDF() {
-            var r = '══════════════════════════════\n';
-            r += '  🐝 ' + t('report_title') + ' v1.4\n';
-            r += '══════════════════════════════\n\n';
-            r += '📅 Date: ' + new Date().toLocaleString() + '\n\n';
-            r += '👤 ' + t('personal_info_label') + ':\n';
-            r += '   ' + (personalInfo.firstName || '?') + ' ' + (personalInfo.lastName || '?') + '\n';
-            r += '   📞 ' + (personalInfo.phone || '?') + '\n\n';
-            r += '👤 ' + t('triangulator') + ': ' + (inspectorName || 'N/A') + '\n\n';
-            r += '📍 ' + t('pot_location') + ':\n';
-            r += '   ' + (surveyLocation.name || 'N/A') + '\n';
-            r += '   Coordonnées: ' + surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5) + '\n\n';
-            r += '📝 Notes: ' + (notes || 'N/A') + '\n\n';
-            r += '──────────────────────────────\n';
-            r += '🐝 FRELONS:\n';
-            r += '──────────────────────────────\n\n';
-            for (var i = 0; i < hornets.length; i++) {
-                var h = hornets[i];
-                var avg = getAverage(h);
-                var dist = getDistance(avg);
-                var nest = getNestCoords(h);
-                r += '• ' + h.name + ' (' + COLOR_NAMES[i % COLOR_NAMES.length] + ')\n';
-                r += '  🧭 Direction: ' + h.direction + '°\n';
-                r += '  ⏱️ Vols: ' + (h.flights.length ? h.flights.join('s, ') + 's' : '—') + '\n';
-                r += '  📏 Moyenne: ' + avg.toFixed(1) + 's\n';
-                r += '  🗺️ Distance estimée: ' + dist.toFixed(0) + 'm\n';
-                if (nest) {
-                    r += '  📍 ' + t('nest_estimated') + ': ' + nest.lat.toFixed(5) + ', ' + nest.lng.toFixed(5) + '\n';
-                } else {
-                    r += '  📍 ' + t('nest_estimated') + ': ' + t('no_nest') + '\n';
-                }
-                r += '\n';
-            }
-            r += '══════════════════════════════\n';
-            r += '  Signalement: frelonasiatique.ch\n';
-            r += '══════════════════════════════\n';
-
-            navigator.clipboard.writeText(r).then(function() {
-                alert('✅ Rapport copié dans le presse-papier.\n\nUtilisez Ctrl+P (ou Cmd+P) et choisissez "Enregistrer en PDF" pour sauvegarder.');
-            }).catch(function() {
-                alert('Rapport généré:\n\n' + r + '\n\nUtilisez Ctrl+P pour imprimer en PDF.');
-            });
-            window.print();
-        }
-
-        function exportGPX() {
-            var g = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="VespaTimer v1.4">\n';
-            g += '<wpt lat="' + surveyLocation.lat + '" lon="' + surveyLocation.lng + '"><name>Pot-à-Mèche</name></wpt>\n';
-            for (var i = 0; i < hornets.length; i++) {
-                var h = hornets[i];
-                if (!h.flights.length) continue;
-                var d = getDistance(getAverage(h));
-                if (d <= 0) continue;
-                var nest = getNestCoords(h);
-                if (nest) {
-                    g += '<wpt lat="' + nest.lat.toFixed(6) + '" lon="' + nest.lng.toFixed(6) + '"><name>' + h.name + ' (nest)</name></wpt>\n';
-                }
-            }
-            g += '</gpx>';
-            downloadBlob(new Blob([g], { type: 'application/gpx+xml' }), 'vespatimer.gpx');
-        }
-
-        function exportKML() {
-            var k = '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n<Document>\n';
-            k += '<Placemark><name>Pot-à-Mèche</name><Point><coordinates>' + surveyLocation.lng + ',' + surveyLocation.lat + ',0</coordinates></Point></Placemark>\n';
-            for (var i = 0; i < hornets.length; i++) {
-                var h = hornets[i];
-                if (!h.flights.length) continue;
-                var d = getDistance(getAverage(h));
-                if (d <= 0) continue;
-                var nest = getNestCoords(h);
-                if (nest) {
-                    k += '<Placemark><name>' + h.name + ' (nest)</name><Point><coordinates>' + nest.lng.toFixed(6) + ',' + nest.lat.toFixed(6) + ',0</coordinates></Point></Placemark>\n';
-                }
-            }
-            k += '</Document>\n</kml>';
-            downloadBlob(new Blob([k], { type: 'application/vnd.google-earth.kml+xml' }), 'vespatimer.kml');
-        }
-
-        function importData(e) {
-            var f = e.target.files[0];
-            if (!f) return;
-            var reader = new FileReader();
-            reader.onload = function(ev) {
-                try {
-                    var d = JSON.parse(ev.target.result);
-                    if (d.hornets && Array.isArray(d.hornets)) {
-                        hornets = d.hornets.map(function(h) {
-                            var newH = createHornet(h.name || 'Frelon');
-                            newH.direction = h.direction || 0;
-                            newH.flights = h.flights || [];
-                            return newH;
-                        });
-                    }
-                    if (d.surveyLocation) surveyLocation = d.surveyLocation;
-                    if (d.personalInfo) personalInfo = d.personalInfo;
-                    inspectorName = d.inspectorName || '';
-                    notes = d.notes || '';
-                    document.getElementById('firstName').value = personalInfo.firstName || '';
-                    document.getElementById('lastName').value = personalInfo.lastName || '';
-                    document.getElementById('phone').value = personalInfo.phone || '';
-                    updatePotMarker();
-                    renderAll();
-                    alert(t('import_success'));
-                } catch (ex) {
-                    alert(t('import_error'));
-                }
-            };
-            reader.readAsText(f);
-            e.target.value = '';
-        }
-
-        function resetAll() {
-            if (!confirm(t('confirm_reset'))) return;
-            saveHistory();
-            hornets = [createHornet('Frelon 1')];
-            surveyLocation = { lat: 46.8, lng: 6.8, name: '' };
-            inspectorName = '';
-            notes = '';
-            personalInfo = { firstName: '', lastName: '', phone: '' };
-            collapsedCards = {};
-            document.getElementById('locationInput').value = '';
-            document.getElementById('inspectorInput').value = '';
-            document.getElementById('notesField').value = '';
-            document.getElementById('firstName').value = '';
-            document.getElementById('lastName').value = '';
-            document.getElementById('phone').value = '';
-            clearMap();
-            updatePotMarker();
-            renderAll();
-        }
-
-        // ==================== RENDER ====================
-        function renderAll() {
-            var container = document.getElementById('hornetContainer');
-            var html = '';
-            for (var idx = 0; idx < hornets.length; idx++) {
-                var h = hornets[idx];
-                var avg = getAverage(h);
-                var dist = getDistance(avg);
-                var fc = h.flights.length;
-                var isCollapsed = collapsedCards[h.id] || false;
-                var timerText = '00:00';
-                if (h.timerRunning && h.timerStart) {
-                    var s = Math.floor((Date.now() - h.timerStart) / 1000);
-                    timerText = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
-                }
-                var badgeBg = h.timerRunning ? '#c47b6b' : (fc > 0 ? '#5f7d6b' : '#d4a853');
-                var badgeText = h.timerRunning ? '⏳ ' + t('running') : (fc > 0 ? '✅ ' + fc + '/5 ' + t('flights_label') : '🆕 ' + t('ready'));
-                var nest = getNestCoords(h);
-
-                var flightsHtml = '—';
-                if (fc) {
-                    var flightSpans = [];
-                    for (var fi = 0; fi < h.flights.length; fi++) {
-                        flightSpans.push(
-                            '<span class="flight-item">' + h.flights[fi] + 's ' +
-                            '<button class="flight-delete-btn" onclick="event.stopPropagation();deleteFlight(' + h.id + ',' + fi + ')" title="' + t('flight_delete') + '">✕</button></span>'
-                        );
-                    }
-                    flightsHtml = flightSpans.join(' ');
-                }
-
-                html += '<div class="hornet-card' + (isCollapsed ? ' collapsed-card' : '') + '" style="border-left:5px solid ' + COLORS[idx % COLORS.length] + ';">';
-                html += '<div class="hornet-header" onclick="toggleCollapse(' + h.id + ')" title="' + t('collapse') + '">';
-                html += '<div style="display:flex;justify-content:space-between;align-items:center;width:100%;flex-wrap:wrap;gap:8px;">';
-                html += '<input class="hornet-name-input" value="' + h.name + '" style="color:' + COLORS[idx % COLORS.length] + ';" onclick="event.stopPropagation()" onchange="updateName(' + h.id + ',this.value)">';
-                html += '<span style="display:flex;align-items:center;gap:6px;">';
-                html += '<span class="badge" style="background:' + badgeBg + '">' + badgeText + '</span>';
-                html += '<span class="collapse-icon' + (!isCollapsed ? ' open' : '') + '">▶</span>';
-                html += '<button class="delete-hornet-btn" onclick="event.stopPropagation();deleteHornet(' + h.id + ')" title="' + t('delete') + '">✕</button>';
-                html += '</span></div>';
-                if (isCollapsed) {
-                    html += '<div class="collapsed-info"><span>🧭 ' + h.direction + '°</span><span class="timer-display' + (h.timerRunning ? ' running' : '') + '" style="font-size:1rem;min-width:60px;padding:4px 8px;">' + timerText + '</span></div>';
-                }
-                html += '</div>';
-                html += '<div class="hornet-body' + (isCollapsed ? ' collapsed' : '') + '">';
-                html += '<div class="flex-row" style="margin:6px 0;">';
-                html += '<span>🧭 <input type="number" class="dir-input" value="' + h.direction + '" min="0" max="359" onchange="updateDirection(' + h.id + ',this.value)">°</span>';
-                html += '<span class="timer-display' + (h.timerRunning ? ' running' : '') + '">' + timerText + '</span>';
-                html += '</div>';
-                html += '<div class="flex-row">';
-                html += '<button class="btn-gold btn-sm" onclick="startTimer(' + h.id + ')" ' + (h.timerRunning || fc >= 5 ? 'disabled' : '') + '>▶ ' + t('start_btn') + '</button>';
-                html += '<button class="btn-grey btn-sm" onclick="stopTimer(' + h.id + ')" ' + (!h.timerRunning ? 'disabled' : '') + '>⏹ ' + t('stop_btn') + '</button>';
-                html += '<button class="btn-red btn-sm" onclick="resetTimer(' + h.id + ')">↺ ' + t('reset_btn_label') + '</button>';
-                html += '</div>';
-                html += '<div class="flights-text">📊 ' + t('flights_label') + ': ' + flightsHtml + '</div>';
-                html += '<div class="stat-line">📏 ' + t('average') + ': <strong>' + avg.toFixed(1) + 's</strong> · 🗺️ ' + t('distance') + ': <strong>' + dist.toFixed(0) + 'm</strong></div>';
-                if (nest) {
-                    html += '<div class="stat-line" style="font-size:0.78rem;">📍 Nid estimé: <strong>' + nest.lat.toFixed(5) + ', ' + nest.lng.toFixed(5) + '</strong></div>';
-                }
-                html += '<div class="manual-time-section">';
-                html += '<span style="font-size:0.8rem;">✍️ ' + t('manual_time') + ':</span>';
-                html += '<div class="flex-row" style="margin-top:4px;">';
-                html += '<input type="number" id="mt_' + h.id + '" class="time-input" placeholder="' + t('manual_time_placeholder') + '" min="1">';
-                html += '<button class="btn-gold btn-sm" onclick="addManualTime(' + h.id + ')" ' + (fc >= 5 ? 'disabled' : '') + '>➕ ' + t('add_manual') + '</button>';
-                html += '</div></div></div></div>';
-            }
-            container.innerHTML = html;
-
-            document.getElementById('locationDisplay').textContent =
-                surveyLocation.name || surveyLocation.lat.toFixed(5) + ', ' + surveyLocation.lng.toFixed(5);
-            document.getElementById('datetime').textContent = new Date().toLocaleString();
-            document.getElementById('inspectorInput').value = inspectorName;
-            document.getElementById('notesField').value = notes;
-            document.getElementById('liveBanner').style.display = hornets.some(function(h) { return h.timerRunning; }) ? 'block' : 'none';
-
-            var hwf = hornets.filter(function(h) { return h.flights.length > 0; });
-            var statsDiv = document.getElementById('statsContent');
-            if (!hwf.length) {
-                statsDiv.innerHTML = t('no_flights_stats');
-            } else {
-                var statsHtml = '';
-                for (var si = 0; si < hwf.length; si++) {
-                    var sh = hwf[si];
-                    var sidx = hornets.indexOf(sh);
-                    statsHtml += '<span style="color:' + COLORS[sidx % COLORS.length] + ';">● ' + sh.name + ' (' + COLOR_NAMES[sidx % COLOR_NAMES.length] + '): ' + getAverage(sh).toFixed(1) + 's</span><br>';
-                }
-                var globalAvg = 0;
-                for (var gi = 0; gi < hwf.length; gi++) {
-                    globalAvg += getAverage(hwf[gi]);
-                }
-                globalAvg = globalAvg / hwf.length;
-                statsHtml += '<strong>📈 Moy. globale: ' + globalAvg.toFixed(1) + 's</strong>';
-                statsDiv.innerHTML = statsHtml;
-            }
-
-            saveAll();
-            if (map) drawAnalysis();
-        }
-
-        // ==================== LIVE UPDATE ====================
-        setInterval(function() {
-    var anyRunning = false;
-    for (var i = 0; i < hornets.length; i++) {
-        var h = hornets[i];
-        if (h.timerRunning && h.timerStart) {
-            anyRunning = true;
-            var s = Math.floor((Date.now() - h.timerStart) / 1000);
-            var timerText = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
-            // Update only the timer displays for this hornet, not the whole card
-            var cards = document.querySelectorAll('.hornet-card');
-            if (cards[i]) {
-                var displays = cards[i].querySelectorAll('.timer-display');
-                for (var d = 0; d < displays.length; d++) {
-                    displays[d].textContent = timerText;
-                }
-            }
-        }
-    }
-    document.getElementById('liveBanner').style.display = anyRunning ? 'block' : 'none';
-    document.getElementById('datetime').textContent = new Date().toLocaleString();
-}, 200);
-        // ==================== AUTO-UPDATE SERVICE WORKER ====================
-        if ('serviceWorker' in navigator) {
-            var refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', function() {
-                if (!refreshing) {
-                    refreshing = true;
-                    window.location.reload();
-                }
-            });
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('service-worker.js').catch(function() {});
-            });
-            setInterval(function() {
-                navigator.serviceWorker.getRegistration().then(function(reg) {
-                    if (reg) reg.update();
-                });
-            }, 300000);
-        }
-
-        // ==================== BOOT ====================
-        function boot() {
-            loadAll();
-            applyTranslations();
-            renderAll();
-            setTimeout(initMap, 500);
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', boot);
-        } else {
-            boot();
-        }
-
-        document.getElementById('aboutModal').addEventListener('click', function(e) {
-            if (e.target === this) closeAbout();
-        });
-    </script>
+// ============ BOOT ============
+function boot(){ loadAll(); renderAll(); setTimeout(initMap,500); }
+if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',boot); } else { boot(); }
+document.getElementById('aboutModal').addEventListener('click',function(e){ if(e.target===this) closeAbout(); });
+</script>
 </body>
 </html>
-      
