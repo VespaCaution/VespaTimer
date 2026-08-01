@@ -291,8 +291,8 @@ function resetTimer(id) { var h=hornets.find(function(x){return x.id===id}); if(
 function deleteFlight(hid,idx) { var h=hornets.find(function(x){return x.id===hid}); if(!h||idx<0||idx>=h.flights.length) return; h.flights.splice(idx,1); renderAll(); }
 function addManualTime(id) { var h=hornets.find(function(x){return x.id===id}); if(!h||h.flights.length>=5) return; var inp=document.getElementById('mt_'+id); if(!inp) return; var v=parseInt(inp.value); if(isNaN(v)||v<=0){ alert('Temps invalide'); return; } h.flights.push(v); if(h.flights.length>5) h.flights.shift(); inp.value=''; saveHist(); renderAll(); }
 function deleteHornet(id) { if(hornets.length<=1){ alert('Gardez au moins un frelon.'); return; } hornets=hornets.filter(function(x){return x.id!==id}); delete collapsedCards[id]; renderAll(); }
-function updateDir(id,val) { var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.direction=Math.min(359,Math.max(0,parseInt(val)||0)); saveAll(); if(map) drawAnalysis(); if(!h.timerRunning){ renderAll(); } }
-function updateName(id,val) { var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.name=val||'Frelon'; saveAll(); if(!h.timerRunning){ renderAll(); } }
+function updateDir(id,val){ var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.direction=Math.min(359,Math.max(0,parseInt(val)||0)); saveAll(); if(map) drawAnalysis(); }
+function updateName(id,val){ var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.name=val||'Frelon'; saveAll(); }    
 function addHornet() { if(hornets.length>=MAX_HORNETS){ alert(t('max_hornets')); return; } hornets.push(createHornet('Frelon '+(hornets.length+1))); renderAll(); }
 
 // ============ LOCATION ============
@@ -387,7 +387,26 @@ function renderAll(){
 }
 
 // ============ LIVE UPDATE ============
-setInterval(function(){ if(hornets.some(function(h){return h.timerRunning})) renderAll(); document.getElementById('datetime').textContent=new Date().toLocaleString(); },500);
+setInterval(function(){ 
+    var anyRunning = false;
+    for (var i = 0; i < hornets.length; i++) {
+        var h = hornets[i];
+        if (h.timerRunning && h.timerStart) {
+            anyRunning = true;
+            var s = Math.floor((Date.now() - h.timerStart) / 1000);
+            var timerText = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+            var cards = document.querySelectorAll('.hornet-card');
+            if (cards[i]) {
+                var displays = cards[i].querySelectorAll('.timer-display');
+                for (var d = 0; d < displays.length; d++) {
+                    displays[d].textContent = timerText;
+                }
+            }
+        }
+    }
+    document.getElementById('liveBanner').style.display = anyRunning ? 'block' : 'none';
+    document.getElementById('datetime').textContent = new Date().toLocaleString(); 
+}, 200);
 
 // ============ AUTO-UPDATE SW ============
 if('serviceWorker' in navigator){ var refreshing=false; navigator.serviceWorker.addEventListener('controllerchange',function(){ if(!refreshing){ refreshing=true; window.location.reload(); } }); window.addEventListener('load',function(){ navigator.serviceWorker.register('service-worker.js').catch(function(){}); }); setInterval(function(){ navigator.serviceWorker.getRegistration().then(function(reg){ if(reg) reg.update(); }); },300000); }
