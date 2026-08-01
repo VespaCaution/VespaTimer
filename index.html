@@ -81,9 +81,10 @@
 <div class="card">
     <h2>👤 Infos personnelles</h2>
     <div class="grid-2">
-<input type="text" id="firstName" data-lang-placeholder="first_name_placeholder" placeholder="Prénom" onchange="saveAll()">
-<input type="text" id="lastName" data-lang-placeholder="last_name_placeholder" placeholder="Nom" onchange="saveAll()">
-<input type="tel" id="phone" data-lang-placeholder="phone_placeholder" placeholder="📞 Téléphone" onchange="saveAll()" style="margin-top:6px;">
+        <input type="text" id="firstName" data-lang-placeholder="first_name_placeholder" placeholder="Prénom" onchange="saveAll()">
+        <input type="text" id="lastName" data-lang-placeholder="last_name_placeholder" placeholder="Nom" onchange="saveAll()">
+    </div>
+    <input type="tel" id="phone" data-lang-placeholder="phone_placeholder" placeholder="📞 Téléphone" onchange="saveAll()" style="margin-top:6px;">
     <div style="margin-top:6px;">🕐 <span id="datetime"></span></div>
     <hr style="border:1px dashed #e0cfaa;margin:12px 0;">
     <h2>📍 Pot-à-Mèche</h2>
@@ -92,7 +93,7 @@
         <button class="btn-gold" onclick="setLocation()">💾 Enregistrer</button>
     </div>
     <div style="margin-top:4px;"><span id="locationDisplay"></span></div>
-<input type="text" id="inspectorInput" data-lang-placeholder="inspector_placeholder" placeholder="👤 Inspecteur (télémètre)" onchange="saveAll()" style="margin-top:6px;">
+    <input type="text" id="inspectorInput" data-lang-placeholder="inspector_placeholder" placeholder="👤 Inspecteur (télémètre)" onchange="saveAll()" style="margin-top:6px;">
     <textarea id="notesField" data-lang-placeholder="notes_placeholder" placeholder="📝 Notes..." onchange="saveAll()" style="margin-top:6px;min-height:50px;"></textarea>
     <div class="banner-live" id="liveBanner">⏱️ Chronomètre actif</div>
 </div>
@@ -169,158 +170,68 @@ var MAX_HORNETS = 7;
 // ============ TRANSLATIONS ============
 var translations = {
     fr: {
-        no_flights: 'Ajoutez des vols pour voir les estimations',
-        no_flights_stats: 'Aucun vol',
-        ready: 'Prêt',
-        running: 'En cours',
-        flights_label: 'vols',
-        history_empty: 'Aucun historique (60 jours)',
-        import_success: '✅ Importé !',
-        import_error: '❌ Fichier invalide',
-        gps_error: '⚠️ GPS impossible',
-        max_hornets: 'Maximum 7 frelons',
-        confirm_reset: 'Tout effacer ?',
-        delete: 'Supprimer',
-        manual_time: 'Ou ajouter un temps (secondes)',
-        add_manual: 'Ajouter',
-        manual_time_placeholder: 'ex: 45',
-        hist_pot: 'Pot historique',
-        flight_delete: 'Supprimer ce vol',
-        start_btn: 'DÉMARRER',
-        stop_btn: 'ARRÊTER',
-        reset_btn_label: 'EFFACER',
-        about_title: 'À propos de VespaTimer',
-        about_welcome: 'Bienvenue sur VespaTimer*, un site qui facilite le travail du pot à mèche**.',
+        no_flights: 'Ajoutez des vols pour voir les estimations', no_flights_stats: 'Aucun vol', ready: 'Prêt', running: 'En cours', flights_label: 'vols',
+        history_empty: 'Aucun historique (60 jours)', import_success: '✅ Importé !', import_error: '❌ Fichier invalide', gps_error: '⚠️ GPS impossible',
+        max_hornets: 'Maximum 7 frelons', confirm_reset: 'Tout effacer ?', delete: 'Supprimer', manual_time: 'Ou ajouter un temps (secondes)',
+        add_manual: 'Ajouter', manual_time_placeholder: 'ex: 45', hist_pot: 'Pot historique', flight_delete: 'Supprimer ce vol',
+        start_btn: 'DÉMARRER', stop_btn: 'ARRÊTER', reset_btn_label: 'EFFACER',
+        about_title: 'À propos de VespaTimer', about_welcome: 'Bienvenue sur VespaTimer*, un site qui facilite le travail du pot à mèche**.',
         about_download: 'Téléchargez le format souhaité (souvent PDF) et transmettez-le à votre télémètre régional.',
-        about_redo: 'Pour refaire l\'exercice, appuyez sur nouveau.',
-        about_report_text: '⚠️ Signalez vos observations sur :',
-        about_happy_text: '🐝 Bonne chasse ! 🙂',
-        about_instructions: 'Instructions : remplissez les infos, chronométrez les frelons, exportez (PDF pour télémètre, JSON pour réimporter, GPX/KML pour cartes).',
+        about_redo: 'Pour refaire l\'exercice, appuyez sur nouveau.', about_report_text: '⚠️ Signalez vos observations sur :',
+        about_happy_text: '🐝 Bonne chasse ! 🙂', about_instructions: 'Instructions : remplissez les infos, chronométrez les frelons, exportez.',
         about_footer_text: '* Connexion Internet requise. Signalez les bugs. ** Plus d\'infos :',
-        first_name_placeholder: 'Prénom',
-        last_name_placeholder: 'Nom',
-        phone_placeholder: '📞 Téléphone',
-        inspector_placeholder: '👤 Inspecteur (télémètre)',
-        notes_placeholder: '📝 Notes de relevé...',
-        location_placeholder: 'Nom du lieu ou lat,lng',
-        pot_popup: 'Pot-à-Mèche',
-        oval_tooltip: 'Ovale: 50m×100m',
+        first_name_placeholder: 'Prénom', last_name_placeholder: 'Nom', phone_placeholder: '📞 Téléphone',
+        inspector_placeholder: '👤 Inspecteur (télémètre)', notes_placeholder: '📝 Notes de relevé...',
+        location_placeholder: 'Nom du lieu ou lat,lng', pot_popup: 'Pot-à-Mèche', oval_tooltip: 'Ovale: 50m×100m',
     },
     en: {
-        no_flights: 'Add flights to see estimates',
-        no_flights_stats: 'No flights',
-        ready: 'Ready',
-        running: 'Running',
-        flights_label: 'flights',
-        history_empty: 'No history (60 days)',
-        import_success: '✅ Imported!',
-        import_error: '❌ Invalid file',
-        gps_error: '⚠️ GPS unavailable',
-        max_hornets: 'Max 7 hornets',
-        confirm_reset: 'Delete all?',
-        delete: 'Delete',
-        manual_time: 'Or add time (seconds)',
-        add_manual: 'Add',
-        manual_time_placeholder: 'e.g. 45',
-        hist_pot: 'Historical pot',
-        flight_delete: 'Delete flight',
-        start_btn: 'START',
-        stop_btn: 'STOP',
-        reset_btn_label: 'RESET',
-        about_title: 'About VespaTimer',
-        about_welcome: 'Welcome to VespaTimer*, a website that facilitates pot-à-mèche work**.',
+        no_flights: 'Add flights to see estimates', no_flights_stats: 'No flights', ready: 'Ready', running: 'Running', flights_label: 'flights',
+        history_empty: 'No history (60 days)', import_success: '✅ Imported!', import_error: '❌ Invalid file', gps_error: '⚠️ GPS unavailable',
+        max_hornets: 'Max 7 hornets', confirm_reset: 'Delete all?', delete: 'Delete', manual_time: 'Or add time (seconds)',
+        add_manual: 'Add', manual_time_placeholder: 'e.g. 45', hist_pot: 'Historical pot', flight_delete: 'Delete flight',
+        start_btn: 'START', stop_btn: 'STOP', reset_btn_label: 'RESET',
+        about_title: 'About VespaTimer', about_welcome: 'Welcome to VespaTimer*, a website that facilitates pot-à-mèche work**.',
         about_download: 'Download the preferred format (often PDF) and send it to your regional telemeter.',
-        about_redo: 'To redo the exercise, press new.',
-        about_report_text: '⚠️ Report your observations on:',
-        about_happy_text: '🐝 Happy hunting! 🙂',
-        about_instructions: 'Instructions: fill in the info, time the hornets, export (PDF for telemeter, JSON for reimport, GPX/KML for maps).',
+        about_redo: 'To redo the exercise, press new.', about_report_text: '⚠️ Report your observations on:',
+        about_happy_text: '🐝 Happy hunting! 🙂', about_instructions: 'Instructions: fill in the info, time the hornets, export.',
         about_footer_text: '* Internet connection required. Report bugs. ** More info:',
-        first_name_placeholder: 'First Name',
-        last_name_placeholder: 'Last Name',
-        phone_placeholder: '📞 Phone',
-        inspector_placeholder: '👤 Inspector (telemeter)',
-        notes_placeholder: '📝 Survey notes...',
-        location_placeholder: 'Location name or lat,lng',
-        pot_popup: 'Pot-à-Mèche',
-        oval_tooltip: 'Oval: 50m×100m',
+        first_name_placeholder: 'First Name', last_name_placeholder: 'Last Name', phone_placeholder: '📞 Phone',
+        inspector_placeholder: '👤 Inspector (telemeter)', notes_placeholder: '📝 Survey notes...',
+        location_placeholder: 'Location name or lat,lng', pot_popup: 'Pot-à-Mèche', oval_tooltip: 'Oval: 50m×100m',
     },
     de: {
-        no_flights: 'Flüge hinzufügen',
-        no_flights_stats: 'Keine Flüge',
-        ready: 'Bereit',
-        running: 'Läuft',
-        flights_label: 'Flüge',
-        history_empty: 'Kein Verlauf (60 Tage)',
-        import_success: '✅ Importiert!',
-        import_error: '❌ Fehler',
-        gps_error: '⚠️ GPS nicht verfügbar',
-        max_hornets: 'Max 7 Hornissen',
-        confirm_reset: 'Alles löschen?',
-        delete: 'Löschen',
-        manual_time: 'Zeit manuell (Sekunden)',
-        add_manual: 'Hinzufügen',
-        manual_time_placeholder: 'z.B. 45',
-        hist_pot: 'Historischer Pot',
-        flight_delete: 'Flug löschen',
-        start_btn: 'START',
-        stop_btn: 'STOPP',
-        reset_btn_label: 'ZURÜCK',
-        about_title: 'Über VespaTimer',
-        about_welcome: 'Willkommen bei VespaTimer*, einer Website für Pot-à-Mèche-Arbeit**.',
+        no_flights: 'Flüge hinzufügen', no_flights_stats: 'Keine Flüge', ready: 'Bereit', running: 'Läuft', flights_label: 'Flüge',
+        history_empty: 'Kein Verlauf (60 Tage)', import_success: '✅ Importiert!', import_error: '❌ Fehler', gps_error: '⚠️ GPS nicht verfügbar',
+        max_hornets: 'Max 7 Hornissen', confirm_reset: 'Alles löschen?', delete: 'Löschen', manual_time: 'Zeit manuell (Sekunden)',
+        add_manual: 'Hinzufügen', manual_time_placeholder: 'z.B. 45', hist_pot: 'Historischer Pot', flight_delete: 'Flug löschen',
+        start_btn: 'START', stop_btn: 'STOPP', reset_btn_label: 'ZURÜCK',
+        about_title: 'Über VespaTimer', about_welcome: 'Willkommen bei VespaTimer*, einer Website für Pot-à-Mèche-Arbeit**.',
         about_download: 'Laden Sie das gewünschte Format herunter (oft PDF) und senden Sie es an Ihren Telemeter.',
-        about_redo: 'Zum Wiederholen drücken Sie neu.',
-        about_report_text: '⚠️ Melden Sie Ihre Beobachtungen auf:',
-        about_happy_text: '🐝 Gute Jagd! 🙂',
-        about_instructions: 'Anleitung: Infos ausfüllen, Hornissen stoppen, exportieren.',
+        about_redo: 'Zum Wiederholen drücken Sie neu.', about_report_text: '⚠️ Melden Sie Ihre Beobachtungen auf:',
+        about_happy_text: '🐝 Gute Jagd! 🙂', about_instructions: 'Anleitung: Infos ausfüllen, Hornissen stoppen, exportieren.',
         about_footer_text: '* Internetverbindung erforderlich. Fehler melden. ** Mehr Info:',
-        first_name_placeholder: 'Vorname',
-        last_name_placeholder: 'Nachname',
-        phone_placeholder: '📞 Telefon',
-        inspector_placeholder: '👤 Inspektor (Telemeter)',
-        notes_placeholder: '📝 Notizen...',
-        location_placeholder: 'Ortsname oder lat,lng',
-        pot_popup: 'Pot-à-Mèche',
-        oval_tooltip: 'Oval: 50m×100m',
+        first_name_placeholder: 'Vorname', last_name_placeholder: 'Nachname', phone_placeholder: '📞 Telefon',
+        inspector_placeholder: '👤 Inspektor (Telemeter)', notes_placeholder: '📝 Notizen...',
+        location_placeholder: 'Ortsname oder lat,lng', pot_popup: 'Pot-à-Mèche', oval_tooltip: 'Oval: 50m×100m',
     },
     it: {
-        no_flights: 'Aggiungi voli',
-        no_flights_stats: 'Nessun volo',
-        ready: 'Pronto',
-        running: 'In corso',
-        flights_label: 'voli',
-        history_empty: 'Nessuna cronologia (60 giorni)',
-        import_success: '✅ Importato!',
-        import_error: '❌ Errore',
-        gps_error: '⚠️ GPS non disponibile',
-        max_hornets: 'Max 7 calabroni',
-        confirm_reset: 'Cancellare tutto?',
-        delete: 'Elimina',
-        manual_time: 'O aggiungi tempo (secondi)',
-        add_manual: 'Aggiungi',
-        manual_time_placeholder: 'es. 45',
-        hist_pot: 'Pot storico',
-        flight_delete: 'Elimina volo',
-        start_btn: 'AVVIA',
-        stop_btn: 'FERMA',
-        reset_btn_label: 'AZZERA',
-        about_title: 'Info VespaTimer',
-        about_welcome: 'Benvenuto su VespaTimer*, un sito per il lavoro pot-à-mèche**.',
+        no_flights: 'Aggiungi voli', no_flights_stats: 'Nessun volo', ready: 'Pronto', running: 'In corso', flights_label: 'voli',
+        history_empty: 'Nessuna cronologia (60 giorni)', import_success: '✅ Importato!', import_error: '❌ Errore', gps_error: '⚠️ GPS non disponibile',
+        max_hornets: 'Max 7 calabroni', confirm_reset: 'Cancellare tutto?', delete: 'Elimina', manual_time: 'O aggiungi tempo (secondi)',
+        add_manual: 'Aggiungi', manual_time_placeholder: 'es. 45', hist_pot: 'Pot storico', flight_delete: 'Elimina volo',
+        start_btn: 'AVVIA', stop_btn: 'FERMA', reset_btn_label: 'AZZERA',
+        about_title: 'Info VespaTimer', about_welcome: 'Benvenuto su VespaTimer*, un sito per il lavoro pot-à-mèche**.',
         about_download: 'Scarica il formato desiderato (spesso PDF) e invialo al tuo telemetro.',
-        about_redo: 'Per rifare l\'esercizio, premi nuovo.',
-        about_report_text: '⚠️ Segnala le tue osservazioni su:',
-        about_happy_text: '🐝 Buona caccia! 🙂',
-        about_instructions: 'Istruzioni: compila le info, cronometra i calabroni, esporta.',
+        about_redo: 'Per rifare l\'esercizio, premi nuovo.', about_report_text: '⚠️ Segnala le tue osservazioni su:',
+        about_happy_text: '🐝 Buona caccia! 🙂', about_instructions: 'Istruzioni: compila le info, cronometra i calabroni, esporta.',
         about_footer_text: '* Connessione Internet richiesta. Segnala bug. ** Maggiori info:',
-        first_name_placeholder: 'Nome',
-        last_name_placeholder: 'Cognome',
-        phone_placeholder: '📞 Telefono',
-        inspector_placeholder: '👤 Ispettore (telemetro)',
-        notes_placeholder: '📝 Note...',
-        location_placeholder: 'Luogo o lat,lng',
-        pot_popup: 'Pot-à-Mèche',
-        oval_tooltip: 'Ovale: 50m×100m',
+        first_name_placeholder: 'Nome', last_name_placeholder: 'Cognome', phone_placeholder: '📞 Telefono',
+        inspector_placeholder: '👤 Ispettore (telemetro)', notes_placeholder: '📝 Note...',
+        location_placeholder: 'Luogo o lat,lng', pot_popup: 'Pot-à-Mèche', oval_tooltip: 'Ovale: 50m×100m',
     }
-    function t(key) { return (translations[currentLang] && translations[currentLang][key]) || key; }
+};
+
+function t(key) { return (translations[currentLang] && translations[currentLang][key]) || key; }
 
 function applyTranslations() {
     var elements = document.querySelectorAll('[data-lang]');
@@ -333,14 +244,8 @@ function applyTranslations() {
     }
 }
 
-function changeLanguage(lang) { 
-    currentLang = lang; 
-    localStorage.setItem('vl', lang); 
-    applyTranslations();
-    renderAll(); 
-    if(map) drawAnalysis(); 
-}
-};
+function changeLanguage(lang) { currentLang = lang; localStorage.setItem('vl', lang); applyTranslations(); renderAll(); if(map) drawAnalysis(); }
+
 // ============ HORNETS ============
 function createHornet(name) { return { id: Date.now()+Math.random(), name: name||'Frelon 1', direction: 0, flights: [], timerRunning: false, timerStart: null, elapsedSeconds: 0 }; }
 function getAvg(h) { if(!h.flights.length) return 0; var s=0; for(var i=0;i<h.flights.length;i++) s+=h.flights[i]; return s/h.flights.length; }
@@ -374,8 +279,8 @@ function resetTimer(id) { var h=hornets.find(function(x){return x.id===id}); if(
 function deleteFlight(hid,idx) { var h=hornets.find(function(x){return x.id===hid}); if(!h||idx<0||idx>=h.flights.length) return; h.flights.splice(idx,1); renderAll(); }
 function addManualTime(id) { var h=hornets.find(function(x){return x.id===id}); if(!h||h.flights.length>=5) return; var inp=document.getElementById('mt_'+id); if(!inp) return; var v=parseInt(inp.value); if(isNaN(v)||v<=0){ alert('Temps invalide'); return; } h.flights.push(v); if(h.flights.length>5) h.flights.shift(); inp.value=''; saveHist(); renderAll(); }
 function deleteHornet(id) { if(hornets.length<=1){ alert('Gardez au moins un frelon.'); return; } hornets=hornets.filter(function(x){return x.id!==id}); delete collapsedCards[id]; renderAll(); }
-function updateDir(id,val){ var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.direction=Math.min(359,Math.max(0,parseInt(val)||0)); saveAll(); if(map) drawAnalysis(); if(!h.timerRunning){ renderAll(); } }
-function updateName(id,val){ var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.name=val||'Frelon'; saveAll(); if(!h.timerRunning){ renderAll(); } }
+function updateDir(id,val) { var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.direction=Math.min(359,Math.max(0,parseInt(val)||0)); saveAll(); if(map) drawAnalysis(); if(!h.timerRunning){ renderAll(); } }
+function updateName(id,val) { var h=hornets.find(function(x){return x.id===id}); if(!h) return; h.name=val||'Frelon'; saveAll(); if(!h.timerRunning){ renderAll(); } }
 function addHornet() { if(hornets.length>=MAX_HORNETS){ alert(t('max_hornets')); return; } hornets.push(createHornet('Frelon '+(hornets.length+1))); renderAll(); }
 
 // ============ LOCATION ============
@@ -389,7 +294,7 @@ function updatePotMarker() { if(!map) return; if(potMarker) map.removeLayer(potM
 function clearMap() { if(!map) return; for(var i=0;i<mapLines.length;i++){ if(map.hasLayer(mapLines[i])) map.removeLayer(mapLines[i]); } mapLines=[]; document.getElementById('predictionPanel').innerHTML='⚠️ '+t('no_flights'); document.getElementById('historyPanel').style.display='none'; }
 function getNestCoordsForHornet(h,loc){ var d=getDist(getAvg(h)); if(d<=0) return null; var rad=(h.direction*Math.PI)/180; var l=loc||surveyLocation; return { lat:l.lat+(d/111320)*Math.cos(rad), lng:l.lng+(d/(111320*Math.cos(l.lat*Math.PI/180)))*Math.sin(rad), distance:d, direction:h.direction }; }
 function getNestCoords(h){ return getNestCoordsForHornet(h,surveyLocation); }
-function createOval(center,dirDeg){ var pts=[]; var hw=50,hh=25; var dirRad=(dirDeg*Math.PI)/180; var perpRad=dirRad+Math.PI/2; for(var i=0;i<64;i++){ var angle=(i/64)*2*Math.PI; var rx=hh*Math.cos(angle); var ry=hw*Math.sin(angle); pts.push(L.latLng(center.lat+(rx/111320)*Math.cos(dirRad)-(ry/111320)*Math.cos(perpRad), center.lng+(rx/(111320*Math.cos(center.lat*Math.PI/180)))*Math.sin(dirRad)-(ry/(111320*Math.cos(center.lat*Math.PI/180)))*Math.sin(perpRad))); } return pts; }
+function createOval(center,dirDeg){ var pts=[]; var hw=100,hh=50; var dirRad=(dirDeg*Math.PI)/180; var perpRad=dirRad+Math.PI/2; for(var i=0;i<64;i++){ var angle=(i/64)*2*Math.PI; var rx=hh*Math.cos(angle); var ry=hw*Math.sin(angle); pts.push(L.latLng(center.lat+(rx/111320)*Math.cos(dirRad)-(ry/111320)*Math.cos(perpRad), center.lng+(rx/(111320*Math.cos(center.lat*Math.PI/180)))*Math.sin(dirRad)-(ry/(111320*Math.cos(center.lat*Math.PI/180)))*Math.sin(perpRad))); } return pts; }
 
 function drawAnalysis(histData){
     if(!map) return;
@@ -398,17 +303,16 @@ function drawAnalysis(histData){
     for(var idx=0;idx<hornets.length;idx++){ var h=hornets[idx]; if(!h.flights.length) continue; var nd=getNestCoordsForHornet(h,surveyLocation); if(!nd) continue; var pot=L.latLng(surveyLocation.lat,surveyLocation.lng); var nestPt=L.latLng(nd.lat,nd.lng);
         mapLines.push(L.polyline([pot,nestPt],{color:COLORS[idx%7],weight:3,dashArray:'5,5'}).addTo(map));
         mapLines.push(L.polygon(createOval(nestPt,nd.direction),{color:COLORS[idx%7],fillOpacity:0.15,weight:1.5,dashArray:'4,4'}).addTo(map));
-        var m=L.circleMarker(nestPt,{radius:7,color:COLORS[idx%7],fillOpacity:0.7}).addTo(map); m.bindPopup('<b>'+h.name+'</b><br>~'+nd.distance.toFixed(0)+'m<br>🧭 '+h.direction+'°<br>⬭ '+t('oval_tooltip'));
+        var m=L.circleMarker(nestPt,{radius:7,color:COLORS[idx%7],fillOpacity:0.7}).addTo(map); m.bindPopup('<b>'+h.name+'</b><br>~'+nd.distance.toFixed(0)+'m<br>🧭 '+h.direction+'°<br>⬭ '+t('oval_tooltip')); mapLines.push(m);
         preds.push({name:h.name,point:nestPt,dist:nd.distance,direction:h.direction});
     }
     if(histData&&histData.length){ for(var ei=0;ei<histData.length;ei++){ var e=histData[ei]; if(!e.location||!e.hornets) continue; var hl=e.location,hp=L.latLng(hl.lat,hl.lng); var hpi=L.divIcon({html:'📍',iconSize:[20,20],iconAnchor:[10,10],className:''}); var hpm=L.marker([hl.lat,hl.lng],{icon:hpi,opacity:0.7}).addTo(map); hpm.bindPopup('<b>'+t('hist_pot')+'</b><br>📅 '+new Date(e.date).toLocaleDateString()); mapLines.push(hpm);
         for(var hi=0;hi<e.hornets.length;hi++){ var hh=e.hornets[hi]; if(!hh.flights||!hh.flights.length) continue; var avg=0; for(var fi=0;fi<hh.flights.length;fi++) avg+=hh.flights[fi]; avg=avg/hh.flights.length; var dm=(avg-30)*2.5; if(dm<=0) continue; var dr=(hh.direction*Math.PI)/180; var nh=L.latLng(hl.lat+(dm/111320)*Math.cos(dr),hl.lng+(dm/(111320*Math.cos(hl.lat*Math.PI/180)))*Math.sin(dr));
         mapLines.push(L.polyline([hp,nh],{color:'#999',weight:2,dashArray:'3,7',opacity:0.6}).addTo(map));
         mapLines.push(L.polygon(createOval(nh,hh.direction),{color:'#999',fillOpacity:0.08,weight:1,dashArray:'3,5',opacity:0.5}).addTo(map));
-        var hm=L.circleMarker(nh,{radius:4,color:'#888',fillOpacity:0.5,weight:1}).addTo(map); hm.bindPopup('<b>Hist: '+hh.name+'</b><br>📅 '+new Date(e.date).toLocaleDateString()+'<br>⬭ 50m×100m'); mapLines.push(hm);
+        var hm=L.circleMarker(nh,{radius:4,color:'#888',fillOpacity:0.5,weight:1}).addTo(map); hm.bindPopup('<b>Hist: '+hh.name+'</b><br>📅 '+new Date(e.date).toLocaleDateString()+'<br>⬭ '+t('oval_tooltip')); mapLines.push(hm);
     }}}
-    // NO STAR - removed priority zone marker
-    document.getElementById('predictionPanel').innerHTML=preds.length?'🔍 'i+preds.map(function(p){return p.name+' → ~'+p.dist.toFixed(0)+'m'}).join(' · '):'⚠️ '+t('no_flights');
+    document.getElementById('predictionPanel').innerHTML=preds.length?'🔍 '+preds.map(function(p){return p.name+' → ~'+p.dist.toFixed(0)+'m'}).join(' · '):'⚠️ '+t('no_flights');
 }
 
 function showHistory(){ var recent=getHist().filter(function(e){return new Date(e.date)>new Date(Date.now()-60*24*60*60*1000)}); drawAnalysis(recent); var panel=document.getElementById('historyPanel'); panel.style.display='block'; panel.innerHTML=recent.length?recent.reverse().map(function(e){return '<div class="history-item"><strong>📅 '+new Date(e.date).toLocaleDateString()+'</strong><br>📍 '+(e.location&&e.location.name?e.location.name:'?')+' | 🐝 '+(e.hornets?e.hornets.filter(function(h){return h.flights&&h.flights.length}).length:0)+' vols</div>'}).join(''):'<div class="history-item">📭 '+t('history_empty')+'</div>'; }
@@ -471,33 +375,13 @@ function renderAll(){
 }
 
 // ============ LIVE UPDATE ============
-setInterval(function(){ 
-    var anyRunning = false;
-    for(var i=0; i<hornets.length; i++){
-        var h = hornets[i];
-        if(h.timerRunning && h.timerStart){
-            anyRunning = true;
-            var s = Math.floor((Date.now() - h.timerStart) / 1000);
-            var timerText = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
-            // Update timer displays WITHOUT full re-render
-            var cards = document.querySelectorAll('.hornet-card');
-            if(cards[i]){
-                var displays = cards[i].querySelectorAll('.timer-display');
-                for(var d=0; d<displays.length; d++){
-                    displays[d].textContent = timerText;
-                }
-            }
-        }
-    }
-    document.getElementById('liveBanner').style.display = anyRunning ? 'block' : 'none';
-    document.getElementById('datetime').textContent = new Date().toLocaleString(); 
-}, 200);
-    
+setInterval(function(){ if(hornets.some(function(h){return h.timerRunning})) renderAll(); document.getElementById('datetime').textContent=new Date().toLocaleString(); },500);
+
 // ============ AUTO-UPDATE SW ============
 if('serviceWorker' in navigator){ var refreshing=false; navigator.serviceWorker.addEventListener('controllerchange',function(){ if(!refreshing){ refreshing=true; window.location.reload(); } }); window.addEventListener('load',function(){ navigator.serviceWorker.register('service-worker.js').catch(function(){}); }); setInterval(function(){ navigator.serviceWorker.getRegistration().then(function(reg){ if(reg) reg.update(); }); },300000); }
 
 // ============ BOOT ============
-function boot(){ loadAll(); renderAll(); setTimeout(initMap,500); }
+function boot(){ loadAll(); applyTranslations(); renderAll(); setTimeout(initMap,500); }
 if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',boot); } else { boot(); }
 document.getElementById('aboutModal').addEventListener('click',function(e){ if(e.target===this) closeAbout(); });
 </script>
